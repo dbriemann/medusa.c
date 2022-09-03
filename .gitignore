@@ -1,2 +1,3 @@
-medusa
+bin/
 .ccls-cache
+*.o

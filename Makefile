@@ -1,3 +1,5 @@
 
-all:
-	clang -o medusa main.c 
+medusa:
+	clang -o bin/medusa main.c 
+
+all: medusa
