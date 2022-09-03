@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
-	printf("hi world\n");
-
+    void *p = malloc(100);
+    printf("hi world\n");
+    return 0;
 }
