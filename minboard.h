@@ -8,7 +8,7 @@
 
 typedef struct MinBoard MinBoard;
 struct MinBoard {
-	Piece squares[64] = { EMPTY };	
+	Piece squares[64];
 	Color color;
 	bool castle_short[2];
 	bool castle_long[2];
@@ -18,6 +18,7 @@ struct MinBoard {
 	uint16_t move_num;
 };
 
-// TODO needs init of "squares" with EMPTY
+// Methods:
+MinBoard MinBoard__create();
 
 #endif
