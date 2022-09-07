@@ -5,7 +5,7 @@ medusa:
 .PHONY: test
 test:
 	clang -o bin/test test/main.c munit/munit.c fen.c minboard.c
-	./bin/test
+	./bin/test --log-visible warning
 
 clean:
 	rm bin/*

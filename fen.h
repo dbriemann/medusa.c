@@ -2,4 +2,4 @@
 #include "minboard.h"
 
 bool parse_fen(char [static 100], MinBoard *);
-bool parse_fen_pieces(char [static 15], Piece [64]);
+bool fen_parse_pieces(char [static 15], Piece [64]);
