@@ -12,21 +12,23 @@ bool parse_fen(char fen[static 100], MinBoard *mb) {
     // Group 1 : pieces
 
     // strpos = strtok(0, group_delim);
+    return false;
 }
 
-bool parse_fen_pieces(char fen[static 15], Piece* squares[64]) {
+bool parse_fen_pieces(char fen[static 15], Piece squares[64]) {
     char pos = 0;
-    // Since FEN has different rank order than MinBoard,
-    // boardpos starts at field a8: see MinBoard doc.
-    size_t boardpos = 56;
+    size_t boardpos = 0;
     while (fen[pos] != 0) {
         char token = fen[pos];
         // Check if strpos hold 1-8 (number of continues empty fields).
         if (token >= '1' && token <= '8') {
-            int amount = token - 48;
-            for (size_t i = 0; i < amount; i++) {
+            int empty_fields = token - '0';
+            for (size_t i = 0; i < empty_fields; i++) {
                 squares[boardpos] = EMPTY;
+                boardpos++;
             }
+            pos++;
+            continue;
         } else {
             // Else detect the piece type.
             switch (token) {
@@ -68,9 +70,8 @@ bool parse_fen_pieces(char fen[static 15], Piece* squares[64]) {
             case 'k':
                 squares[boardpos] = BKING;
                 break;
-            // Nex fen group.
-            case '/':
-                // This is handled after the switch case so we can detect token error in 'default'.
+            case '/': // Indicates next rank.
+                // We can ignore the / because the FEN string should fill the ranks correctly.
                 break;
             // Unknown character (invalid FEN).
             default:
@@ -79,22 +80,21 @@ bool parse_fen_pieces(char fen[static 15], Piece* squares[64]) {
             }
         }
 
-        if(token == '/') {
-            // Check if FEN completed the board.
-            if(boardpos != 7) {
-                // Only if the boardpos ends at 7 (h1) we assigned all fields with a value.
-                return false;
-            }
-            // This is a success.. advance to next fen section.
-            break; // while loop
+        // Check if FEN completed the board.
+        if(boardpos == 63) {
+            return true;
         }
 
-        // Else we continue to next token in pieces group.
-        boardpos++;
-        // If we reach the end of a rank we need to wrap around in towards the
-        // "bottom". E.g. field h8 wraps to a7, h7 to a6, etc...
-        if (boardpos % 8 == 0) {
-            boardpos -= 8;
+        pos++;
+
+        if(token == '/') {
+            continue;
         }
+
+        boardpos++;
     }
+
+    // TODO: mirror ranks to have layout that fits engine board layout.
+
+    return true;
 }
