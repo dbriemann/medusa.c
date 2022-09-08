@@ -54,7 +54,7 @@ debug: $(DEBUG_DIR) $(DEBUG_EXE)
 
 test: $(TEST_DIR) $(TEST_EXE)
 	# TODO: improve coverage reporting: https://llvm.org/docs/CommandGuide/llvm-cov.html
-	LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test
+	LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test --log-visible info --show-stderr
 	llvm-profdata merge -sparse cov/medusa.profraw -o cov/medusa.profdata
 	llvm-cov show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/line.report
 	llvm-cov report $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/summary.report

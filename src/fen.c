@@ -13,7 +13,6 @@ bool parse_fen(char fen[static 100], MinBoard *mb) {
 	// TODO:
 	// bool ok = fen_parse_pieces(strpos, *mb->squares);
 
-
 	// strpos = strtok(0, group_delim);
 	return false;
 }
@@ -35,8 +34,9 @@ bool parse_fen(char fen[static 100], MinBoard *mb) {
 	 +-----------------
 */
 bool fen_parse_pieces(char fen[static 15], Piece squares[64]) {
-	char   pos		= 0;
+	size_t pos		= 0;
 	size_t boardpos = 0;
+
 	while(fen[pos] != 0) {
 		char token = fen[pos];
 		// Check if strpos hold 1-8 (number of continues empty fields).
@@ -73,18 +73,23 @@ bool fen_parse_pieces(char fen[static 15], Piece squares[64]) {
 			}
 		}
 
+		pos++;
+		if(token != '/') {
+			boardpos++;
+		} else {
+			// If boardpos is not on file 1 after rank break, the fen is malformed.
+			if(boardpos % 8) {
+				return false;
+			}
+		}
+
 		// Check if FEN completed the board.
-		if(boardpos == 63) {
+		if(boardpos == 64) {
+			if(pos < strlen(fen)) {
+				return false;
+			}
 			break;
 		}
-
-		pos++;
-
-		if(token == '/') {
-			continue;
-		}
-
-		boardpos++;
 	}
 
 	/*
