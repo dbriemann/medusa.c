@@ -3,7 +3,7 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "../munit/munit.h"
 
-#include "../fen.h"
+#include "../src/fen.h"
 
 static MunitResult test_fen_parse_pieces_start_pos(const MunitParameter params[], void *data) {
 	Piece result[64];
