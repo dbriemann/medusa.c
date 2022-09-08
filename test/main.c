@@ -103,12 +103,33 @@ static MunitResult test_fen_parse_pieces(const MunitParameter params[], void *da
 }
 
 static MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *data) {
-	// TODO
+	Color c;
+	
+	munit_log(MUNIT_LOG_INFO, "testcase: color string is black: \"b\" (valid)");
+	bool ok = fen_parse_color_to_move("b", &c);
+	munit_assert_int(true, ==, ok);
+	munit_assert_int(BLACK, ==, c);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: color string is white: \"w\" (valid)");
+	ok = fen_parse_color_to_move("w", &c);
+	munit_assert_int(true, ==, ok);
+	munit_assert_int(WHITE, ==, c);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: color string is empty: \"\" (invalid)");
+	ok = fen_parse_color_to_move("", &c);
+	munit_assert_int(false, ==, ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: color string is too long: \"bw\" (invalid)");
+	ok = fen_parse_color_to_move("bw", &c);
+	munit_assert_int(false, ==, ok);
+
+	return MUNIT_OK;
 }
 
 // Test suite is array of tests.
 static MunitTest test_fen_suite[] = {
 	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
  // End of tests.
 	{			 0,					 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0}

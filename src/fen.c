@@ -27,17 +27,6 @@ bool parse_fen(char fen[static 100], MinBoard *mb) {
 	return false;
 }
 
-bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
-	if(strlen(fen) != 1) {
-		return false;
-	}
-	switch(fen[0]) {
-	case 'b': *color = BLACK; return true;
-	case 'w': *color = WHITE; return true;
-	default: return false;
-	}
-}
-
 /**
 	Parses the first FEN group which represents the pieces on the board.
 	Stores the result in 'squares' which has the following layout:
@@ -136,3 +125,15 @@ bool fen_parse_pieces(char fen[static 15], Piece squares[64]) {
 
 	return true;
 }
+
+bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
+	if(strlen(fen) != 1) {
+		return false;
+	}
+	switch(fen[0]) {
+	case 'b': *color = BLACK; return true;
+	case 'w': *color = WHITE; return true;
+	default: return false;
+	}
+}
+
