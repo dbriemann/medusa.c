@@ -1,20 +1,41 @@
 #include <string.h>
 
+#include "base.h"
+#include "fen.h"
 #include "minboard.h"
 
 bool parse_fen(char fen[static 100], MinBoard *mb) {
 	char group_delim[] = " "; // Spaces splits fen into 6 groups.
 
+	// Group 1 : pieces
 	char *strpos = strtok(fen, group_delim);
 	if(strpos == 0) {
 		return false;
 	}
-	// Group 1 : pieces
-	// TODO:
-	// bool ok = fen_parse_pieces(strpos, *mb->squares);
+	bool ok = fen_parse_pieces(strpos, mb->squares);
+	if(!ok) {
+		return false;
+	}
+
+	// Group 2 : color to move
+	strpos = strtok(fen, group_delim);
+	if(strpos == 0) {
+		return false;
+	}
 
 	// strpos = strtok(0, group_delim);
 	return false;
+}
+
+bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
+	if(strlen(fen) != 1) {
+		return false;
+	}
+	switch(fen[0]) {
+	case 'b': *color = BLACK; return true;
+	case 'w': *color = WHITE; return true;
+	default: return false;
+	}
 }
 
 /**

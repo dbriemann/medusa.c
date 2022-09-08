@@ -102,6 +102,10 @@ static MunitResult test_fen_parse_pieces(const MunitParameter params[], void *da
 	return MUNIT_OK;
 }
 
+static MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *data) {
+	// TODO
+}
+
 // Test suite is array of tests.
 static MunitTest test_fen_suite[] = {
 	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
