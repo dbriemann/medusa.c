@@ -2,6 +2,7 @@ CC=clang
 
 SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))
+TEST_SOURCES=$(wildcard test/*.c)
 
 DEBUG_CFLAGS=-Wall
 DEBUG_DIR=bin/debug
@@ -11,6 +12,7 @@ DEBUG_EXE=$(DEBUG_DIR)/medusa
 TEST_CFLAGS=-Wall -fprofile-instr-generate -fcoverage-mapping
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
+TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
 TEST_EXE=$(TEST_DIR)/test
 
 RELEASE_CFLAGS=-Wall # TODO
@@ -25,8 +27,9 @@ $(DEBUG_EXE): $(DEBUG_OBJECTS)
 	$(CC) $(DEBUG_CFLAGS) -o $(DEBUG_EXE) $(DEBUG_OBJECTS)
 
 # Testing with coverage reports
-$(TEST_DIR)/main.o: test/main.c 
-	$(CC) $(DEBUG_CFLAGS) -c test/main.c -o $(TEST_DIR)/main.o
+$(TEST_SRC_OBJECTS): $(TEST_DIR)/%.o : test/%.c
+	# Don't use coverage flags here.
+	$(CC) $(DEBUG_CFLAGS) -c $< -o $@
 
 $(TEST_DIR)/munit.o: munit/munit.c 
 	# Don't use coverage flags here.
@@ -35,8 +38,8 @@ $(TEST_DIR)/munit.o: munit/munit.c
 $(TEST_OBJECTS): $(TEST_DIR)/%.o : src/%.c
 	$(CC) $(TEST_CFLAGS) -c $< -o $@
 
-$(TEST_EXE): $(TEST_OBJECTS) $(TEST_DIR)/main.o $(TEST_DIR)/munit.o
-	$(CC) $(TEST_CFLAGS) -o $(TEST_EXE) $(TEST_OBJECTS) $(TEST_DIR)/main.o $(TEST_DIR)/munit.o
+$(TEST_EXE): $(TEST_OBJECTS) $(TEST_SRC_OBJECTS) $(TEST_DIR)/munit.o
+	$(CC) $(TEST_CFLAGS) -o $(TEST_EXE) $(TEST_OBJECTS) $(TEST_SRC_OBJECTS) $(TEST_DIR)/munit.o
 
 # Directories for builds
 $(DEBUG_DIR): 

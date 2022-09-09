@@ -137,3 +137,30 @@ bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
 	}
 }
 
+bool fen_parse_castling_rights(const char fen[static 1], bool oo[2], bool ooo[2]) {
+	if(strlen(fen) < 1 || strlen(fen) > 4) {
+		return false;
+	}
+	size_t pos = 0;
+	if(strlen(fen) == 1) {
+		if(fen[pos] == '-') {
+			// No more castling permitted.
+			oo[WHITE]  = false;
+			oo[BLACK]  = false;
+			ooo[WHITE] = false;
+			ooo[BLACK] = false;
+			return true;
+		}
+	}
+	while(fen[pos] != 0) {
+		switch(fen[pos]) {
+		case 'K': oo[WHITE] = true; break;
+		case 'Q': ooo[WHITE] = true; break;
+		case 'k': oo[BLACK] = true; break;
+		case 'q': ooo[BLACK] = true; break;
+		default: return false;
+		}
+		pos++;
+	}
+	return true;
+}
