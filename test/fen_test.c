@@ -7,7 +7,7 @@
 
 MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 	const FenParsePiecesTestCase testcases[] = {
-	// clang-format off
+		// clang-format off
 		{
 			.name 			 = "Starting position (valid)",
 			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
@@ -71,7 +71,7 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 			.expected_success = false,
 			.expected_pieces = {},
 		},
-	// clang-format on
+		// clang-format on
 	};
 	Piece output[64];
 
@@ -121,12 +121,54 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *da
 MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *data) {
 	const FenParseCastlingRightsTestCase testcases[] = {
 		{
-			.name			  = "KQkq (valid)",
+			.name			  = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
 			.input_fen		  = "KQkq",
 			.expected_success = true,
 			.expected_oo	  = {true, true},
 			.expected_ooo	  = {true, true},
-		 },
+		},
+		{
+			.name			  = "White: 0-0, 0-0-0 (valid)",
+			.input_fen		  = "KQ",
+			.expected_success = true,
+			.expected_oo	  = {false, true},
+			.expected_ooo	  = {false, true},
+		},
+		{
+			.name			  = "White: 0-0, 0-0-0 (valid)",
+			.input_fen		  = "kq",
+			.expected_success = true,
+			.expected_oo	  = {true, false},
+			.expected_ooo	  = {true, false},
+		},
+		{
+			.name			  = "White: 0-0-0, Black: 0-0 (valid)",
+			.input_fen		  = "Qk", // reversed notation is accepted in medusa.
+			.expected_success = true,
+			.expected_oo	  = {true, false},
+			.expected_ooo	  = {false, true},
+		},
+		{
+			.name			  = "Empty string (invalid)",
+			.input_fen		  = "",
+			.expected_success = false,
+			.expected_oo	  = {},
+			.expected_ooo	  = {},
+		},
+		{
+			.name			  = "White: 0-0, unknown char (invalid)",
+			.input_fen		  = "Qx",
+			.expected_success = false,
+			.expected_oo	  = {},
+			.expected_ooo	  = {},
+		},
+		{
+			.name			  = "Too many chars (invalid)",
+			.input_fen		  = "KQkqK",
+			.expected_success = false,
+			.expected_oo	  = {},
+			.expected_ooo	  = {},
+		},
 	};
 
 	const size_t len = sizeof(testcases) / sizeof(FenParseCastlingRightsTestCase);
@@ -156,10 +198,131 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *
 	return MUNIT_OK;
 }
 
-MunitTest test_fen_suite[] = {
-	{		 "parse_pieces",			 test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{	 "parse_color_to_move",	test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) {
+	const char *valid_squares[64] = {
+		// clang-format off
+		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+		"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+		// clang-format on
+	};
+	const Square valid_squares_index[64] = {
+		// clang-format off
+		56, 57, 58, 59, 60, 61, 62, 63,
+		48, 49, 50, 51, 52, 53, 54, 55,
+		40, 41, 42, 43, 44, 45, 46, 47,
+		32, 33, 34, 35, 36, 37, 38, 39,
+		24, 25, 26, 27, 28, 29, 30, 31,
+		16, 17, 18, 19, 20, 21, 22, 23,
+		 8,  9, 10, 11, 12, 13, 14, 15,
+		 0,  1,  2,  3,  4,  5,  6,  7,
+		// clang-format on
+	};
 
-	{					  0,							  0, 0, 0, MUNIT_TEST_OPTION_NONE, 0}
+	munit_log(MUNIT_LOG_INFO, "testcase: all squares on board (valid)");
+	Square sq;
+	for(int i = 0; i < 64; i++) {
+		bool ok = fen_square_to_index(valid_squares[i], &sq);
+		munit_assert_true(ok);
+
+		if(ok) {
+			munit_assert_int(valid_squares_index[i], ==, sq);
+		}
+	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: fantasy squares (invalid)");
+	size_t		len				  = 6;
+	const char *fantasy_squares[] = {"a0", "l8", "c9", "i2", "zz", "33"};
+	for(int i = 0; i < len; i++) {
+		bool ok = fen_square_to_index(fantasy_squares[i], &sq);
+		munit_assert_false(ok);
+	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
+// Disable bounds check for this test.. should be handled by function.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
+	bool ok = fen_square_to_index("", &sq);
+#pragma clang diagnostic pop
+	munit_assert_false(ok);
+	ok = fen_square_to_index("a88", &sq);
+	munit_assert_false(ok);
+
+	return MUNIT_OK;
+}
+
+MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) {
+	const char *valid_squares[16] = {
+		// clang-format off
+		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+		// clang-format on
+	};
+
+	const Square valid_squares_index[16] = {
+		// clang-format off
+		40, 41, 42, 43, 44, 45, 46, 47,
+		16, 17, 18, 19, 20, 21, 22, 23,
+		// clang-format on
+	};
+
+	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 3 and 6 (valid)");
+	Square sq;
+	for(int i = 0; i < 16; i++) {
+		bool ok = fen_parse_ep_square(valid_squares[i], &sq);
+		munit_assert_true(ok);
+
+		if(ok) {
+			munit_assert_int(valid_squares_index[i], ==, sq);
+		}
+	}
+
+	const char *invalid_squares[48] = {
+		// clang-format off
+		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+		"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+		// clang-format on
+	};
+
+	munit_log(MUNIT_LOG_INFO, "testcase: no ep square (valid)");
+	bool ok = fen_parse_ep_square("-", &sq);
+	munit_assert_true(ok);
+	munit_assert_int(OTB, ==, sq);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 1,2,4,5,7,8 (invalid)");
+	for(int i = 0; i < 48; i++) {
+		bool ok = fen_parse_ep_square(invalid_squares[i], &sq);
+		munit_assert_false(ok);
+	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
+// Disable bounds check for this test.. should be handled by function.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
+	ok = fen_parse_ep_square("", &sq);
+#pragma clang diagnostic pop
+	munit_assert_false(ok);
+	ok = fen_parse_ep_square("xx8", &sq);
+	munit_assert_false(ok);
+
+	return MUNIT_OK;
+}
+
+MunitTest test_fen_suite[] = {
+	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+
+	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

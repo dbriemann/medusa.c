@@ -49,10 +49,10 @@ bool fen_parse_pieces(char fen[static 15], Piece squares[64]) {
 
 	while(fen[pos] != 0) {
 		char token = fen[pos];
-		// Check if strpos hold 1-8 (number of continues empty fields).
+		// Check if strpos hold 1-8 (number of continues empty squares).
 		if(token >= '1' && token <= '8') {
-			int empty_fields = token - '0';
-			for(size_t i = 0; i < empty_fields; i++) {
+			int empty_squares = token - '0';
+			for(size_t i = 0; i < empty_squares; i++) {
 				squares[boardpos] = EMPTY;
 				boardpos++;
 			}
@@ -142,15 +142,15 @@ bool fen_parse_castling_rights(const char fen[static 1], bool oo[2], bool ooo[2]
 		return false;
 	}
 	size_t pos = 0;
-	if(strlen(fen) == 1) {
-		if(fen[pos] == '-') {
-			// No more castling permitted.
-			oo[WHITE]  = false;
-			oo[BLACK]  = false;
-			ooo[WHITE] = false;
-			ooo[BLACK] = false;
-			return true;
-		}
+	// Init all with false.
+	oo[WHITE]  = false;
+	oo[BLACK]  = false;
+	ooo[WHITE] = false;
+	ooo[BLACK] = false;
+	if(strlen(fen) == 1 && fen[pos] == '-') {
+		// No more castling permitted.
+		// Just use default from above.
+		return true;
 	}
 	while(fen[pos] != 0) {
 		switch(fen[pos]) {
@@ -163,4 +163,42 @@ bool fen_parse_castling_rights(const char fen[static 1], bool oo[2], bool ooo[2]
 		pos++;
 	}
 	return true;
+}
+
+bool fen_square_to_index(const char fensq[static 2], Square *sq) {
+	*sq = OTB;
+	if(strlen(fensq) != 2) {
+		return false;
+	}
+	char r = fensq[0];
+	if(r < 'a' || r > 'h') {
+		return false;
+	}
+	char f = fensq[1];
+	if(f < '1' || f > '8') {
+		return false;
+	}
+	char rank = r - 'a';
+	char file = f - '1';
+
+	*sq = rank+file*8;
+	return true;
+}
+
+bool fen_parse_ep_square(const char fen[static 1], Square *sq) {
+	*sq = OTB;
+	if(strlen(fen) == 1 && fen[0] == '-') {
+		return true;
+	}
+
+	if(strlen(fen) != 2) {
+		return false;
+	}
+
+	// Only rank 3 and 6 can have valid ep squares.
+	if(fen[1] != '3' && fen[1] != '6') {
+		return false;
+	}
+	
+	return fen_square_to_index(fen, sq);
 }
