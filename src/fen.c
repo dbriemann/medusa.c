@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "base.h"
 #include "fen.h"
@@ -202,3 +203,25 @@ bool fen_parse_ep_square(const char fen[static 1], Square *sq) {
 	
 	return fen_square_to_index(fen, sq);
 }
+
+bool fen_parse_half_move_clock(const char fen[static 1], size_t *num) {
+	// Half move counter can be 0.
+	char *endptr = 0;
+	unsigned long ul = strtoul(fen, &endptr, 10);
+	if(endptr && *endptr != '\0') {
+		return false;
+	}
+	*num = (size_t)ul;
+	return true;
+}
+
+bool fen_parse_move_number(const char fen[static 1], size_t *num) {
+	// TODO: maximum game length?
+	bool ok = fen_parse_half_move_clock(fen, num);
+	// Moves start at 1.
+	if(!ok || *num == 0) {
+		return false;
+	}
+	return true;
+}
+

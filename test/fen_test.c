@@ -317,12 +317,79 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 	return MUNIT_OK;
 }
 
+MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data) {
+	size_t num;
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
+	bool ok = fen_parse_move_number("1", &num);
+	munit_assert_true(ok);
+	munit_assert_int(1, ==, num);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 666 (valid)");
+	ok = fen_parse_move_number("666", &num);
+	munit_assert_true(ok);
+	munit_assert_int(666, ==, num);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 0 (invalid)");
+	ok = fen_parse_move_number("0", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"22c\" (invalid)");
+	ok = fen_parse_move_number("22c", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"x44\" (invalid)");
+	ok = fen_parse_move_number("x44", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is hex number: \"0xEE\" (invalid)");
+	ok = fen_parse_move_number("0xEE", &num);
+	munit_assert_false(ok);
+
+	return MUNIT_OK;
+}
+
+MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *data) {
+	size_t num;
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
+	bool ok = fen_parse_half_move_clock("1", &num);
+	munit_assert_true(ok);
+	munit_assert_int(1, ==, num);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 666 (valid)");
+	ok = fen_parse_half_move_clock("666", &num);
+	munit_assert_true(ok);
+	munit_assert_int(666, ==, num);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: move number 0 (valid)");
+	ok = fen_parse_half_move_clock("0", &num);
+	munit_assert_true(ok);
+	munit_assert_int(0, ==, num);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"22c\" (invalid)");
+	ok = fen_parse_half_move_clock("22c", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"x44\" (invalid)");
+	ok = fen_parse_half_move_clock("x44", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: string is hex number: \"0xEE\" (invalid)");
+	ok = fen_parse_half_move_clock("0xEE", &num);
+	munit_assert_false(ok);
+
+	return MUNIT_OK;
+}
+
 MunitTest test_fen_suite[] = {
 	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"fen_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"fen_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen_move_number", test_fen_parse_move_number, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen_half_move_clock", test_fen_parse_half_move_clock, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

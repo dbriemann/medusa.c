@@ -28,6 +28,8 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter[], void *);
 MunitResult test_fen_parse_castling_rights(const MunitParameter[], void *);
 MunitResult test_fen_square_to_index(const MunitParameter[], void *);
 MunitResult test_fen_parse_ep_square(const MunitParameter[], void *);
+MunitResult test_fen_parse_move_number(const MunitParameter[], void *);
+MunitResult test_fen_parse_half_move_clock(const MunitParameter[], void *);
 
 extern MunitTest test_fen_suite[];
 
