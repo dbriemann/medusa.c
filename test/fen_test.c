@@ -1,3 +1,4 @@
+#include <string.h>
 
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "../munit/munit.h"
@@ -85,7 +86,6 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 
 		if(ok) {
 			for(size_t i = 0; i < 64; i++) {
-				// munit_logf(MUNIT_LOG_WARNING, "%zu: %d / %d", i, target[i], result[i]);
 				munit_assert_int(testcases[tc].expected_pieces[i], ==, output[i]);
 			}
 		}
@@ -318,7 +318,7 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 }
 
 MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data) {
-	size_t num;
+	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
 	bool ok = fen_parse_move_number("1", &num);
@@ -350,7 +350,7 @@ MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data
 }
 
 MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *data) {
-	size_t num;
+	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
 	bool ok = fen_parse_half_move_clock("1", &num);
@@ -382,14 +382,59 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *
 	return MUNIT_OK;
 }
 
+MunitResult test_parse_fen(const MunitParameter params[], void *data) {
+	ParseFenTestCase testcases[] = {
+		{
+			.name = "Start position",
+			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+			.expected_success = true,
+			.expected_mb = {
+				.color = WHITE,
+				.castle_short = {true, true},
+				.castle_long = {true, true},
+				.ep_square = OTB,
+			},
+		},
+	};
+
+	MinBoard out_board;
+
+	const size_t len = sizeof(testcases) / sizeof(ParseFenTestCase);
+
+	for(size_t tc = 0; tc < len; tc++) {
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		char *cpy = strdup(testcases[tc].input_fen);
+		bool ok = parse_fen(cpy, &out_board);
+		free(cpy);
+		munit_assert_int(testcases[tc].expected_success, ==, ok);
+
+		if(ok) {
+			const MinBoard *emb = &testcases[tc].expected_mb;
+			munit_assert_int(emb->color, ==, out_board.color);
+			for(size_t i = BLACK; i <= WHITE; i++) {
+				munit_assert_int(emb->castle_short[i], ==, out_board.castle_short[i]);
+				munit_assert_int(emb->castle_long[i], ==, out_board.castle_long[i]);
+			}
+			munit_assert_int(emb->ep_square, ==, out_board.ep_square);
+			for(size_t i = 0; i < 64; i++) {
+				munit_assert_int(emb->squares[i], ==, out_board.squares[i]);
+			}
+		}
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_fen_suite[] = {
 	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"fen_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"fen_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"fen_move_number", test_fen_parse_move_number, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"fen_half_move_clock", test_fen_parse_half_move_clock, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_move_number", test_fen_parse_move_number, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_half_move_clock", test_fen_parse_half_move_clock, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"parse_fen", test_parse_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

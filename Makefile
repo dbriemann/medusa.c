@@ -1,15 +1,16 @@
+# TODO compiler..
 CC=clang
 
 SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))
 TEST_SOURCES=$(wildcard test/*.c)
 
-DEBUG_CFLAGS=-Wall
+DEBUG_CFLAGS=-Wall -g -O0
 DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_EXE=$(DEBUG_DIR)/medusa
 
-TEST_CFLAGS=-Wall -fprofile-instr-generate -fcoverage-mapping
+TEST_CFLAGS=-Wall -fprofile-instr-generate -fcoverage-mapping -g -O0
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
