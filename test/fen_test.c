@@ -389,10 +389,45 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 			.expected_success = true,
 			.expected_mb = {
+				.squares = {
+					WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
+					WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,
+					BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,
+				},
 				.color = WHITE,
 				.castle_short = {true, true},
 				.castle_long = {true, true},
+				.half_moves = 0,
+				.move_num = 1,
 				.ep_square = OTB,
+			},
+		},
+		{
+			.name = "Ep passent & no castles",
+			.input_fen		 = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
+			.expected_success = true,
+			.expected_mb = {
+				.squares = {
+					WROOK, EMPTY, WBISHOP, WQUEEN, EMPTY, WBISHOP, WKNIGHT, WROOK,
+					WPAWN, WPAWN, WPAWN, WPAWN, WKING, WPAWN, WPAWN, WPAWN,
+					EMPTY, EMPTY, WKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, BPAWN, BPAWN, WPAWN, EMPTY, EMPTY, EMPTY, 
+					EMPTY, EMPTY, EMPTY, EMPTY, BPAWN, EMPTY, EMPTY, EMPTY, 
+					BPAWN, BPAWN, EMPTY, EMPTY, BKING, BPAWN, BPAWN, BPAWN,
+					BROOK, BKNIGHT, BBISHOP, BQUEEN, EMPTY, BBISHOP, BKNIGHT, BROOK,
+				},
+				.color = WHITE,
+				.castle_short = {false, false},
+				.castle_long = {false, false},
+				.half_moves = 0,
+				.move_num = 5,
+				.ep_square = 43,
 			},
 		},
 	};
@@ -417,6 +452,8 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 				munit_assert_int(emb->castle_long[i], ==, out_board.castle_long[i]);
 			}
 			munit_assert_int(emb->ep_square, ==, out_board.ep_square);
+			munit_assert_int(emb->half_moves, ==, out_board.half_moves);
+			munit_assert_int(emb->move_num, ==, out_board.move_num);
 			for(size_t i = 0; i < 64; i++) {
 				munit_assert_int(emb->squares[i], ==, out_board.squares[i]);
 			}
