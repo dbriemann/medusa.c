@@ -10,12 +10,17 @@ DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_EXE=$(DEBUG_DIR)/medusa
 
+GENERATOR_DIR=bin/generator
+GENERATOR_OBJECTS=$(GENERATOR_DIR)/gen.o $(GENERATOR_DIR)/generate.o
+GENERATOR_EXE=$(GENERATOR_DIR)/gen
+
 TEST_CFLAGS=-Wall -fprofile-instr-generate -fcoverage-mapping -g -O0
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
 TEST_EXE=$(TEST_DIR)/test
 
+# TODO: for release only compile sources that are needed (no generators etc)
 RELEASE_CFLAGS=-Wall # TODO
 RELEASE_DIR=bin/release
 RELEASE_EXE=$(RELEASE_DIR)/medusa # TODO
@@ -26,6 +31,15 @@ $(DEBUG_OBJECTS): $(DEBUG_DIR)/%.o : src/%.c
 
 $(DEBUG_EXE): $(DEBUG_OBJECTS)
 	$(CC) $(DEBUG_CFLAGS) -o $(DEBUG_EXE) $(DEBUG_OBJECTS)
+
+# Generator build
+$(GENERATOR_DIR)/gen.o : generators/gen.c 
+	$(CC) $(DEBUG_CFLAGS) -c $< -o $@
+$(GENERATOR_DIR)/generate.o : src/generate.c 
+	$(CC) $(DEBUG_CFLAGS) -c $< -o $@
+
+$(GENERATOR_EXE): $(GENERATOR_OBJECTS)
+	$(CC) $(DEBUG_CFLAGS) -o $(GENERATOR_EXE) $(GENERATOR_OBJECTS)
 
 # Testing with coverage reports
 $(TEST_SRC_OBJECTS): $(TEST_DIR)/%.o : test/%.c
@@ -49,10 +63,14 @@ $(TEST_DIR):
 	@mkdir -p $(TEST_DIR)
 $(RELEASE_DIR): 
 	@mkdir -p $(RELEASE_DIR)
+$(GENERATOR_DIR): 
+	@mkdir -p $(GENERATOR_DIR)
 
 clean:
 	rm -rf ./bin/
 	rm -rf ./cov/
+
+generator: $(GENERATOR_DIR) $(GENERATOR_EXE)
 
 debug: $(DEBUG_DIR) $(DEBUG_EXE)
 
