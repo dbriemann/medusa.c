@@ -3,7 +3,7 @@
 #include "base.h"
 #include "minboard.h"
 
-bool parse_fen(char fen[], MinBoard *mb);
+bool parse_fen(const char fen[], MinBoard *mb);
 bool fen_parse_pieces(const char fen[], Piece squares[64]);
 bool fen_parse_color_to_move(const char fen[], Color *color);
 bool fen_parse_castling_rights(const char fen[], bool oo[2], bool ooo[2]);

@@ -5,75 +5,85 @@
 #include "fen.h"
 #include "minboard.h"
 
-bool parse_fen(char fen[], MinBoard *mb) {
+bool parse_fen(const char fen[], MinBoard *mb) {
 	if(fen == NULL || mb == NULL) {
 		return false;
 	}
 
+	char *cpy = strdup(fen);
+	if(cpy == NULL) {
+		return false;
+	}
+
 	char delim[] = " "; // Spaces splits fen into 6 groups.
+	bool success = false;
 
-	// Group 1 : pieces
-	char *strpos = strtok(fen, delim);
-	if(!strpos) {
-		return false;
-	}
-	bool ok = fen_parse_pieces(strpos, mb->squares);
-	if(!ok) {
-		return false;
-	}
+	do { // This loop runs only ONCE.. so we do not need to free for many returns
+		// Group 1 : pieces
+		char *strpos = strtok(cpy, delim);
+		if(!strpos) {
+			break;
+		}
+		bool ok = fen_parse_pieces(strpos, mb->squares);
+		if(!ok) {
+			break;
+		}
 
-	// Group 2 : color to move
-	strpos = strtok(0, delim);
-	if(strpos == NULL) {
-		return false;
-	}
-	ok = fen_parse_color_to_move(strpos, &mb->color);
-	if(!ok) {
-		return false;
-	}
+		// Group 2 : color to move
+		strpos = strtok(NULL, delim);
+		if(strpos == NULL) {
+			break;
+		}
+		ok = fen_parse_color_to_move(strpos, &mb->color);
+		if(!ok) {
+			break;
+		}
 
-	// Group 3 : castling rights
-	strpos = strtok(0, delim);
-	if(strpos == NULL) {
-		return false;
-	}
-	ok = fen_parse_castling_rights(strpos, mb->castle_short, mb->castle_long);
-	if(!ok) {
-		return false;
-	}
+		// Group 3 : castling rights
+		strpos = strtok(NULL, delim);
+		if(strpos == NULL) {
+			break;
+		}
+		ok = fen_parse_castling_rights(strpos, mb->castle_short, mb->castle_long);
+		if(!ok) {
+			break;
+		}
 
-	// Group 4 : en passent square
-	strpos = strtok(0, delim);
-	if(strpos == NULL) {
-		return false;
-	}
-	ok = fen_parse_ep_square(strpos, &mb->ep_square);
-	if(!ok) {
-		return false;
-	}
+		// Group 4 : en passent square
+		strpos = strtok(NULL, delim);
+		if(strpos == NULL) {
+			break;
+		}
+		ok = fen_parse_ep_square(strpos, &mb->ep_square);
+		if(!ok) {
+			break;
+		}
 
-	// Group 5 : half-move clock
-	// Counts since last capture or pawn advance.
-	strpos = strtok(0, delim);
-	if(strpos == NULL) {
-		return false;
-	}
-	ok = fen_parse_half_move_clock(strpos, &mb->half_moves);
-	if(!ok) {
-		return false;
-	}
+		// Group 5 : half-move clock
+		// Counts since last capture or pawn advance.
+		strpos = strtok(NULL, delim);
+		if(strpos == NULL) {
+			break;
+		}
+		ok = fen_parse_half_move_clock(strpos, &mb->half_moves);
+		if(!ok) {
+			break;
+		}
 
-	// Group 6 : move number
-	strpos = strtok(0, delim);
-	if(strpos == NULL) {
-		return false;
-	}
-	ok = fen_parse_move_number(strpos, &mb->move_num);
-	if(!ok) {
-		return false;
-	}
+		// Group 6 : move number
+		strpos = strtok(NULL, delim);
+		if(strpos == NULL) {
+			break;
+		}
+		ok = fen_parse_move_number(strpos, &mb->move_num);
+		if(!ok) {
+			break;
+		}
+		success = true;
+	} while(false);
 
-	return true;
+	free(cpy);
+	return success;
 }
 
 /**
@@ -246,7 +256,7 @@ bool fen_square_to_index(const char fensq[static 2], Square *sq) {
 	char rank = r - 'a';
 	char file = f - '1';
 
-	*sq = rank+file*8;
+	*sq = rank + file * 8;
 	return true;
 }
 
@@ -268,7 +278,7 @@ bool fen_parse_ep_square(const char fen[], Square *sq) {
 	if(fen[1] != '3' && fen[1] != '6') {
 		return false;
 	}
-	
+
 	return fen_square_to_index(fen, sq);
 }
 
@@ -278,8 +288,8 @@ bool fen_parse_half_move_clock(const char fen[], uint16_t *num) {
 	}
 
 	// Half move counter can be 0.
-	char *endptr = 0;
-	unsigned long ul = strtoul(fen, &endptr, 10);
+	char *		  endptr = 0;
+	unsigned long ul	 = strtoul(fen, &endptr, 10);
 	if(endptr && *endptr != '\0') {
 		return false;
 	}
@@ -300,4 +310,3 @@ bool fen_parse_move_number(const char fen[], uint16_t *num) {
 	}
 	return true;
 }
-

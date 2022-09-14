@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "board.h"
+#include "fen.h"
 
 void Board__set_starting_position(Board *b) {
 	assert(b != NULL);
@@ -13,5 +14,6 @@ void Board__set_starting_position(Board *b) {
 }
 
 bool Board__set_fen(Board *b, char *fen) {
+	// parse_fen
 
 }

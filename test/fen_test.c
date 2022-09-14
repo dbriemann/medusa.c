@@ -476,9 +476,7 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 	for(size_t tc = 0; tc < len; tc++) {
 		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
 
-		char *cpy = strdup(testcases[tc].input_fen);
-		bool ok = parse_fen(cpy, &out_board);
-		free(cpy);
+		bool ok = parse_fen(testcases[tc].input_fen, &out_board);
 		munit_assert_int(testcases[tc].expected_success, ==, ok);
 
 		if(ok) {
