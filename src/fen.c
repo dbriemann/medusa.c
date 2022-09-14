@@ -5,7 +5,11 @@
 #include "fen.h"
 #include "minboard.h"
 
-bool parse_fen(char fen[static 1], MinBoard *mb) {
+bool parse_fen(char fen[], MinBoard *mb) {
+	if(fen == NULL || mb == NULL) {
+		return false;
+	}
+
 	char delim[] = " "; // Spaces splits fen into 6 groups.
 
 	// Group 1 : pieces
@@ -20,7 +24,7 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 
 	// Group 2 : color to move
 	strpos = strtok(0, delim);
-	if(strpos == 0) {
+	if(strpos == NULL) {
 		return false;
 	}
 	ok = fen_parse_color_to_move(strpos, &mb->color);
@@ -30,7 +34,7 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 
 	// Group 3 : castling rights
 	strpos = strtok(0, delim);
-	if(strpos == 0) {
+	if(strpos == NULL) {
 		return false;
 	}
 	ok = fen_parse_castling_rights(strpos, mb->castle_short, mb->castle_long);
@@ -40,7 +44,7 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 
 	// Group 4 : en passent square
 	strpos = strtok(0, delim);
-	if(strpos == 0) {
+	if(strpos == NULL) {
 		return false;
 	}
 	ok = fen_parse_ep_square(strpos, &mb->ep_square);
@@ -51,7 +55,7 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 	// Group 5 : half-move clock
 	// Counts since last capture or pawn advance.
 	strpos = strtok(0, delim);
-	if(strpos == 0) {
+	if(strpos == NULL) {
 		return false;
 	}
 	ok = fen_parse_half_move_clock(strpos, &mb->half_moves);
@@ -61,7 +65,7 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 
 	// Group 6 : move number
 	strpos = strtok(0, delim);
-	if(strpos == 0) {
+	if(strpos == NULL) {
 		return false;
 	}
 	ok = fen_parse_move_number(strpos, &mb->move_num);
@@ -88,7 +92,11 @@ bool parse_fen(char fen[static 1], MinBoard *mb) {
 	1|[0,1,2,3,4,5,6,7, <- array index 0 is white rook @ A1
 	 +-----------------
 */
-bool fen_parse_pieces(const char fen[static 15], Piece squares[64]) {
+bool fen_parse_pieces(const char fen[], Piece squares[64]) {
+	if(fen == NULL || squares == NULL) {
+		return false;
+	}
+
 	size_t pos		= 0;
 	size_t boardpos = 0;
 
@@ -171,7 +179,11 @@ bool fen_parse_pieces(const char fen[static 15], Piece squares[64]) {
 	return true;
 }
 
-bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
+bool fen_parse_color_to_move(const char fen[], Color *color) {
+	if(fen == NULL || color == NULL) {
+		return false;
+	}
+
 	if(strlen(fen) != 1) {
 		return false;
 	}
@@ -182,7 +194,11 @@ bool fen_parse_color_to_move(const char fen[static 1], Color *color) {
 	}
 }
 
-bool fen_parse_castling_rights(const char fen[static 1], bool oo[2], bool ooo[2]) {
+bool fen_parse_castling_rights(const char fen[], bool oo[2], bool ooo[2]) {
+	if(fen == NULL || oo == NULL || ooo == NULL) {
+		return false;
+	}
+
 	if(strlen(fen) < 1 || strlen(fen) > 4) {
 		return false;
 	}
@@ -211,6 +227,10 @@ bool fen_parse_castling_rights(const char fen[static 1], bool oo[2], bool ooo[2]
 }
 
 bool fen_square_to_index(const char fensq[static 2], Square *sq) {
+	if(fensq == NULL || sq == NULL) {
+		return false;
+	}
+
 	*sq = OTB;
 	if(strlen(fensq) != 2) {
 		return false;
@@ -230,7 +250,11 @@ bool fen_square_to_index(const char fensq[static 2], Square *sq) {
 	return true;
 }
 
-bool fen_parse_ep_square(const char fen[static 1], Square *sq) {
+bool fen_parse_ep_square(const char fen[], Square *sq) {
+	if(fen == NULL || sq == NULL) {
+		return false;
+	}
+
 	*sq = OTB;
 	if(strlen(fen) == 1 && fen[0] == '-') {
 		return true;
@@ -248,7 +272,11 @@ bool fen_parse_ep_square(const char fen[static 1], Square *sq) {
 	return fen_square_to_index(fen, sq);
 }
 
-bool fen_parse_half_move_clock(const char fen[static 1], uint16_t *num) {
+bool fen_parse_half_move_clock(const char fen[], uint16_t *num) {
+	if(fen == NULL || num == NULL) {
+		return false;
+	}
+
 	// Half move counter can be 0.
 	char *endptr = 0;
 	unsigned long ul = strtoul(fen, &endptr, 10);
@@ -259,7 +287,11 @@ bool fen_parse_half_move_clock(const char fen[static 1], uint16_t *num) {
 	return true;
 }
 
-bool fen_parse_move_number(const char fen[static 1], uint16_t *num) {
+bool fen_parse_move_number(const char fen[], uint16_t *num) {
+	if(fen == NULL || num == NULL) {
+		return false;
+	}
+
 	// TODO: maximum game length?
 	bool ok = fen_parse_half_move_clock(fen, num);
 	// Moves start at 1.

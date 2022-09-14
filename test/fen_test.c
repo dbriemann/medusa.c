@@ -91,6 +91,12 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 		}
 	}
 
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	bool ok = fen_parse_pieces(NULL, output);
+	munit_assert_false(ok);
+	ok = fen_parse_pieces("does not matter", NULL);
+	munit_assert_false(ok);
+
 	return MUNIT_OK;
 }
 
@@ -114,6 +120,12 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *da
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is too long: \"bw\" (invalid)");
 	ok = fen_parse_color_to_move("bw", &c);
 	munit_assert_int(false, ==, ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	ok = fen_parse_color_to_move(NULL, &c);
+	munit_assert_false(ok);
+	ok = fen_parse_color_to_move("does not matter", NULL);
+	munit_assert_false(ok);
 
 	return MUNIT_OK;
 }
@@ -195,6 +207,15 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *
 			munit_assert_int(testcases[tc].expected_ooo[WHITE], ==, target_ooo[WHITE]);
 		}
 	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	bool ok = fen_parse_castling_rights(NULL, target_oo, target_ooo);
+	munit_assert_false(ok);
+	ok = fen_parse_castling_rights("does not matter", NULL, target_ooo);
+	munit_assert_false(ok);
+	ok = fen_parse_castling_rights("does not matter", target_oo, NULL);
+	munit_assert_false(ok);
+
 	return MUNIT_OK;
 }
 
@@ -226,7 +247,7 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on board (valid)");
 	Square sq;
-	for(int i = 0; i < 64; i++) {
+	for(size_t i = 0; i < 64; i++) {
 		bool ok = fen_square_to_index(valid_squares[i], &sq);
 		munit_assert_true(ok);
 
@@ -238,19 +259,21 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 	munit_log(MUNIT_LOG_INFO, "testcase: fantasy squares (invalid)");
 	size_t		len				  = 6;
 	const char *fantasy_squares[] = {"a0", "l8", "c9", "i2", "zz", "33"};
-	for(int i = 0; i < len; i++) {
+	for(size_t i = 0; i < len; i++) {
 		bool ok = fen_square_to_index(fantasy_squares[i], &sq);
 		munit_assert_false(ok);
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
-// Disable bounds check for this test.. should be handled by function.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warray-bounds"
 	bool ok = fen_square_to_index("", &sq);
-#pragma clang diagnostic pop
 	munit_assert_false(ok);
 	ok = fen_square_to_index("a88", &sq);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	ok = fen_square_to_index(NULL, &sq);
+	munit_assert_false(ok);
+	ok = fen_square_to_index("does not matter", NULL);
 	munit_assert_false(ok);
 
 	return MUNIT_OK;
@@ -273,7 +296,7 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 3 and 6 (valid)");
 	Square sq;
-	for(int i = 0; i < 16; i++) {
+	for(size_t i = 0; i < 16; i++) {
 		bool ok = fen_parse_ep_square(valid_squares[i], &sq);
 		munit_assert_true(ok);
 
@@ -299,19 +322,21 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 	munit_assert_int(OTB, ==, sq);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 1,2,4,5,7,8 (invalid)");
-	for(int i = 0; i < 48; i++) {
+	for(size_t i = 0; i < 48; i++) {
 		bool ok = fen_parse_ep_square(invalid_squares[i], &sq);
 		munit_assert_false(ok);
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
-// Disable bounds check for this test.. should be handled by function.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warray-bounds"
 	ok = fen_parse_ep_square("", &sq);
-#pragma clang diagnostic pop
 	munit_assert_false(ok);
 	ok = fen_parse_ep_square("xx8", &sq);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	ok = fen_parse_ep_square(NULL, &sq);
+	munit_assert_false(ok);
+	ok = fen_parse_ep_square("does not matter", NULL);
 	munit_assert_false(ok);
 
 	return MUNIT_OK;
@@ -346,6 +371,12 @@ MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data
 	ok = fen_parse_move_number("0xEE", &num);
 	munit_assert_false(ok);
 
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	ok = fen_parse_move_number(NULL, &num);
+	munit_assert_false(ok);
+	ok = fen_parse_move_number("does not matter", NULL);
+	munit_assert_false(ok);
+
 	return MUNIT_OK;
 }
 
@@ -377,6 +408,12 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is hex number: \"0xEE\" (invalid)");
 	ok = fen_parse_half_move_clock("0xEE", &num);
+	munit_assert_false(ok);
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	ok = fen_parse_half_move_clock(NULL, &num);
+	munit_assert_false(ok);
+	ok = fen_parse_half_move_clock("does not matter", NULL);
 	munit_assert_false(ok);
 
 	return MUNIT_OK;
@@ -459,6 +496,12 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 			}
 		}
 	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
+	bool ok = parse_fen(NULL, &out_board);
+	munit_assert_false(ok);
+	ok = fen_parse_pieces("does not matter", NULL);
+	munit_assert_false(ok);
 
 	return MUNIT_OK;
 }

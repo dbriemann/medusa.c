@@ -1,10 +1,14 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "generate.h"
 
 // TODO: how to test this?
 // TODO: do we need diff_dirs? should it store dir or muldir?
-void generateAttackMaps(Piece square_diffs[static 1], Direction diff_dirs[static 1]) {
+void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
+	assert(square_diffs != NULL);
+	assert(diff_dirs != NULL);
+
 	// Zero arrays.
 	for(size_t i = 0; i < 240; i++) {
 		square_diffs[i] = 0;

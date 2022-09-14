@@ -49,4 +49,7 @@ struct Board {
 	size_t pawns_size[2];
 };
 
+void Board__set_starting_position(Board *b);
+bool Board__set_fen(Board *b, char *fen);
+
 #endif
