@@ -50,6 +50,6 @@ struct Board {
 };
 
 void Board__set_starting_position(Board *b);
-bool Board__set_fen(Board *b, char *fen);
+bool Board__set_fen(Board *b, const char *fen);
 
 #endif

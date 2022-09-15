@@ -13,7 +13,15 @@ void Board__set_starting_position(Board *b) {
 	assert(ok);
 }
 
-bool Board__set_fen(Board *b, char *fen) {
+bool Board__set_fen(Board *b, const char *fen) {
+	if(b == NULL || fen == NULL) {
+		return false;
+	}
 	// parse_fen
+	MinBoard mb;
+	bool ok = parse_fen(fen, &mb);
+	if(!ok) {
+		return false;
+	}
 
 }

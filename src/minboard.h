@@ -18,7 +18,4 @@ struct MinBoard {
 	uint16_t move_num;
 };
 
-// Methods:
-MinBoard MinBoard__create();
-
 #endif
