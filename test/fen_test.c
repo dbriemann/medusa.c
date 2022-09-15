@@ -3,6 +3,7 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "../munit/munit.h"
 
+#include "../src/errors.h"
 #include "../src/fen.h"
 #include "fen_test.h"
 
@@ -12,7 +13,7 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 		{
 			.name 			 = "Starting position (valid)",
 			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-			.expected_success = true,
+			.expected_result = OK,
 			.expected_pieces = {
 				WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
 				WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,
@@ -27,7 +28,7 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 		{
 			.name 			 = "Sicilian after 1.e4 e5 (valid)",
 			.input_fen		 = "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
-			.expected_success = true,
+			.expected_result = OK,
 			.expected_pieces = {
 				WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
 				WPAWN, WPAWN, WPAWN, WPAWN, EMPTY, WPAWN, WPAWN, WPAWN,
@@ -42,7 +43,7 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 		{
 			.name 			 = "Sicilian after 1.e4 e5 2. Nf3 (valid)",
 			.input_fen		 = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R",
-			.expected_success = true,
+			.expected_result = OK,
 			.expected_pieces = {
 				WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, EMPTY, WROOK,
 				WPAWN, WPAWN, WPAWN, WPAWN, EMPTY, WPAWN, WPAWN, WPAWN,
@@ -57,19 +58,19 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 		{
 			.name 			 = "Too many ranks (invalid)",
 			.input_fen		 = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/pppPPppP",
-			.expected_success = false,
+			.expected_result = ERR_INVALID_INPUT,
 			.expected_pieces = {},
 		},
 		{
 			.name 			 = "Wrong number of empty fields (invalid)",
 			.input_fen		 = "rnbqkbnr/pp1ppppp/7/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
-			.expected_success = false,
+			.expected_result = ERR_INVALID_INPUT,
 			.expected_pieces = {},
 		},
 		{
 			.name 			 = "Unknown piece character (invalid)",
 			.input_fen		 = "rnbqkbnr/pp1pppop/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R",
-			.expected_success = false,
+			.expected_result = ERR_INVALID_INPUT,
 			.expected_pieces = {},
 		},
 		// clang-format on
@@ -81,10 +82,10 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 	for(size_t tc = 0; tc < len; tc++) {
 		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
 
-		bool ok = fen_parse_pieces(testcases[tc].input_fen, output);
-		munit_assert_int(testcases[tc].expected_success, ==, ok);
+		Error error = fen_parse_pieces(testcases[tc].input_fen, output);
+		munit_assert_int(testcases[tc].expected_result, ==, error);
 
-		if(ok) {
+		if(error == OK) {
 			for(size_t i = 0; i < 64; i++) {
 				munit_assert_int(testcases[tc].expected_pieces[i], ==, output[i]);
 			}
@@ -92,10 +93,10 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	bool ok = fen_parse_pieces(NULL, output);
-	munit_assert_false(ok);
-	ok = fen_parse_pieces("does not matter", NULL);
-	munit_assert_false(ok);
+	Error error = fen_parse_pieces(NULL, output);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_pieces("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -104,28 +105,28 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *da
 	Color c;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is black: \"b\" (valid)");
-	bool ok = fen_parse_color_to_move("b", &c);
-	munit_assert_int(true, ==, ok);
+	Error error = fen_parse_color_to_move("b", &c);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(BLACK, ==, c);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is white: \"w\" (valid)");
-	ok = fen_parse_color_to_move("w", &c);
-	munit_assert_int(true, ==, ok);
+	error = fen_parse_color_to_move("w", &c);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(WHITE, ==, c);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is empty: \"\" (invalid)");
-	ok = fen_parse_color_to_move("", &c);
-	munit_assert_int(false, ==, ok);
+	error = fen_parse_color_to_move("", &c);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is too long: \"bw\" (invalid)");
-	ok = fen_parse_color_to_move("bw", &c);
-	munit_assert_int(false, ==, ok);
+	error = fen_parse_color_to_move("bw", &c);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	ok = fen_parse_color_to_move(NULL, &c);
-	munit_assert_false(ok);
-	ok = fen_parse_color_to_move("does not matter", NULL);
-	munit_assert_false(ok);
+	error = fen_parse_color_to_move(NULL, &c);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_color_to_move("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -133,53 +134,53 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *da
 MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *data) {
 	const FenParseCastlingRightsTestCase testcases[] = {
 		{
-			.name			  = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
-			.input_fen		  = "KQkq",
-			.expected_success = true,
-			.expected_oo	  = {true, true},
-			.expected_ooo	  = {true, true},
+			.name			 = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
+			.input_fen		 = "KQkq",
+			.expected_result = OK,
+			.expected_oo	 = {true, true},
+			.expected_ooo	 = {true, true},
 		},
 		{
-			.name			  = "White: 0-0, 0-0-0 (valid)",
-			.input_fen		  = "KQ",
-			.expected_success = true,
-			.expected_oo	  = {false, true},
-			.expected_ooo	  = {false, true},
+			.name			 = "White: 0-0, 0-0-0 (valid)",
+			.input_fen		 = "KQ",
+			.expected_result = OK,
+			.expected_oo	 = {false, true},
+			.expected_ooo	 = {false, true},
 		},
 		{
-			.name			  = "White: 0-0, 0-0-0 (valid)",
-			.input_fen		  = "kq",
-			.expected_success = true,
-			.expected_oo	  = {true, false},
-			.expected_ooo	  = {true, false},
+			.name			 = "White: 0-0, 0-0-0 (valid)",
+			.input_fen		 = "kq",
+			.expected_result = OK,
+			.expected_oo	 = {true, false},
+			.expected_ooo	 = {true, false},
 		},
 		{
-			.name			  = "White: 0-0-0, Black: 0-0 (valid)",
-			.input_fen		  = "Qk", // reversed notation is accepted in medusa.
-			.expected_success = true,
-			.expected_oo	  = {true, false},
-			.expected_ooo	  = {false, true},
+			.name			 = "White: 0-0-0, Black: 0-0 (valid)",
+			.input_fen		 = "Qk", // reversed notation is accepted in medusa.
+			.expected_result = OK,
+			.expected_oo	 = {true, false},
+			.expected_ooo	 = {false, true},
 		},
 		{
-			.name			  = "Empty string (invalid)",
-			.input_fen		  = "",
-			.expected_success = false,
-			.expected_oo	  = {},
-			.expected_ooo	  = {},
+			.name			 = "Empty string (invalid)",
+			.input_fen		 = "",
+			.expected_result = ERR_INVALID_INPUT,
+			.expected_oo	 = {},
+			.expected_ooo	 = {},
 		},
 		{
-			.name			  = "White: 0-0, unknown char (invalid)",
-			.input_fen		  = "Qx",
-			.expected_success = false,
-			.expected_oo	  = {},
-			.expected_ooo	  = {},
+			.name			 = "White: 0-0, unknown char (invalid)",
+			.input_fen		 = "Qx",
+			.expected_result = ERR_INVALID_INPUT,
+			.expected_oo	 = {},
+			.expected_ooo	 = {},
 		},
 		{
-			.name			  = "Too many chars (invalid)",
-			.input_fen		  = "KQkqK",
-			.expected_success = false,
-			.expected_oo	  = {},
-			.expected_ooo	  = {},
+			.name			 = "Too many chars (invalid)",
+			.input_fen		 = "KQkqK",
+			.expected_result = ERR_INVALID_INPUT,
+			.expected_oo	 = {},
+			.expected_ooo	 = {},
 		},
 	};
 
@@ -197,10 +198,10 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *
 		target_ooo[BLACK] = !testcases[tc].expected_ooo[BLACK];
 		target_ooo[WHITE] = !testcases[tc].expected_ooo[WHITE];
 
-		bool ok = fen_parse_castling_rights(testcases[tc].input_fen, target_oo, target_ooo);
-		munit_assert_int(testcases[tc].expected_success, ==, ok);
+		Error error = fen_parse_castling_rights(testcases[tc].input_fen, target_oo, target_ooo);
+		munit_assert_int(testcases[tc].expected_result, ==, error);
 
-		if(ok) {
+		if(error == OK) {
 			munit_assert_int(testcases[tc].expected_oo[BLACK], ==, target_oo[BLACK]);
 			munit_assert_int(testcases[tc].expected_oo[WHITE], ==, target_oo[WHITE]);
 			munit_assert_int(testcases[tc].expected_ooo[BLACK], ==, target_ooo[BLACK]);
@@ -209,12 +210,12 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	bool ok = fen_parse_castling_rights(NULL, target_oo, target_ooo);
-	munit_assert_false(ok);
-	ok = fen_parse_castling_rights("does not matter", NULL, target_ooo);
-	munit_assert_false(ok);
-	ok = fen_parse_castling_rights("does not matter", target_oo, NULL);
-	munit_assert_false(ok);
+	Error error = fen_parse_castling_rights(NULL, target_oo, target_ooo);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_castling_rights("does not matter", NULL, target_ooo);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_castling_rights("does not matter", target_oo, NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -248,10 +249,10 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on board (valid)");
 	Square sq;
 	for(size_t i = 0; i < 64; i++) {
-		bool ok = fen_square_to_index(valid_squares[i], &sq);
-		munit_assert_true(ok);
+		Error error = fen_square_to_index(valid_squares[i], &sq);
+		munit_assert_int(OK, ==, error);
 
-		if(ok) {
+		if(error == OK) {
 			munit_assert_int(valid_squares_index[i], ==, sq);
 		}
 	}
@@ -260,21 +261,21 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 	size_t		len				  = 6;
 	const char *fantasy_squares[] = {"a0", "l8", "c9", "i2", "zz", "33"};
 	for(size_t i = 0; i < len; i++) {
-		bool ok = fen_square_to_index(fantasy_squares[i], &sq);
-		munit_assert_false(ok);
+		Error error = fen_square_to_index(fantasy_squares[i], &sq);
+		munit_assert_int(ERR_INVALID_INPUT, ==, error);
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
-	bool ok = fen_square_to_index("", &sq);
-	munit_assert_false(ok);
-	ok = fen_square_to_index("a88", &sq);
-	munit_assert_false(ok);
+	Error error = fen_square_to_index("", &sq);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
+	error = fen_square_to_index("a88", &sq);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	ok = fen_square_to_index(NULL, &sq);
-	munit_assert_false(ok);
-	ok = fen_square_to_index("does not matter", NULL);
-	munit_assert_false(ok);
+	error = fen_square_to_index(NULL, &sq);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_square_to_index("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -297,10 +298,10 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 3 and 6 (valid)");
 	Square sq;
 	for(size_t i = 0; i < 16; i++) {
-		bool ok = fen_parse_ep_square(valid_squares[i], &sq);
-		munit_assert_true(ok);
+		Error error = fen_parse_ep_square(valid_squares[i], &sq);
+		munit_assert_int(OK, ==, error);
 
-		if(ok) {
+		if(error == OK) {
 			munit_assert_int(valid_squares_index[i], ==, sq);
 		}
 	}
@@ -317,27 +318,27 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 	};
 
 	munit_log(MUNIT_LOG_INFO, "testcase: no ep square (valid)");
-	bool ok = fen_parse_ep_square("-", &sq);
-	munit_assert_true(ok);
+	Error error = fen_parse_ep_square("-", &sq);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(OTB, ==, sq);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 1,2,4,5,7,8 (invalid)");
 	for(size_t i = 0; i < 48; i++) {
-		bool ok = fen_parse_ep_square(invalid_squares[i], &sq);
-		munit_assert_false(ok);
+		Error error = fen_parse_ep_square(invalid_squares[i], &sq);
+		munit_assert_int(ERR_INVALID_INPUT, ==, error);
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
-	ok = fen_parse_ep_square("", &sq);
-	munit_assert_false(ok);
-	ok = fen_parse_ep_square("xx8", &sq);
-	munit_assert_false(ok);
+	error = fen_parse_ep_square("", &sq);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
+	error = fen_parse_ep_square("xx8", &sq);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	ok = fen_parse_ep_square(NULL, &sq);
-	munit_assert_false(ok);
-	ok = fen_parse_ep_square("does not matter", NULL);
-	munit_assert_false(ok);
+	error = fen_parse_ep_square(NULL, &sq);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_ep_square("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -346,36 +347,36 @@ MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data
 	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
-	bool ok = fen_parse_move_number("1", &num);
-	munit_assert_true(ok);
+	Error error = fen_parse_move_number("1", &num);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(1, ==, num);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 666 (valid)");
-	ok = fen_parse_move_number("666", &num);
-	munit_assert_true(ok);
+	error = fen_parse_move_number("666", &num);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(666, ==, num);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 0 (invalid)");
-	ok = fen_parse_move_number("0", &num);
-	munit_assert_false(ok);
+	error = fen_parse_move_number("0", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"22c\" (invalid)");
-	ok = fen_parse_move_number("22c", &num);
-	munit_assert_false(ok);
+	error = fen_parse_move_number("22c", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"x44\" (invalid)");
-	ok = fen_parse_move_number("x44", &num);
-	munit_assert_false(ok);
+	error = fen_parse_move_number("x44", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is hex number: \"0xEE\" (invalid)");
-	ok = fen_parse_move_number("0xEE", &num);
-	munit_assert_false(ok);
+	error = fen_parse_move_number("0xEE", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	ok = fen_parse_move_number(NULL, &num);
-	munit_assert_false(ok);
-	ok = fen_parse_move_number("does not matter", NULL);
-	munit_assert_false(ok);
+	error = fen_parse_move_number(NULL, &num);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_move_number("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
@@ -384,90 +385,100 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *
 	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
-	bool ok = fen_parse_half_move_clock("1", &num);
-	munit_assert_true(ok);
+	Error error = fen_parse_half_move_clock("1", &num);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(1, ==, num);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 666 (valid)");
-	ok = fen_parse_half_move_clock("666", &num);
-	munit_assert_true(ok);
+	error = fen_parse_half_move_clock("666", &num);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(666, ==, num);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 0 (valid)");
-	ok = fen_parse_half_move_clock("0", &num);
-	munit_assert_true(ok);
+	error = fen_parse_half_move_clock("0", &num);
+	munit_assert_int(OK, ==, error);
 	munit_assert_int(0, ==, num);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"22c\" (invalid)");
-	ok = fen_parse_half_move_clock("22c", &num);
-	munit_assert_false(ok);
+	error = fen_parse_half_move_clock("22c", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is not a number: \"x44\" (invalid)");
-	ok = fen_parse_half_move_clock("x44", &num);
-	munit_assert_false(ok);
+	error = fen_parse_half_move_clock("x44", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: string is hex number: \"0xEE\" (invalid)");
-	ok = fen_parse_half_move_clock("0xEE", &num);
-	munit_assert_false(ok);
+	error = fen_parse_half_move_clock("0xEE", &num);
+	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	ok = fen_parse_half_move_clock(NULL, &num);
-	munit_assert_false(ok);
-	ok = fen_parse_half_move_clock("does not matter", NULL);
-	munit_assert_false(ok);
+	error = fen_parse_half_move_clock(NULL, &num);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_half_move_clock("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
 
 MunitResult test_parse_fen(const MunitParameter params[], void *data) {
-	ParseFenTestCase testcases[] = {
-		{
-			.name = "Start position",
-			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-			.expected_success = true,
-			.expected_mb = {
-				.squares = {
-					WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
-					WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,
-					BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,
+	ParseFenTestCase
+		testcases[] =
+			{
+				{
+					.name			 = "Start position",
+					.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+					.expected_result = OK,
+					.expected_mb =
+						{
+							.squares =
+								{
+									// clang-format off
+									WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
+									WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,
+									EMPTY, EMPTY, EMPTY, EMPTY,	EMPTY, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+									BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,
+									BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,
+									// clang-format on
+								},
+							.color		  = WHITE,
+							.castle_short = {true, true},
+							.castle_long  = {true, true},
+							.half_moves	  = 0,
+							.move_num	  = 1,
+							.ep_square	  = OTB,
+						},
 				},
-				.color = WHITE,
-				.castle_short = {true, true},
-				.castle_long = {true, true},
-				.half_moves = 0,
-				.move_num = 1,
-				.ep_square = OTB,
-			},
-		},
-		{
-			.name = "Ep passent & no castles",
-			.input_fen		 = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
-			.expected_success = true,
-			.expected_mb = {
-				.squares = {
-					WROOK, EMPTY, WBISHOP, WQUEEN, EMPTY, WBISHOP, WKNIGHT, WROOK,
-					WPAWN, WPAWN, WPAWN, WPAWN, WKING, WPAWN, WPAWN, WPAWN,
-					EMPTY, EMPTY, WKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, BPAWN, BPAWN, WPAWN, EMPTY, EMPTY, EMPTY, 
-					EMPTY, EMPTY, EMPTY, EMPTY, BPAWN, EMPTY, EMPTY, EMPTY, 
-					BPAWN, BPAWN, EMPTY, EMPTY, BKING, BPAWN, BPAWN, BPAWN,
-					BROOK, BKNIGHT, BBISHOP, BQUEEN, EMPTY, BBISHOP, BKNIGHT, BROOK,
+				{
+					.name			 = "Ep passent & no castles",
+					.input_fen		 = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
+					.expected_result = OK,
+					.expected_mb =
+						{
+							.squares =
+								{
+									// clang-format off
+									WROOK, EMPTY, WBISHOP, WQUEEN, EMPTY, WBISHOP, WKNIGHT, WROOK,
+									WPAWN, WPAWN, WPAWN, WPAWN, WKING, WPAWN, WPAWN, WPAWN,
+									EMPTY, EMPTY, WKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, BPAWN, BPAWN, WPAWN, EMPTY, EMPTY, EMPTY,
+									EMPTY, EMPTY, EMPTY, EMPTY, BPAWN, EMPTY, EMPTY, EMPTY,
+									BPAWN, BPAWN, EMPTY, EMPTY, BKING, BPAWN, BPAWN, BPAWN,
+									BROOK, BKNIGHT, BBISHOP, BQUEEN, EMPTY, BBISHOP, BKNIGHT, BROOK,
+									// clang-format on
+								},
+							.color		  = WHITE,
+							.castle_short = {false, false},
+							.castle_long  = {false, false},
+							.half_moves	  = 0,
+							.move_num	  = 5,
+							.ep_square	  = 43,
+						},
 				},
-				.color = WHITE,
-				.castle_short = {false, false},
-				.castle_long = {false, false},
-				.half_moves = 0,
-				.move_num = 5,
-				.ep_square = 43,
-			},
-		},
-	};
+			};
 
 	MinBoard out_board;
 
@@ -476,10 +487,10 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 	for(size_t tc = 0; tc < len; tc++) {
 		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
 
-		bool ok = parse_fen(testcases[tc].input_fen, &out_board);
-		munit_assert_int(testcases[tc].expected_success, ==, ok);
+		Error error = parse_fen(testcases[tc].input_fen, &out_board);
+		munit_assert_int(testcases[tc].expected_result, ==, error);
 
-		if(ok) {
+		if(error == OK) {
 			const MinBoard *emb = &testcases[tc].expected_mb;
 			munit_assert_int(emb->color, ==, out_board.color);
 			for(size_t i = BLACK; i <= WHITE; i++) {
@@ -496,10 +507,10 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 	}
 
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	bool ok = parse_fen(NULL, &out_board);
-	munit_assert_false(ok);
-	ok = fen_parse_pieces("does not matter", NULL);
-	munit_assert_false(ok);
+	Error error = parse_fen(NULL, &out_board);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = fen_parse_pieces("does not matter", NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }

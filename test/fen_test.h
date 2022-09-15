@@ -5,12 +5,13 @@
 #include "../munit/munit.h"
 
 #include "../src/fen.h"
+#include "../src/errors.h"
 
 typedef struct FenParsePiecesTestCase FenParsePiecesTestCase;
 struct FenParsePiecesTestCase {
 	const char *name;
 	const char *input_fen;
-	const bool	expected_success;
+	const Error	expected_result;
 	const Piece expected_pieces[64];
 };
 
@@ -20,7 +21,7 @@ struct FenParseCastlingRightsTestCase {
 	const char *input_fen;
 	bool		expected_oo[2];
 	bool		expected_ooo[2];
-	bool		expected_success;
+	Error		expected_result;
 };
 
 typedef struct ParseFenTestCase ParseFenTestCase;
@@ -28,7 +29,7 @@ struct ParseFenTestCase {
 	const char *name;
 	const char *input_fen;
 	MinBoard	expected_mb;
-	bool		expected_success;
+	Error		expected_result;
 };
 
 MunitResult test_fen_parse_pieces(const MunitParameter[], void *);
