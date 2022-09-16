@@ -516,14 +516,14 @@ MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 }
 
 MunitTest test_fen_suite[] = {
-	{"parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_move_number", test_fen_parse_move_number, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_half_move_clock", test_fen_parse_half_move_clock, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"parse_fen", test_parse_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_pieces", test_fen_parse_pieces, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_color_to_move", test_fen_parse_color_to_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_castling_rights", test_fen_parse_castling_rights, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_square_to_index", test_fen_square_to_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_ep_squares", test_fen_parse_ep_square, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_move_number", test_fen_parse_move_number, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_half_move_clock", test_fen_parse_half_move_clock, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"fen/parse_fen", test_parse_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

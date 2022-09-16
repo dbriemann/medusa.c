@@ -5,6 +5,7 @@
 #include "fen.h"
 #include "minboard.h"
 
+// TODO: ensure amount of certain pieces?! e.g. 16 queens will blow up the piece list.
 Error parse_fen(const char fen[], MinBoard *mb) {
 	if(fen == NULL || mb == NULL) {
 		return ERR_NULL_PTR;

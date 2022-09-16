@@ -6,6 +6,7 @@
 #include <stddef.h>
 
 #include "base.h"
+#include "errors.h"
 
 // Board contains all information for a chess board state, including the board itself as 0x88 board.
 //
@@ -50,6 +51,6 @@ struct Board {
 };
 
 void Board__set_starting_position(Board *b);
-bool Board__set_fen(Board *b, const char *fen);
+Error Board__set_fen(Board *b, const char *fen);
 
 #endif
