@@ -27,7 +27,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_pieces(strpos, mb->squares);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_PIECES;
 			break;
 		}
@@ -39,7 +39,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_color_to_move(strpos, &mb->color);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_COLOR;
 			break;
 		}
@@ -51,7 +51,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_castling_rights(strpos, mb->castle_short, mb->castle_long);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_CASTLING;
 			break;
 		}
@@ -63,7 +63,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_ep_square(strpos, &mb->ep_square);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_EP;
 			break;
 		}
@@ -76,7 +76,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_half_move_clock(strpos, &mb->half_moves);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_HALF_MOVE;
 			break;
 		}
@@ -88,7 +88,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = fen_parse_move_number(strpos, &mb->move_num);
-		if(error) {
+		if(error != OK) {
 			error = ERR_PARSE_FEN_MOVE;
 			break;
 		}
@@ -118,6 +118,10 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	if(fen == NULL || squares == NULL) {
 		return ERR_NULL_PTR;
+	}
+
+	for(size_t i = 0; i < 64; i++) {
+		squares[i] = EMPTY;
 	}
 
 	size_t pos		= 0;
@@ -318,7 +322,7 @@ Error fen_parse_move_number(const char fen[], uint16_t *num) {
 	// TODO: maximum game length?
 	Error error = fen_parse_half_move_clock(fen, num);
 	// Moves start at 1.
-	if(error || *num == 0) {
+	if(error != OK || *num == 0) {
 		return ERR_INVALID_INPUT;
 	}
 	return OK;

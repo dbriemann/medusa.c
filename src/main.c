@@ -3,33 +3,14 @@
 #include <string.h>
 
 #include "base.h"
-#include "fen.h"
-#include "../test/fen_test.h"
+#include "board.h"
+#include "errors.h"
 
 int main() {
-	ParseFenTestCase testcases[] = {
-		{
-			.name = "Start position",
-			.input_fen		 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-			.expected_success = true,
-			.expected_mb = {
-				.color = WHITE,
-				.castle_short = {true, true},
-				.castle_long = {true, true},
-				.ep_square = OTB,
-			},
-		},
-	};
+	const char *input_fen = "1nbqkb1r/1ppppp1p/r4n2/p5pP/8/2N4R/PPPPPPP1/R1BQKBN1 w Qk g6 0 5";
+	Board		ob;
 
-	MinBoard out_board;
-
-	const size_t len = sizeof(testcases) / sizeof(ParseFenTestCase);
-
-	for(size_t tc = 0; tc < len; tc++) {
-		char *cpy = strdup(testcases[tc].input_fen);
-		bool ok = parse_fen(cpy, &out_board);
-		free(cpy);
-	}
+	Error error = Board__set_fen(&ob, input_fen);
 
 	return EXIT_SUCCESS;
 }

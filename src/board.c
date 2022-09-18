@@ -23,7 +23,11 @@ Error Board__set_fen(Board *b, const char *fen) {
 	MinBoard mb;
 	Error	 err = parse_fen(fen, &mb);
 	if(err != OK) {
-		return false;
+		return err;
+	}
+
+	for(size_t i = 0; i < 64*2; i++) {
+		b->squares[i] = EMPTY;
 	}
 
 	// Clear piece lists by zeroing their sizes.
@@ -60,6 +64,8 @@ Error Board__set_fen(Board *b, const char *fen) {
 		b->squares[sq] = piece;
 
 		switch(piece) {
+		case EMPTY:
+			break;
 		case BKING: b->kings[BLACK] = sq; break;
 		case WKING: b->kings[WHITE] = sq; break;
 		case BQUEEN:
