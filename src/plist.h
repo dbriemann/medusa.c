@@ -5,6 +5,8 @@
 
 #include "base.h"
 
-void PieceList__add(Square sq, Piece *list, size_t *len);
+void PieceList__add(Piece *list, size_t *len, Square sq);
+void PieceList__del(Piece *list, size_t *len, Square sq);
+void PieceList__del_index(Piece *list, size_t *len, size_t i);
 
 #endif

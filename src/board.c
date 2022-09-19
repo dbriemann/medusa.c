@@ -26,7 +26,7 @@ Error Board__set_fen(Board *b, const char *fen) {
 		return err;
 	}
 
-	for(size_t i = 0; i < 64*2; i++) {
+	for(size_t i = 0; i < 64 * 2; i++) {
 		b->squares[i] = EMPTY;
 	}
 
@@ -64,46 +64,54 @@ Error Board__set_fen(Board *b, const char *fen) {
 		b->squares[sq] = piece;
 
 		switch(piece) {
-		case EMPTY:
-			break;
+		case EMPTY: break;
 		case BKING: b->kings[BLACK] = sq; break;
 		case WKING: b->kings[WHITE] = sq; break;
-		case BQUEEN:
-			PieceList__add(sq, b->queens[BLACK], &(b->queens_size[BLACK]));
-			break;
-		case WQUEEN:
-			PieceList__add(sq, b->queens[WHITE], &(b->queens_size[WHITE]));
-			break;
-		case BROOK:
-			PieceList__add(sq, b->rooks[BLACK], &(b->rooks_size[BLACK]));
-			break;
-		case WROOK:
-			PieceList__add(sq, b->rooks[WHITE], &(b->rooks_size[WHITE]));
-			break;
-		case BBISHOP:
-			PieceList__add(sq, b->bishops[BLACK], &(b->bishops_size[BLACK]));
-			break;
-		case WBISHOP:
-			PieceList__add(sq, b->bishops[WHITE], &(b->bishops_size[WHITE]));
-			break;
-		case BKNIGHT:
-			PieceList__add(sq, b->knights[BLACK], &(b->knights_size[BLACK]));
-			break;
-		case WKNIGHT:
-			PieceList__add(sq, b->knights[WHITE], &(b->knights_size[WHITE]));
-			break;
-		case BPAWN:
-			PieceList__add(sq, b->pawns[BLACK], &(b->pawns_size[BLACK]));
-			break;
-		case WPAWN:
-			PieceList__add(sq, b->pawns[WHITE], &(b->pawns_size[WHITE]));
-			break;
-		default:
-			return ERR_INVALID_INPUT;
+		case BQUEEN: PieceList__add(b->queens[BLACK], &(b->queens_size[BLACK]), sq); break;
+		case WQUEEN: PieceList__add(b->queens[WHITE], &(b->queens_size[WHITE]), sq); break;
+		case BROOK: PieceList__add(b->rooks[BLACK], &(b->rooks_size[BLACK]), sq); break;
+		case WROOK: PieceList__add(b->rooks[WHITE], &(b->rooks_size[WHITE]), sq); break;
+		case BBISHOP: PieceList__add(b->bishops[BLACK], &(b->bishops_size[BLACK]), sq); break;
+		case WBISHOP: PieceList__add(b->bishops[WHITE], &(b->bishops_size[WHITE]), sq); break;
+		case BKNIGHT: PieceList__add(b->knights[BLACK], &(b->knights_size[BLACK]), sq); break;
+		case WKNIGHT: PieceList__add(b->knights[WHITE], &(b->knights_size[WHITE]), sq); break;
+		case BPAWN: PieceList__add(b->pawns[BLACK], &(b->pawns_size[BLACK]), sq); break;
+		case WPAWN: PieceList__add(b->pawns[WHITE], &(b->pawns_size[WHITE]), sq); break;
+		default: return ERR_INVALID_INPUT;
 		}
 	}
 
 	// TODO: Detect checks (and pins?) here for init.
 
 	return OK;
+}
+
+void Board__add_piece(Board *b, Square sq, Piece p) {
+	b->squares[sq] = p;
+
+	const Piece ptype = p & PIECE_MASK;
+	const Piece pcol  = p & COLOR_ONLY_MASK;
+
+	switch(ptype) {
+	case PAWN: PieceList__add(b->pawns[pcol], &(b->pawns_size[pcol]), sq); break;
+	case KNIGHT: PieceList__add(b->knights[pcol], &(b->knights_size[pcol]), sq); break;
+	case BISHOP: PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq); break;
+	case ROOK: PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq); break;
+	case QUEEN: PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq); break;
+	case KING: b->kings[pcol] = sq; break;
+	default:
+		// This should never happen. Ignore all other values.
+		break;
+	}
+}
+
+void Board__del_piece(Board *b, Square sq) {
+	const Piece p	  = b->squares[sq];
+	const Piece ptype = p & PIECE_MASK;
+	const Piece pcol  = p & COLOR_ONLY_MASK;
+
+	b->squares[sq] = EMPTY;
+	switch(ptype) {
+
+	}
 }

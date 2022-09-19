@@ -52,5 +52,7 @@ struct Board {
 
 void Board__set_starting_position(Board *b);
 Error Board__set_fen(Board *b, const char *fen);
+void Board__add_piece(Board *b, Square sq, Piece p);
+void Board__del_piece(Board *b, Square sq);
 
 #endif
