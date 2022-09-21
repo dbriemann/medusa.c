@@ -80,5 +80,6 @@ test: $(TEST_DIR) $(TEST_EXE)
 	llvm-profdata merge -sparse cov/medusa.profraw -o cov/medusa.profdata
 	llvm-cov show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/line.report
 	llvm-cov report $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/summary.report
+	llvm-cov show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata -format=html > cov/line.report.html
 
 all: test debug

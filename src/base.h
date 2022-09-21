@@ -21,6 +21,11 @@ typedef int8_t	Direction;
 const static Piece	NONE = 0;
 const static Square OTB	 = 0x7F;
 
+// All special check values are off-board.
+const static Square CHECK_NONE		   = OTB;
+const static Square CHECK_DOUBLE_CHECK = 0x0F; 
+const static Square CHECK_CHECKMATE	   = 0x1F;
+
 // Colors
 const static Color BLACK		   = 0;
 const static Color WHITE		   = 1;

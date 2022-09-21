@@ -8,6 +8,51 @@
 #include "plist.h"
 #include "errors.h"
 
+void Board__clear(Board *b) {
+	// TODO: manually unroll loops for performance?
+	// NOTE: this is probably only needed for testing.. no need to optimize.
+
+	for(size_t i = 0; i < 2 * 64; i++) {
+		b->squares[i] = EMPTY;
+	}
+	b->castle_short[BLACK] = false;
+	b->castle_short[WHITE] = false;
+	b->castle_long[BLACK]  = false;
+	b->castle_long[WHITE]  = false;
+	b->move_number		   = 1;
+	b->draw_counter		   = 0;
+	b->ep_square		   = OTB;
+	b->player			   = WHITE;
+
+	for(Color c = BLACK; c <= WHITE; c++) {
+		b->kings[c]		   = OTB;
+		b->sliders_size[c] = 0;
+		for(size_t i = 0; i < 13; i++) {
+			b->sliders[c][i] = OTB;
+		}
+		b->queens_size[c] = 0;
+		for(size_t i = 0; i < 9; i++) {
+			b->queens[c][i] = OTB;
+		}
+		b->rooks_size[c] = 0;
+		for(size_t i = 0; i < 10; i++) {
+			b->rooks[c][i] = OTB;
+		}
+		b->bishops_size[c] = 0;
+		for(size_t i = 0; i < 10; i++) {
+			b->bishops[c][i] = OTB;
+		}
+		b->knights_size[c] = 0;
+		for(size_t i = 0; i < 10; i++) {
+			b->knights[c][i] = OTB;
+		}
+		b->pawns_size[c] = 0;
+		for(size_t i = 0; i < 8; i++) {
+			b->pawns[c][i] = OTB;
+		}
+	}
+}
+
 void Board__set_starting_position(Board *b) {
 	assert(b != NULL);
 
@@ -82,11 +127,16 @@ Error Board__set_fen(Board *b, const char *fen) {
 	}
 
 	// TODO: Detect checks (and pins?) here for init.
+	b->check_info = CHECK_NONE;
 
 	return OK;
 }
 
+// TODO: NULL check?
 void Board__add_piece(Board *b, Square sq, Piece p) {
+	if(!on_board(sq)) {
+		return;
+	}
 	b->squares[sq] = p;
 
 	const Piece ptype = p & PIECE_MASK;
@@ -105,13 +155,17 @@ void Board__add_piece(Board *b, Square sq, Piece p) {
 	}
 }
 
+// TODO: NULL check?
 void Board__del_piece(Board *b, Square sq) {
+	if(!on_board(sq)) {
+		return;
+	}
 	const Piece p	  = b->squares[sq];
 	const Piece ptype = p & PIECE_MASK;
 	const Piece pcol  = p & COLOR_ONLY_MASK;
 
 	b->squares[sq] = EMPTY;
 	switch(ptype) {
-
+		// TODO: plists
 	}
 }

@@ -7,10 +7,13 @@
 #include "errors.h"
 
 int main() {
-	const char *input_fen = "1nbqkb1r/1ppppp1p/r4n2/p5pP/8/2N4R/PPPPPPP1/R1BQKBN1 w Qk g6 0 5";
-	Board		ob;
+	Board out_board;
 
-	Error error = Board__set_fen(&ob, input_fen);
+	// Add white rook at h5 (0x47)
+	Board__add_piece(&out_board, 0x47, WROOK);
+	printf("%d\n", out_board.squares[0x47]);
+	printf("%zu\n", out_board.rooks_size[WHITE]);
+	printf("%d\n", out_board.rooks[WHITE][0]);
 
 	return EXIT_SUCCESS;
 }

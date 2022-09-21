@@ -65,6 +65,7 @@ MunitResult test_piecelist__del_index(const MunitParameter params[], void *data)
 MunitTest test_diverse_suite[] = {
 	{"piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

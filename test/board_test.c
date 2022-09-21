@@ -80,16 +80,63 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 		}
 	}
 
-	// munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
-	// Error error = fen_parse_pieces(NULL, output);
-	// munit_assert_int(ERR_NULL_PTR, ==, error);
-	// error = fen_parse_pieces("does not matter", NULL);
+	munit_log(MUNIT_LOG_INFO, "testcase 1: NULL args");
+	Error error = Board__set_fen(NULL, "arg does not matter");
+	munit_assert_int(ERR_NULL_PTR, ==, error);
+	error = Board__set_fen(&out_board, NULL);
+	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
 
+MunitResult test_board__add_del_piece(const MunitParameter params[], void *data) {
+	Board out_board;
+	Board__clear(&out_board);
+
+	// Add white rook at h5 (0x47)
+	Board__add_piece(&out_board, 0x47, WROOK);
+	munit_assert_int(WROOK, ==, out_board.squares[0x47]);
+	munit_assert_size(1, ==, out_board.rooks_size[WHITE]);
+	munit_assert_int(0x47, ==, out_board.rooks[WHITE][0]);
+
+	// Add white rook at h4 (0x37)
+	Board__add_piece(&out_board, 0x37, WROOK);
+	munit_assert_int(WROOK, ==, out_board.squares[0x37]);
+	munit_assert_size(2, ==, out_board.rooks_size[WHITE]);
+	munit_assert_int(0x37, ==, out_board.rooks[WHITE][1]);
+
+	// Add black pawn at a7 (0x60)
+	Board__add_piece(&out_board, 0x60, BPAWN);
+	munit_assert_int(BPAWN, ==, out_board.squares[0x60]);
+	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
+	munit_assert_int(0x60, ==, out_board.pawns[BLACK][0]);
+
+	// Add pawn out-of-board (invalid): is ignored.
+	Board__add_piece(&out_board, OTB, BPAWN);
+	munit_assert_int(EMPTY, ==, out_board.squares[OTB]);
+	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
+
+	// Delete something out-of-board (invalid): is ignored.
+	Board__del_piece(&out_board, OTB);
+	munit_assert_int(EMPTY, ==, out_board.squares[OTB]);
+	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
+
+	// Delete black pawn at a7 (0x60)
+	// Board__del_piece(&out_board, 0x60);
+	// munit_assert_int(EMPTY, ==, out_board.squares[0x60]);
+	// munit_assert_size(0, ==, out_board.pawns_size[BLACK]);
+	// // Deleting will not change "dead" pieces in the piece list.
+	// munit_assert_int(0x60, ==, out_board.pawns[BLACK][0]);
+	// TODO
+
+	return MUNIT_OK;
+}
+
+
 MunitTest test_board_suite[] = {
 	{"board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };
+
