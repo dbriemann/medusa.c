@@ -133,6 +133,8 @@ Error Board__set_fen(Board *b, const char *fen) {
 }
 
 // TODO: NULL check?
+// TODO: what if square has a piece already?
+// TODO: check if plists are full? (should never happen [maybe in chess variants])
 void Board__add_piece(Board *b, Square sq, Piece p) {
 	if(!on_board(sq)) {
 		return;
@@ -145,9 +147,18 @@ void Board__add_piece(Board *b, Square sq, Piece p) {
 	switch(ptype) {
 	case PAWN: PieceList__add(b->pawns[pcol], &(b->pawns_size[pcol]), sq); break;
 	case KNIGHT: PieceList__add(b->knights[pcol], &(b->knights_size[pcol]), sq); break;
-	case BISHOP: PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq); break;
-	case ROOK: PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq); break;
-	case QUEEN: PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq); break;
+	case BISHOP:
+		PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
+		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
+	case ROOK:
+		PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
+		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
+	case QUEEN:
+		PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq);
+		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
 	case KING: b->kings[pcol] = sq; break;
 	default:
 		// This should never happen. Ignore all other values.
@@ -166,6 +177,23 @@ void Board__del_piece(Board *b, Square sq) {
 
 	b->squares[sq] = EMPTY;
 	switch(ptype) {
-		// TODO: plists
+	case PAWN: PieceList__del(b->pawns[pcol], &(b->pawns_size[pcol]), sq); break;
+	case KNIGHT: PieceList__del(b->knights[pcol], &(b->knights_size[pcol]), sq); break;
+	case BISHOP:
+		PieceList__del(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
+		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
+	case ROOK:
+		PieceList__del(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
+		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
+	case QUEEN:
+		PieceList__del(b->queens[pcol], &(b->queens_size[pcol]), sq);
+		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+		break;
+	case KING: b->kings[pcol] = sq; break;
+	default:
+		// This should never happen. Ignore all other values.
+		break;
 	}
 }

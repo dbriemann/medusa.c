@@ -39,7 +39,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 				.rooks_size = {2, 2},
 				.bishops = {
 					{0x72, 0x75, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0x02, 0x07, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0x02, 0x05, 0, 0, 0, 0, 0, 0, 0, 0},
 				},
 				.bishops_size = {2, 2},
 				.sliders = {
@@ -74,11 +74,13 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 
 		if(error == OK) {
 			const Board *expb = &testcases[tc].expected_board;
-			for(size_t i = 0; i < 2*64; i++) {
+			for(size_t i = 0; i < 2 * 64; i++) {
 				munit_assert_int(expb->squares[i], ==, out_board.squares[i]);
 			}
 		}
 	}
+
+	// TODO: test rest of board info.. plist etc
 
 	munit_log(MUNIT_LOG_INFO, "testcase 1: NULL args");
 	Error error = Board__set_fen(NULL, "arg does not matter");
@@ -90,48 +92,156 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 }
 
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data) {
+	// Set up a starting position and validate the correctness including plists.
+	const BoardAddDelPieceTestCase testcases[] = {
+		{.piece = WPAWN, .sq = 0x10},
+		{.piece = WPAWN, .sq = 0x11},
+		{.piece = WPAWN, .sq = 0x12},
+		{.piece = WPAWN, .sq = 0x13},
+		{.piece = WPAWN, .sq = 0x14},
+		{.piece = WPAWN, .sq = 0x15},
+		{.piece = WPAWN, .sq = 0x16},
+		{.piece = WPAWN, .sq = 0x17},
+		{.piece = WROOK, .sq = 0x00},
+		{.piece = WKNIGHT, .sq = 0x01},
+		{.piece = WBISHOP, .sq = 0x02},
+		{.piece = WQUEEN, .sq = 0x03},
+		{.piece = WKING, .sq = 0x04},
+		{.piece = WBISHOP, .sq = 0x05},
+		{.piece = WKNIGHT, .sq = 0x06},
+		{.piece = WROOK, .sq = 0x07},
+
+		{.piece = BPAWN, .sq = 0x60},
+		{.piece = BPAWN, .sq = 0x61},
+		{.piece = BPAWN, .sq = 0x62},
+		{.piece = BPAWN, .sq = 0x63},
+		{.piece = BPAWN, .sq = 0x64},
+		{.piece = BPAWN, .sq = 0x65},
+		{.piece = BPAWN, .sq = 0x66},
+		{.piece = BPAWN, .sq = 0x67},
+		{.piece = BROOK, .sq = 0x70},
+		{.piece = BKNIGHT, .sq = 0x71},
+		{.piece = BBISHOP, .sq = 0x72},
+		{.piece = BQUEEN, .sq = 0x73},
+		{.piece = BKING, .sq = 0x74},
+		{.piece = BBISHOP, .sq = 0x75},
+		{.piece = BKNIGHT, .sq = 0x76},
+		{.piece = BROOK, .sq = 0x77},
+
+		// Plus one nonsense add operation outside of board. Should be ignored.
+		{.piece = BQUEEN, .sq = OTB},
+	};
+
+	// Manually set up a starting board for comparison.
+	Board starting_board =  {
+		.squares = {
+			WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,	
+			WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,			EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+			BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		},
+		.kings = {0x74, 0x04},
+		.queens = {
+			{0x73, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0x03, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		.queens_size = {1, 1},
+		.rooks = {
+			{0x70, 0x77, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0x00, 0x07, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		.rooks_size = {2, 2},
+		.bishops = {
+			{0x72, 0x75, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0x02, 0x05, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		.bishops_size = {2, 2},
+		.sliders = {
+			{0x70, 0x72, 0x73, 0x75, 0x77, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0x00, 0x02, 0x03, 0x05, 0x07, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		.sliders_size = {5, 5},
+		.knights = {
+			{0x71, 0x76, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0x01, 0x06, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		.knights_size = {2, 2},
+		.pawns = {
+			{0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67},
+			{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+		},
+		.pawns_size = {8, 8},
+	};
+
 	Board out_board;
 	Board__clear(&out_board);
 
-	// Add white rook at h5 (0x47)
-	Board__add_piece(&out_board, 0x47, WROOK);
-	munit_assert_int(WROOK, ==, out_board.squares[0x47]);
-	munit_assert_size(1, ==, out_board.rooks_size[WHITE]);
-	munit_assert_int(0x47, ==, out_board.rooks[WHITE][0]);
+	const size_t len = sizeof(testcases) / sizeof(BoardAddDelPieceTestCase);
+	for(size_t i = 0; i < len; i++) {
+		BoardAddDelPieceTestCase tc = testcases[i];
+		Board__add_piece(&out_board, tc.sq, tc.piece);
+	}
 
-	// Add white rook at h4 (0x37)
-	Board__add_piece(&out_board, 0x37, WROOK);
-	munit_assert_int(WROOK, ==, out_board.squares[0x37]);
-	munit_assert_size(2, ==, out_board.rooks_size[WHITE]);
-	munit_assert_int(0x37, ==, out_board.rooks[WHITE][1]);
+	// Test board squares.
+	for(size_t i = 0; i < 64*2; i++) {
+		munit_assert_int(starting_board.squares[i], ==, out_board.squares[i]);
+	}
 
-	// Add black pawn at a7 (0x60)
-	Board__add_piece(&out_board, 0x60, BPAWN);
-	munit_assert_int(BPAWN, ==, out_board.squares[0x60]);
-	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
-	munit_assert_int(0x60, ==, out_board.pawns[BLACK][0]);
+	// Test piece lists.
+	for(Color c = BLACK; c <= WHITE; c++) {
+		munit_assert_int(starting_board.kings[c], ==, out_board.kings[c]);
+		munit_assert_int(starting_board.sliders_size[c], ==, out_board.sliders_size[c]);
+		for(size_t i = 0; i < out_board.sliders_size[c]; i++) {
+			munit_assert_int(starting_board.sliders[c][i], ==, out_board.sliders[c][i]);
+		}
+		munit_assert_int(starting_board.queens_size[c], ==, out_board.queens_size[c]);
+		for(size_t i = 0; i < out_board.queens_size[c]; i++) {
+			munit_assert_int(starting_board.queens[c][i], ==, out_board.queens[c][i]);
+		}
+		munit_assert_int(starting_board.rooks_size[c], ==, out_board.rooks_size[c]);
+		for(size_t i = 0; i < out_board.rooks_size[c]; i++) {
+			munit_assert_int(starting_board.rooks[c][i], ==, out_board.rooks[c][i]);
+		}
+		munit_assert_int(starting_board.bishops_size[c], ==, out_board.bishops_size[c]);
+		for(size_t i = 0; i < out_board.bishops_size[c]; i++) {
+			munit_assert_int(starting_board.bishops[c][i], ==, out_board.bishops[c][i]);
+		}
+		munit_assert_int(starting_board.knights_size[c], ==, out_board.knights_size[c]);
+		for(size_t i = 0; i < out_board.knights_size[c]; i++) {
+			munit_assert_int(starting_board.knights[c][i], ==, out_board.knights[c][i]);
+		}
+		munit_assert_int(starting_board.pawns_size[c], ==, out_board.pawns_size[c]);
+		for(size_t i = 0; i < out_board.pawns_size[c]; i++) {
+			munit_assert_int(starting_board.pawns[c][i], ==, out_board.pawns[c][i]);
+		}
+	}
 
-	// Add pawn out-of-board (invalid): is ignored.
-	Board__add_piece(&out_board, OTB, BPAWN);
-	munit_assert_int(EMPTY, ==, out_board.squares[OTB]);
-	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
+	for(size_t i = 0; i < len; i++) {
+		BoardAddDelPieceTestCase tc = testcases[i];
+		Board__del_piece(&out_board, tc.sq);
+	}
 
-	// Delete something out-of-board (invalid): is ignored.
-	Board__del_piece(&out_board, OTB);
-	munit_assert_int(EMPTY, ==, out_board.squares[OTB]);
-	munit_assert_size(1, ==, out_board.pawns_size[BLACK]);
+	// Test board squares.
+	for(size_t i = 0; i < 64*2; i++) {
+		munit_assert_int(EMPTY, ==, out_board.squares[i]);
+	}
 
-	// Delete black pawn at a7 (0x60)
-	// Board__del_piece(&out_board, 0x60);
-	// munit_assert_int(EMPTY, ==, out_board.squares[0x60]);
-	// munit_assert_size(0, ==, out_board.pawns_size[BLACK]);
-	// // Deleting will not change "dead" pieces in the piece list.
-	// munit_assert_int(0x60, ==, out_board.pawns[BLACK][0]);
-	// TODO
+	// Test piece lists.
+	for(Color c = BLACK; c <= WHITE; c++) {
+		munit_assert_int(0, ==, out_board.sliders_size[c]);
+		munit_assert_int(0, ==, out_board.queens_size[c]);
+		munit_assert_int(0, ==, out_board.rooks_size[c]);
+		munit_assert_int(0, ==, out_board.bishops_size[c]);
+		munit_assert_int(0, ==, out_board.knights_size[c]);
+		munit_assert_int(0, ==, out_board.pawns_size[c]);
+	}
 
 	return MUNIT_OK;
 }
-
 
 MunitTest test_board_suite[] = {
 	{"board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
@@ -139,4 +249,3 @@ MunitTest test_board_suite[] = {
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };
-

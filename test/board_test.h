@@ -15,9 +15,14 @@ struct BoardSetFenTestCase {
 	const Board expected_board;
 };
 
+typedef struct BoardAddDelPieceTestCase BoardAddDelPieceTestCase;
+struct BoardAddDelPieceTestCase {
+	const Piece piece;
+	const Square sq;
+};
+
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
-MunitResult test_board__del_piece(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 
