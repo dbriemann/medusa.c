@@ -2,3 +2,4 @@
 
 ## TODOs
 
+- doxygen: https://doxygen.nl/manual/starting.html
