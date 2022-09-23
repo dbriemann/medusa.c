@@ -33,7 +33,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 				},
 				.queens_size = {1, 1},
 				.rooks = {
-					{0x77, 0x50, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0x50, 0x77, 0, 0, 0, 0, 0, 0, 0, 0},
 					{0x00, 0x27, 0, 0, 0, 0, 0, 0, 0, 0},
 				},
 				.rooks_size = {2, 2},
@@ -43,17 +43,17 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 				},
 				.bishops_size = {2, 2},
 				.sliders = {
-					{0x72, 0x73, 0x75, 0x77, 0x50, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0x50, 0x72, 0x73, 0x75, 0x77, 0, 0, 0, 0, 0, 0, 0, 0},
 					{0x00, 0x02, 0x03, 0x05, 0x27, 0, 0, 0, 0, 0, 0, 0, 0},
 				},
 				.sliders_size = {5, 5},
 				.knights = {
-					{0x71, 0x55, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0x55, 0x71, 0, 0, 0, 0, 0, 0, 0, 0},
 					{0x06, 0x22, 0, 0, 0, 0, 0, 0, 0, 0},
 				},
 				.knights_size = {2, 2},
 				.pawns = {
-					{0x61, 0x62, 0x63, 0x64, 0x65, 0x67, 0x40, 0x46},
+					{0x40, 0x46, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67},
 					{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x47},
 				},
 				.pawns_size = {8, 8},
@@ -76,6 +76,45 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 			const Board *expb = &testcases[tc].expected_board;
 			for(size_t i = 0; i < 2 * 64; i++) {
 				munit_assert_int(expb->squares[i], ==, out_board.squares[i]);
+			}
+
+			munit_assert_int(expb->move_number, ==, out_board.move_number);
+			munit_assert_int(expb->draw_counter, ==, out_board.draw_counter);
+			munit_assert_int(expb->check_info, ==, out_board.check_info);
+			munit_assert_int(expb->ep_square, ==, out_board.ep_square);
+			munit_assert_int(expb->player, ==, out_board.player);
+
+			for(Color c = BLACK; c <= WHITE; c++) {
+				// Castling rights
+				munit_assert_int(expb->castle_short[c], ==, out_board.castle_short[c]);
+				munit_assert_int(expb->castle_short[c], ==, out_board.castle_short[c]);
+
+				// Test piece lists.
+				munit_assert_int(expb->kings[c], ==, out_board.kings[c]);
+				munit_assert_int(expb->sliders_size[c], ==, out_board.sliders_size[c]);
+				for(size_t i = 0; i < out_board.sliders_size[c]; i++) {
+					munit_assert_int(expb->sliders[c][i], ==, out_board.sliders[c][i]);
+				}
+				munit_assert_int(expb->queens_size[c], ==, out_board.queens_size[c]);
+				for(size_t i = 0; i < out_board.queens_size[c]; i++) {
+					munit_assert_int(expb->queens[c][i], ==, out_board.queens[c][i]);
+				}
+				munit_assert_int(expb->rooks_size[c], ==, out_board.rooks_size[c]);
+				for(size_t i = 0; i < out_board.rooks_size[c]; i++) {
+					munit_assert_int(expb->rooks[c][i], ==, out_board.rooks[c][i]);
+				}
+				munit_assert_int(expb->bishops_size[c], ==, out_board.bishops_size[c]);
+				for(size_t i = 0; i < out_board.bishops_size[c]; i++) {
+					munit_assert_int(expb->bishops[c][i], ==, out_board.bishops[c][i]);
+				}
+				munit_assert_int(expb->knights_size[c], ==, out_board.knights_size[c]);
+				for(size_t i = 0; i < out_board.knights_size[c]; i++) {
+					munit_assert_int(expb->knights[c][i], ==, out_board.knights[c][i]);
+				}
+				munit_assert_int(expb->pawns_size[c], ==, out_board.pawns_size[c]);
+				for(size_t i = 0; i < out_board.pawns_size[c]; i++) {
+					munit_assert_int(expb->pawns[c][i], ==, out_board.pawns[c][i]);
+				}
 			}
 		}
 	}
@@ -133,7 +172,8 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 	};
 
 	// Manually set up a starting board for comparison.
-	Board starting_board =  {
+	Board starting_board = {
+		// clang-format off
 		.squares = {
 			WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,	
 			WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
@@ -175,6 +215,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 			{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
 		},
 		.pawns_size = {8, 8},
+		// clang-format on
 	};
 
 	Board out_board;
@@ -187,7 +228,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 	}
 
 	// Test board squares.
-	for(size_t i = 0; i < 64*2; i++) {
+	for(size_t i = 0; i < 64 * 2; i++) {
 		munit_assert_int(starting_board.squares[i], ==, out_board.squares[i]);
 	}
 
@@ -226,7 +267,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 	}
 
 	// Test board squares.
-	for(size_t i = 0; i < 64*2; i++) {
+	for(size_t i = 0; i < 64 * 2; i++) {
 		munit_assert_int(EMPTY, ==, out_board.squares[i]);
 	}
 

@@ -103,27 +103,38 @@ Error Board__set_fen(Board *b, const char *fen) {
 	b->player = mb.color;
 
 	for(size_t i = 0; i < 64; i++) {
-		Square sq	 = LOOKUP_0x88[i];
-		Piece  piece = mb.squares[i];
+		const Square sq	   = LOOKUP_0x88[i];
+		const Piece	 piece = mb.squares[i];
+		const Piece	 ptype = piece & PIECE_MASK;
+		const Piece	 pcol  = piece & COLOR_ONLY_MASK;
 
-		b->squares[sq] = piece;
-
-		switch(piece) {
-		case EMPTY: break;
-		case BKING: b->kings[BLACK] = sq; break;
-		case WKING: b->kings[WHITE] = sq; break;
-		case BQUEEN: PieceList__add(b->queens[BLACK], &(b->queens_size[BLACK]), sq); break;
-		case WQUEEN: PieceList__add(b->queens[WHITE], &(b->queens_size[WHITE]), sq); break;
-		case BROOK: PieceList__add(b->rooks[BLACK], &(b->rooks_size[BLACK]), sq); break;
-		case WROOK: PieceList__add(b->rooks[WHITE], &(b->rooks_size[WHITE]), sq); break;
-		case BBISHOP: PieceList__add(b->bishops[BLACK], &(b->bishops_size[BLACK]), sq); break;
-		case WBISHOP: PieceList__add(b->bishops[WHITE], &(b->bishops_size[WHITE]), sq); break;
-		case BKNIGHT: PieceList__add(b->knights[BLACK], &(b->knights_size[BLACK]), sq); break;
-		case WKNIGHT: PieceList__add(b->knights[WHITE], &(b->knights_size[WHITE]), sq); break;
-		case BPAWN: PieceList__add(b->pawns[BLACK], &(b->pawns_size[BLACK]), sq); break;
-		case WPAWN: PieceList__add(b->pawns[WHITE], &(b->pawns_size[WHITE]), sq); break;
-		default: return ERR_INVALID_INPUT;
+		if(piece == EMPTY) {
+			b->squares[sq] = EMPTY;
+			continue;
 		}
+
+		switch(ptype) {
+		case PAWN: PieceList__add(b->pawns[pcol], &(b->pawns_size[pcol]), sq); break;
+		case KNIGHT: PieceList__add(b->knights[pcol], &(b->knights_size[pcol]), sq); break;
+		case BISHOP:
+			PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
+			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+			break;
+		case ROOK:
+			PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
+			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+			break;
+		case QUEEN:
+			PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq);
+			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
+			break;
+		case KING:
+			b->squares[sq] = piece;
+			b->kings[pcol] = sq;
+			break;
+		default: printf("ptype: %d\n", ptype); return ERR_INVALID_INPUT; // Skips squares assignment.
+		}
+		b->squares[sq] = piece;
 	}
 
 	// TODO: Detect checks (and pins?) here for init.
@@ -139,7 +150,6 @@ void Board__add_piece(Board *b, Square sq, Piece p) {
 	if(!on_board(sq)) {
 		return;
 	}
-	b->squares[sq] = p;
 
 	const Piece ptype = p & PIECE_MASK;
 	const Piece pcol  = p & COLOR_ONLY_MASK;
@@ -162,8 +172,9 @@ void Board__add_piece(Board *b, Square sq, Piece p) {
 	case KING: b->kings[pcol] = sq; break;
 	default:
 		// This should never happen. Ignore all other values.
-		break;
+		return; // Skips squares assignment.
 	}
+	b->squares[sq] = p;
 }
 
 // TODO: NULL check?
@@ -196,4 +207,31 @@ void Board__del_piece(Board *b, Square sq) {
 		// This should never happen. Ignore all other values.
 		break;
 	}
+}
+
+Error Board__to_string(Board *b, char *str) {
+	if(b == NULL || str == NULL) {
+		return ERR_NULL_PTR;
+	}
+
+	// str := "  +-----------------+\n"
+	// for r := 7; r >= 0; r-- {
+	// 	str += strconv.Itoa(r+1) + " | "
+	// 	for f := 0; f < 8; f++ {
+	// 		idx := 16*r + f
+	// 		if Piece(idx) == b.EpSquare {
+	// 			str += ", "
+	// 		} else {
+	// 			str += PrintMap[b.Squares[idx]] + " "
+	// 		}
+	//
+	// 		if f == 7 {
+	// 			str += "|\n"
+	// 		}
+	// 	}
+	// }
+	// str += "  +-----------------+\n"
+	// str += "    a b c d e f g h\n"
+
+	return OK;
 }
