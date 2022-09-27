@@ -26,6 +26,9 @@ const static Square CHECK_NONE		   = OTB;
 const static Square CHECK_DOUBLE_CHECK = 0x0F; 
 const static Square CHECK_CHECKMATE	   = 0x1F;
 
+// Other special constants.
+const static Piece PROMO_NONE;
+
 // Colors
 const static Color BLACK		   = 0;
 const static Color WHITE		   = 1;
@@ -139,8 +142,30 @@ const static Square DIFF_ATTACK_MAP[240] = {
 	// clang-format on
 };
 
+// TODO: do we need the dir map at all?
+const static Square DIFF_DIR_MAP[240] = {
+	// clang-format off
+	0, 0, 0, 0, 0, 0, -16, 0, 0, 0,	0, 0, 0, -15, 0, 0, -17, 0, 0, 0,
+	0, 0, -16, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, -17, 0, 0, 0, 0, -16, 0,
+	0, 0, 0, -15, 0, 0, 0, 0, 0, 0, -17, 0, 0, 0, -16, 0, 0, 0, -15, 0,
+	0, 0, 0, 0, 0, 0, 0, -17, 0, 0, -16, 0, 0, -15, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, -17, -33, -16, -31, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	-18, -17, -16, -15, -14, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, 0, 1,
+	1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 14, 15, 16, 17, 18, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 15, 31, 16, 33, 17, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 15, 0, 0, 16, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0,
+	0, 0, 16, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 16, 0,
+	0, 0, 0, 17, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0,
+	17, 0, 0, 15, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 17, 0, 40,
+	// clang-format on
+};
+
 static inline bool on_board(Square sq) {
 	return !(sq & 0x88);
+}
+
+static inline Color flip_color(const Color c) {
+	return c ^ 1;
 }
 
 #endif

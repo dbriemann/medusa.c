@@ -1,5 +1,7 @@
 #include "diverse_test.h"
 #include "../src/plist.h"
+#include "../src/bitmove.h"
+#include "../src/base.h"
 
 MunitResult test_piecelist__add(const MunitParameter params[], void *data) {
 	Square sq = 0x34; //e4
@@ -62,10 +64,32 @@ MunitResult test_piecelist__del_index(const MunitParameter params[], void *data)
 	return MUNIT_OK;
 }
 
+MunitResult test_bitmove_all(const MunitParameter params[], void *data) {
+	// We don't care about the underlying representation in the test,
+	// just that what is put into a BitMove also comes back out of it 
+	// using the extraction function.
+	const Square e2 = 0x14;
+	const Square e4 = 0x34;
+	const BitMove e2e4 = BitMove__new(e2, e4, PROMO_NONE);
+	munit_assert_int(e2, ==, BitMove__from(e2e4));
+	munit_assert_int(e4, ==, BitMove__to(e2e4));
+	munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(e2e4));
+
+	const Square g7 = 0x66;
+	const Square g8 = 0x76;
+	const BitMove g7g8Q = BitMove__new(g7, g8, WQUEEN);
+	munit_assert_int(g7, ==, BitMove__from(g7g8Q));
+	munit_assert_int(g8, ==, BitMove__to(g7g8Q));
+	munit_assert_int(WQUEEN, ==, BitMove__promoted_piece(g7g8Q));
+
+	return MUNIT_OK;
+}
+
 MunitTest test_diverse_suite[] = {
 	{"piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"bitmove__all", test_bitmove_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };
