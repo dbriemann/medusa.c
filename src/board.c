@@ -53,6 +53,77 @@ void Board__clear(Board *b) {
 	}
 }
 
+void Board__clear_meta(Board *b) {
+	// This function is called often and thus the "loop" is manually unrolled.
+	// It is a lot faster than any looping construct.
+	b->check_info = OTB;
+
+	b->squares[0x8] = INFO_NONE;
+	b->squares[0x9] = INFO_NONE;
+	b->squares[0xa] = INFO_NONE;
+	b->squares[0xb] = INFO_NONE;
+	b->squares[0xc] = INFO_NONE;
+	b->squares[0xd] = INFO_NONE;
+	b->squares[0xe] = INFO_NONE;
+	b->squares[0xf] = INFO_NONE;
+	b->squares[0x18] = INFO_NONE;
+	b->squares[0x19] = INFO_NONE;
+	b->squares[0x1a] = INFO_NONE;
+	b->squares[0x1b] = INFO_NONE;
+	b->squares[0x1c] = INFO_NONE;
+	b->squares[0x1d] = INFO_NONE;
+	b->squares[0x1e] = INFO_NONE;
+	b->squares[0x1f] = INFO_NONE;
+	b->squares[0x28] = INFO_NONE;
+	b->squares[0x29] = INFO_NONE;
+	b->squares[0x2a] = INFO_NONE;
+	b->squares[0x2b] = INFO_NONE;
+	b->squares[0x2c] = INFO_NONE;
+	b->squares[0x2d] = INFO_NONE;
+	b->squares[0x2e] = INFO_NONE;
+	b->squares[0x2f] = INFO_NONE;
+	b->squares[0x38] = INFO_NONE;
+	b->squares[0x39] = INFO_NONE;
+	b->squares[0x3a] = INFO_NONE;
+	b->squares[0x3b] = INFO_NONE;
+	b->squares[0x3c] = INFO_NONE;
+	b->squares[0x3d] = INFO_NONE;
+	b->squares[0x3e] = INFO_NONE;
+	b->squares[0x3f] = INFO_NONE;
+	b->squares[0x48] = INFO_NONE;
+	b->squares[0x49] = INFO_NONE;
+	b->squares[0x4a] = INFO_NONE;
+	b->squares[0x4b] = INFO_NONE;
+	b->squares[0x4c] = INFO_NONE;
+	b->squares[0x4d] = INFO_NONE;
+	b->squares[0x4e] = INFO_NONE;
+	b->squares[0x4f] = INFO_NONE;
+	b->squares[0x58] = INFO_NONE;
+	b->squares[0x59] = INFO_NONE;
+	b->squares[0x5a] = INFO_NONE;
+	b->squares[0x5b] = INFO_NONE;
+	b->squares[0x5c] = INFO_NONE;
+	b->squares[0x5d] = INFO_NONE;
+	b->squares[0x5e] = INFO_NONE;
+	b->squares[0x5f] = INFO_NONE;
+	b->squares[0x68] = INFO_NONE;
+	b->squares[0x69] = INFO_NONE;
+	b->squares[0x6a] = INFO_NONE;
+	b->squares[0x6b] = INFO_NONE;
+	b->squares[0x6c] = INFO_NONE;
+	b->squares[0x6d] = INFO_NONE;
+	b->squares[0x6e] = INFO_NONE;
+	b->squares[0x6f] = INFO_NONE;
+	b->squares[0x78] = INFO_NONE;
+	b->squares[0x79] = INFO_NONE;
+	b->squares[0x7a] = INFO_NONE;
+	b->squares[0x7b] = INFO_NONE;
+	b->squares[0x7c] = INFO_NONE;
+	b->squares[0x7d] = INFO_NONE;
+	b->squares[0x7e] = INFO_NONE;
+	b->squares[0x7f] = INFO_NONE;
+}
+
 void Board__set_starting_position(Board *b) {
 	assert(b != NULL);
 
@@ -208,6 +279,81 @@ void Board__del_piece(Board *b, Square sq) {
 		break;
 	}
 }
+
+bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color) {
+	Color opp_color = flip_color(color);
+	
+	// 1. Detect attacks by knights.
+	for(size_t i = 0; i < b->knights_size[opp_color]; i++) {
+		Square ksq = b->knights[opp_color][i];
+		if(ksq == ignore_sq) {
+			continue;
+		}
+		Square diff = square_diff(ksq, sq);
+		if(contains_piece(DIFF_ATTACK_MAP[diff], KNIGHT)) {
+			return true;
+		}
+	}
+
+
+	// TODO: continue here
+
+}
+
+// IsSquareAttacked tests if a specific square is attacked by any enemy.
+// func (b *Board) IsSquareAttacked(sq, ignoreSq Square, color Color) bool {
+// 	oppColor := color.Flip()
+//
+// 	// 1. Detect attacks	by knights.
+// 	for i := uint8(0); i < b.Knights[oppColor].Size; i++ {
+// 		knightSq := b.Knights[oppColor].Pieces[i]
+// 		if knightSq == ignoreSq {
+// 			continue
+// 		}
+// 		diff := knightSq.Diff(sq)
+// 		if SQUARE_DIFFS[diff].Contains(KNIGHT) {
+// 			return true
+// 		}
+// 	}
+//
+// 	// 3. Detect attacks by sliders.
+// 	if b.IsSqAttackedBySlider(color, sq, ignoreSq) {
+// 		return true
+// 	}
+// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Queens[oppColor], QUEEN) {
+// 	//		return true
+// 	//	}
+// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Bishops[oppColor], BISHOP) {
+// 	//		return true
+// 	//	}
+// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Rooks[oppColor], ROOK) {
+// 	//		return true
+// 	//	}
+//
+// 	// 2. Detect attacks by pawns.
+// 	oppPawn := PAWN | oppColor
+//
+// 	maybePawnSq := Square(int8(sq) + PAWN_CAPTURE_DIRS[color][0])
+// 	if maybePawnSq.OnBoard() && b.Squares[maybePawnSq] == oppPawn {
+// 		// Found an attacking pawn by inspecting in reverse direction.
+// 		return true
+// 	}
+// 	maybePawnSq = Square(int8(sq) + PAWN_CAPTURE_DIRS[color][1])
+// 	if maybePawnSq.OnBoard() && b.Squares[maybePawnSq] == oppPawn {
+// 		// Found an attacking pawn by inspecting in reverse direction.
+// 		return true
+// 	}
+//
+// 	// 0. Detect attacks by kings.
+// 	oppKingSq := b.Kings[oppColor]
+// 	diff := oppKingSq.Diff(sq)
+// 	if SQUARE_DIFFS[diff].Contains(KING) {
+// 		return true
+// 	}
+//
+// 	return false
+// }
+//
 
 Error Board__to_string(Board *b, char *str) {
 	if(b == NULL || str == NULL) {

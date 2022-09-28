@@ -18,7 +18,7 @@ typedef uint8_t Square;
 typedef uint8_t Info;
 typedef int8_t	Direction;
 
-const static Piece	NONE = 0;
+const static Piece	INFO_NONE = 0;
 const static Square OTB	 = 0x7F;
 
 // All special check values are off-board.
@@ -160,12 +160,24 @@ const static Square DIFF_DIR_MAP[240] = {
 	// clang-format on
 };
 
+//TODO: test
 static inline bool on_board(Square sq) {
 	return !(sq & 0x88);
 }
 
+//TODO: test
 static inline Color flip_color(const Color c) {
 	return c ^ 1;
+}
+
+//TODO: test
+static inline Square square_diff(const Square sq1, const Square sq2) {
+	return (Square)(0x77 + ((int)sq1 - (int)sq2));
+}
+
+//TODO: test
+static inline bool contains_piece(const Piece pieces, const Piece p) {
+	return p & pieces;
 }
 
 #endif
