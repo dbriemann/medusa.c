@@ -23,6 +23,7 @@ struct BoardAddDelPieceTestCase {
 
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
+MunitResult test_board__clear_funcs(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 

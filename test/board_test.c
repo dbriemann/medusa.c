@@ -284,9 +284,38 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 	return MUNIT_OK;
 }
 
+MunitResult test_board__clear_funcs(const MunitParameter params[], void *data) {
+	Board board;
+
+	munit_log(MUNIT_LOG_INFO, "Board__clear");
+	for(size_t i = 0; i < 2 * 64; i++) {
+		board.squares[i] = OTB;
+	}
+	Board__clear(&board);
+	for(size_t i = 0; i < 2 * 64; i++) {
+		munit_assert_int(EMPTY, ==, board.squares[i]);
+	}
+
+	munit_log(MUNIT_LOG_INFO, "Board__clear_meta");
+	for(size_t i = 0; i < 2 * 64; i++) {
+		board.squares[i] = OTB;
+	}
+	Board__clear_meta(&board);
+	for(size_t i = 0; i < 2 * 64; i++) {
+		if(on_board(i)) {
+			munit_assert_int(OTB, ==, board.squares[i]);
+		} else {
+			munit_assert_int(INFO_NONE, ==, board.squares[i]);
+		}
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{"board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"board__clear_funcs", test_board__clear_funcs, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };
