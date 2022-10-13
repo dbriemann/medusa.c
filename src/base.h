@@ -143,7 +143,7 @@ const static Square DIFF_ATTACK_MAP[240] = {
 };
 
 // TODO: do we need the dir map at all?
-const static Square DIFF_DIR_MAP[240] = {
+const static Direction DIFF_DIR_MAP[240] = {
 	// clang-format off
 	0, 0, 0, 0, 0, 0, -16, 0, 0, 0,	0, 0, 0, -15, 0, 0, -17, 0, 0, 0,
 	0, 0, -16, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, -17, 0, 0, 0, 0, -16, 0,
@@ -160,23 +160,23 @@ const static Square DIFF_DIR_MAP[240] = {
 	// clang-format on
 };
 
-//TODO: test
+static inline bool has_color(const Piece p, const Color c) {
+	return (COLOR_TEST_MASK & p) == c;
+}
+
 static inline bool on_board(Square sq) {
 	return !(sq & 0x88);
 }
 
-//TODO: test
 static inline Color flip_color(const Color c) {
 	return c ^ 1;
 }
 
-//TODO: test
 static inline Square square_diff(const Square sq1, const Square sq2) {
 	return (Square)(0x77 + ((int)sq1 - (int)sq2));
 }
 
-//TODO: test
-static inline bool contains_piece(const Piece pieces, const Piece p) {
+static inline bool contains_piece_type(const Piece pieces, const Piece p) {
 	return p & pieces;
 }
 

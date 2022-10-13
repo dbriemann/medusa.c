@@ -9,8 +9,7 @@
 #include "errors.h"
 
 void Board__clear(Board *b) {
-	// TODO: manually unroll loops for performance?
-	// NOTE: this is probably only needed for testing.. no need to optimize.
+	// NOTE: this is only needed for testing.. no need to optimize.
 
 	for(size_t i = 0; i < 2 * 64; i++) {
 		b->squares[i] = EMPTY;
@@ -58,14 +57,14 @@ void Board__clear_meta(Board *b) {
 	// It is a lot faster than any looping construct.
 	b->check_info = OTB;
 
-	b->squares[0x8] = INFO_NONE;
-	b->squares[0x9] = INFO_NONE;
-	b->squares[0xa] = INFO_NONE;
-	b->squares[0xb] = INFO_NONE;
-	b->squares[0xc] = INFO_NONE;
-	b->squares[0xd] = INFO_NONE;
-	b->squares[0xe] = INFO_NONE;
-	b->squares[0xf] = INFO_NONE;
+	b->squares[0x8]	 = INFO_NONE;
+	b->squares[0x9]	 = INFO_NONE;
+	b->squares[0xa]	 = INFO_NONE;
+	b->squares[0xb]	 = INFO_NONE;
+	b->squares[0xc]	 = INFO_NONE;
+	b->squares[0xd]	 = INFO_NONE;
+	b->squares[0xe]	 = INFO_NONE;
+	b->squares[0xf]	 = INFO_NONE;
 	b->squares[0x18] = INFO_NONE;
 	b->squares[0x19] = INFO_NONE;
 	b->squares[0x1a] = INFO_NONE;
@@ -281,79 +280,91 @@ void Board__del_piece(Board *b, Square sq) {
 }
 
 bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color) {
-	Color opp_color = flip_color(color);
-	
-	// 1. Detect attacks by knights.
+	const Color opp_color = flip_color(color);
+
+	// TODO: benchmark if order of piece types has a significant impact here.
+
+	// Detect attacks by knights.
 	for(size_t i = 0; i < b->knights_size[opp_color]; i++) {
-		Square ksq = b->knights[opp_color][i];
-		if(ksq == ignore_sq) {
+		Square opp_knight_sq = b->knights[opp_color][i];
+		if(opp_knight_sq == ignore_sq) {
 			continue;
 		}
-		Square diff = square_diff(ksq, sq);
-		if(contains_piece(DIFF_ATTACK_MAP[diff], KNIGHT)) {
+		Square diff = square_diff(opp_knight_sq, sq);
+		if(contains_piece_type(DIFF_ATTACK_MAP[diff], KNIGHT)) {
 			return true;
 		}
 	}
 
+ 	// Detect attacks by sliders.
+	if(Board__is_sq_attacked_by_slider(b, sq, ignore_sq, color)) {
+		return true;
+	}
+	// TODO: should each slider have a call? (probably not)
 
-	// TODO: continue here
+	// Detect attacks by pawns.
+	const Piece opp_pawn = opp_color | PAWN;
 
+	Square potential_pawn_atk_sq = (Square) ((Direction)sq + PAWN_CAPTURE_DIRS[color][0]);
+	if(on_board(potential_pawn_atk_sq) && b->squares[potential_pawn_atk_sq] == opp_pawn) {
+		// Found attacking pawn by lookup in reverse direction.
+		return true;
+	}
+	potential_pawn_atk_sq = (Square) ((Direction)sq + PAWN_CAPTURE_DIRS[color][1]);
+	if(on_board(potential_pawn_atk_sq) && b->squares[potential_pawn_atk_sq] == opp_pawn) {
+		// Found attacking pawn by lookup in reverse direction.
+		return true;
+	}
+
+	// Detect attacks by kings.
+	const Square opp_king_sq = b->kings[opp_color];
+	Square diff = square_diff(opp_king_sq, sq);
+	if(contains_piece_type(DIFF_ATTACK_MAP[diff], KING)) {
+		return true;
+	}
+
+	return false;
 }
 
-// IsSquareAttacked tests if a specific square is attacked by any enemy.
-// func (b *Board) IsSquareAttacked(sq, ignoreSq Square, color Color) bool {
-// 	oppColor := color.Flip()
-//
-// 	// 1. Detect attacks	by knights.
-// 	for i := uint8(0); i < b.Knights[oppColor].Size; i++ {
-// 		knightSq := b.Knights[oppColor].Pieces[i]
-// 		if knightSq == ignoreSq {
-// 			continue
-// 		}
-// 		diff := knightSq.Diff(sq)
-// 		if SQUARE_DIFFS[diff].Contains(KNIGHT) {
-// 			return true
-// 		}
-// 	}
-//
-// 	// 3. Detect attacks by sliders.
-// 	if b.IsSqAttackedBySlider(color, sq, ignoreSq) {
-// 		return true
-// 	}
-// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Queens[oppColor], QUEEN) {
-// 	//		return true
-// 	//	}
-// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Bishops[oppColor], BISHOP) {
-// 	//		return true
-// 	//	}
-// 	//	if b.IsSqAttackedBySlider(color, sq, ignoreSq, &b.Rooks[oppColor], ROOK) {
-// 	//		return true
-// 	//	}
-//
-// 	// 2. Detect attacks by pawns.
-// 	oppPawn := PAWN | oppColor
-//
-// 	maybePawnSq := Square(int8(sq) + PAWN_CAPTURE_DIRS[color][0])
-// 	if maybePawnSq.OnBoard() && b.Squares[maybePawnSq] == oppPawn {
-// 		// Found an attacking pawn by inspecting in reverse direction.
-// 		return true
-// 	}
-// 	maybePawnSq = Square(int8(sq) + PAWN_CAPTURE_DIRS[color][1])
-// 	if maybePawnSq.OnBoard() && b.Squares[maybePawnSq] == oppPawn {
-// 		// Found an attacking pawn by inspecting in reverse direction.
-// 		return true
-// 	}
-//
-// 	// 0. Detect attacks by kings.
-// 	oppKingSq := b.Kings[oppColor]
-// 	diff := oppKingSq.Diff(sq)
-// 	if SQUARE_DIFFS[diff].Contains(KING) {
-// 		return true
-// 	}
-//
-// 	return false
-// }
-//
+bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ignore_sq, Color color) {
+	const Color opp_color = flip_color(color);
+
+	for(size_t i = 0; i < b->sliders_size[opp_color]; i++) {
+		const Square slider_sq = b->sliders[opp_color][i];
+		if(slider_sq == ignore_sq) {
+			// This can only eval true in pawn move legality tests.
+			// If a pawn captured a piece, it still is in the piece list and must be ignored here.
+			continue;
+		}
+		const Piece ptype = b->squares[slider_sq] & PIECE_MASK;
+		const Square diff = square_diff(sq, slider_sq);
+		
+		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
+			// The slider possibly attacks Square sq.
+			const Direction dir = DIFF_DIR_MAP[diff];
+ 			// Starting from sq we step through the path in question towards the enemy slider.
+			Square step_sq = (Direction) sq + dir;
+			while(true) {
+				Piece cur_piece = b->squares[step_sq];
+				if(cur_piece == EMPTY) {
+					step_sq = (Direction) step_sq + dir;
+					continue;
+				} else if(has_color(cur_piece, color)) {
+					// A friendly piece was encountered -> blocks any attack.
+					break;
+				} else if(contains_piece_type(cur_piece, ptype)) {
+					// An attacking enemy slider was encountered.
+					return true;
+				} else {
+					// Blocking enemy piece.
+					break;
+				}
+			} 
+		}
+	}
+
+	return false;
+}
 
 Error Board__to_string(Board *b, char *str) {
 	if(b == NULL || str == NULL) {
