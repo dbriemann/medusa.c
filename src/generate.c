@@ -3,8 +3,7 @@
 
 #include "generate.h"
 
-// TODO: how to test this?
-// TODO: do we need diff_dirs? should it store dir or muldir?
+// TODO: somehow test this (currently this is only partially manually tested)
 void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 	assert(square_diffs != NULL);
 	assert(diff_dirs != NULL);

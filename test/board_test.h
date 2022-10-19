@@ -21,9 +21,18 @@ struct BoardAddDelPieceTestCase {
 	const Square sq;
 };
 
+typedef struct IsSqAttackedTestCase IsSqAttackedTestCase;
+struct IsSqAttackedTestCase {
+	const char *name;
+	const char *fen;
+	const bool attacked_by_black[64];
+	const bool attacked_by_white[64];
+};
+
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
 MunitResult test_board__clear_funcs(const MunitParameter params[], void *data);
+MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 

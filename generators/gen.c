@@ -11,25 +11,25 @@ int main() {
 	generateAttackMaps(square_diffs, diff_dirs);
 
 	printf("\nsquare_diffs:\n");
-	printf("{\n");
-	for(size_t i = 1; i <= 240; i++) {
-		printf("%d, ", (int)square_diffs[i]);
-		if(i % 10 == 0) {
+	printf("{");
+	for(size_t i = 0; i < 240; i++) {
+		if(i % 20 == 0) {
 			printf("\n");
 		}
+		printf("%d, ", (int)square_diffs[i]);
 	}
-	printf("}\n");
+	printf("\n}\n");
 
 
 	printf("\ndiff_dirs\n");
-	printf("{\n");
-	for(size_t i = 1; i <= 240; i++) {
-		printf("%d, ", (int)diff_dirs[i]);
-		if(i % 10 == 0) {
+	printf("{");
+	for(size_t i = 0; i < 240; i++) {
+		if(i % 20 == 0) {
 			printf("\n");
 		}
+		printf("%d, ", (int)diff_dirs[i]);
 	}
-	printf("}\n");
+	printf("\n}\n");
 
 	return EXIT_SUCCESS;
 }

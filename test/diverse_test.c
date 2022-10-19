@@ -101,19 +101,19 @@ MunitResult test_utility_functions(const MunitParameter params[], void *data) {
 
 	munit_log(MUNIT_LOG_INFO, "func square_diff");
 	Square diff = square_diff(0x7, 0x17);
-	munit_assert_int(-0x10 + 0x77, ==, diff);
-	diff = square_diff(0x17, 0x7);
 	munit_assert_int(0x10 + 0x77, ==, diff);
+	diff = square_diff(0x17, 0x7);
+	munit_assert_int(-0x10 + 0x77, ==, diff);
 
 	diff = square_diff(0x77, 0x0);
-	munit_assert_int(0x77 + 0x77, ==, diff);
-	diff = square_diff(0x0, 0x77);
 	munit_assert_int(-0x77 + 0x77, ==, diff);
+	diff = square_diff(0x0, 0x77);
+	munit_assert_int(0x77 + 0x77, ==, diff);
 
 	diff = square_diff(0x40, 0x47);
-	munit_assert_int(-0x7 + 0x77, ==, diff);
-	diff = square_diff(0x47, 0x40);
 	munit_assert_int(0x7 + 0x77, ==, diff);
+	diff = square_diff(0x47, 0x40);
+	munit_assert_int(-0x7 + 0x77, ==, diff);
 
 	munit_log(MUNIT_LOG_INFO, "func flip_color");
 	Color flipped = flip_color(BLACK);
