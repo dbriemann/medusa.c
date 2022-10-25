@@ -1,4 +1,5 @@
 #include "board_test.h"
+#include "../src/base.h"
 #include "../src/board.h"
 
 MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
@@ -313,8 +314,7 @@ MunitResult test_board__clear_funcs(const MunitParameter params[], void *data) {
 }
 
 MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data) {
-	const IsSqAttackedTestCase testcases[] =
-	{
+	const IsSqAttackedTestCase testcases[] = {
 		// clang-format off
 		{
 			.name = "constructed, only pawns",
@@ -329,6 +329,16 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 				true, true, false, false, false, false, false, false,
 				false, true, false, false, false, false, false, false,
 			},
+			.attacked_by_white = {
+				false, false, false, false, false, false, true, false,
+				false, false, false, false, false, false, true, true,
+				false, true, false, false, false, false, false, false,
+				true, true, true, true, false, false, false, false,
+				false, false, true, true, true, true, false, false,
+				false, false, false, false, true, true, true, true,
+				false, false, false, false, false, false, true, false,
+				false, false, false, false, false, false, false, false,
+			},
 		},
 		{
 			.name = "real position: sevian vs. caruana (usc 2022)",
@@ -342,7 +352,17 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 				true, true, false, false, true, true, true, true,
 				true, true, true, true, true, true, true, true,
 				false, true, true, true, true, true, true, true,
-			}
+			},
+			.attacked_by_white = {
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, false, true, true, true, true, false,
+				false, true, true, true, true, true, true, true,
+				false, false, true, false, true, true, false, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			},
 		},
 		// clang-format on
 	};
@@ -357,11 +377,68 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 		munit_assert_int(OK, ==, error);
 
 		for(size_t i = 0; i < 64; i++) {
-			// munit_logf(MUNIT_LOG_INFO, "square: %zu\n", i);
 			const Square sq = LOOKUP_0x88[i];
+			// munit_logf(MUNIT_LOG_INFO, "i: %zu, sq:%d\n", i, sq);
+			// Attacked by black.
 			bool attack_check = Board__is_sq_attacked(&board, sq, OTB, WHITE);
 			munit_assert_int(testcases[tc].attacked_by_black[i], ==, attack_check);
+			// Attacked by white.
+			attack_check = Board__is_sq_attacked(&board, sq, OTB, BLACK);
+			munit_assert_int(testcases[tc].attacked_by_white[i], ==, attack_check);
 		}
+	}
+
+	return MUNIT_OK;
+}
+
+MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data) {
+	const DetectChecksAndPinsTestCase testcases[] = {
+		// clang-format off
+		{
+			.name = "",
+			.fen  = "8/8/8/2k1p3/3P4/4K3/8/8 b - - 0 1",
+			.expected_board = {
+				.check_info = 0x33,
+				.ep_square	= OTB,
+				.player		= BLACK,
+				.squares = {
+					// We only care for the info board .. thus the regular squares are just set to EMPTY.
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_MASK_CHECK, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+				}
+			}
+		},
+	};
+	// clang-format on
+
+	const size_t len = sizeof(testcases) / sizeof(DetectChecksAndPinsTestCase);
+
+	Board board;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+
+		for(size_t i = 0; i < 2 * 64; i++) {
+			// Only check info board squares.. this test does not care about the pieces.
+			if(!on_board(i)) {
+				// munit_logf(MUNIT_LOG_INFO, "i: %zu\n", i);
+				munit_assert_int(testcases[tc].expected_board.squares[i], ==, board.squares[i]);
+			}
+		}
+
+		// Test check_info
+		munit_assert_int(testcases[tc].expected_board.check_info, ==, board.check_info);
 	}
 
 	return MUNIT_OK;
@@ -372,6 +449,7 @@ MunitTest test_board_suite[] = {
 	{"board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__clear_funcs", test_board__clear_funcs, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__is_sq_attacked", test_board__is_sq_attacked, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"board__detect_checks_and_pins", test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

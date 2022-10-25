@@ -296,7 +296,7 @@ bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Co
 		}
 	}
 
- 	// Detect attacks by sliders.
+	// Detect attacks by sliders.
 	if(Board__is_sq_attacked_by_slider(b, sq, ignore_sq, color)) {
 		return true;
 	}
@@ -305,12 +305,12 @@ bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Co
 	// Detect attacks by pawns.
 	const Piece opp_pawn = opp_color | PAWN;
 
-	Square potential_pawn_atk_sq = (Square) ((Direction)sq + PAWN_CAPTURE_DIRS[color][0]);
+	Square potential_pawn_atk_sq = (Square)((Direction)sq + PAWN_CAPTURE_DIRS[color][0]);
 	if(on_board(potential_pawn_atk_sq) && b->squares[potential_pawn_atk_sq] == opp_pawn) {
 		// Found attacking pawn by lookup in reverse direction.
 		return true;
 	}
-	potential_pawn_atk_sq = (Square) ((Direction)sq + PAWN_CAPTURE_DIRS[color][1]);
+	potential_pawn_atk_sq = (Square)((Direction)sq + PAWN_CAPTURE_DIRS[color][1]);
 	if(on_board(potential_pawn_atk_sq) && b->squares[potential_pawn_atk_sq] == opp_pawn) {
 		// Found attacking pawn by lookup in reverse direction.
 		return true;
@@ -318,7 +318,7 @@ bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Co
 
 	// Detect attacks by kings.
 	const Square opp_king_sq = b->kings[opp_color];
-	Square diff = square_diff(opp_king_sq, sq);
+	Square		 diff		 = square_diff(opp_king_sq, sq);
 	if(contains_piece_type(DIFF_ATTACK_MAP[diff], KING)) {
 		return true;
 	}
@@ -336,18 +336,18 @@ bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ign
 			// If a pawn captured a piece, it still is in the piece list and must be ignored here.
 			continue;
 		}
-		const Piece ptype = b->squares[slider_sq] & PIECE_MASK;
-		const Square diff = square_diff(sq, slider_sq);
-		
+		const Piece	 ptype = b->squares[slider_sq] & PIECE_MASK;
+		const Square diff  = square_diff(sq, slider_sq);
+
 		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
 			// The slider possibly attacks Square sq.
 			const Direction dir = DIFF_DIR_MAP[diff];
- 			// Starting from sq we step through the path in question towards the enemy slider.
-			Square step_sq = (Direction) sq + dir;
+			// Starting from sq we step through the path in question towards the enemy slider.
+			Square step_sq = (Direction)sq + dir;
 			while(true) {
 				Piece cur_piece = b->squares[step_sq];
 				if(cur_piece == EMPTY) {
-					step_sq = (Direction) step_sq + dir;
+					step_sq = (Direction)step_sq + dir;
 					continue;
 				} else if(has_color(cur_piece, color)) {
 					// A friendly piece was encountered -> blocks any attack.
@@ -359,11 +359,154 @@ bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ign
 					// Blocking enemy piece.
 					break;
 				}
-			} 
+			}
 		}
 	}
 
 	return false;
+}
+
+void Board__detect_checks_and_pins(Board *b, Color color) {
+	Board__clear_meta(b);
+	const Color opp_color = flip_color(color);
+
+	const Square king_sq	   = b->kings[color];
+	int			 check_counter = 0;
+	Info		 pin_marker	   = INFO_PIN_COUNTER_START;
+
+	// Detect checks by knigts.
+	for(size_t i = 0; i < b->knights_size[opp_color]; i++) {
+		const Square knight_sq = b->knights[opp_color][i];
+		const Square diff	   = square_diff(knight_sq, king_sq);
+		if(contains_piece_type(DIFF_ATTACK_MAP[diff], KNIGHT)) {
+			// A knight checks the king. Safe the info and break the loop.
+			// There can never be a double check of two knights.
+			b->check_info = knight_sq;
+			check_counter++;
+			b->squares[to_info_index(knight_sq)] = INFO_MASK_CHECK;
+			break; // TODO: we could skip the pawn section here ?!
+		}
+	}
+
+	// Detect checks by pawns.
+	for(size_t i = 0; i < b->pawns_size[opp_color]; i++) {
+		const Square pawn_sq = b->pawns[opp_color][i];
+		for(int d = 0; d < PAWN_PUSH_CAPTURE_LEN; d++) {
+			Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
+			Square	  to  = (Square)((Direction)pawn_sq + dir);
+			if(king_sq == to) {
+				// A pawn checks the king. Safe the info and break the loop.
+				// There can never be a double check of two pawns.
+				b->check_info = pawn_sq;
+				check_counter++;
+				b->squares[to_info_index(pawn_sq)] = INFO_MASK_CHECK;
+				goto EXIT_PAWN_CHECK; // double break -> exit pawn loops
+			}
+		}
+	}
+
+EXIT_PAWN_CHECK:
+
+	// Detect checks and pins by sliders.
+	// Queens
+	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->queens_size[opp_color], b->queens[opp_color], QUEEN);
+	if(check_counter > 1) {
+		// Double check -> exit early.
+		return;
+	}
+	// Rooks
+	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->rooks_size[opp_color], b->rooks[opp_color], ROOK);
+	if(check_counter > 1) {
+		// Double check -> exit early.
+		return;
+	}
+	// Bishops
+	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->bishops_size[opp_color], b->bishops[opp_color], BISHOP);
+	if(check_counter > 1) {
+		// Double check -> exit early.
+		return;
+	}
+}
+
+int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, const int ccount, size_t plist_len, Square const *const plist, Piece ptype) {
+	const Square king_sq = b->kings[color];
+	int check_counter = 0;
+
+	for(size_t i = 0; i < plist_len; i++) {
+		const Square slider_sq = plist[i];
+		const Square diff = square_diff(king_sq, slider_sq);
+		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
+			// The slider possible checks the king or pins a piece in front of the king.
+			const Direction diffdir = DIFF_DIR_MAP[diff];
+ 			// Starting from the king we step through the path in question towards the enemy slider.
+			Info info = INFO_NONE;
+			Square step_sq = (Square)((Direction)king_sq + diffdir);
+			while(true) {
+				Piece cur_piece = b->squares[step_sq];
+				if(cur_piece == EMPTY) {
+					step_sq = (Direction)step_sq + diffdir;
+					continue;
+				} else if(has_color(cur_piece, color)) {
+					// A friendly piece was encountered on the path.
+					if(info == INFO_NONE) {
+						// First friendly piece on the path -> mark as possible pin.
+						info = INFO_MASK_MAYBE_PINNED;	
+					} else {
+						// Another piece was previously marked -> two pieces on path means no pin.
+ 						// (There is an exception for EP capture but those are handled elsewhere.
+						info = INFO_NONE;
+						break; // This path contains no pin.
+					}
+				} else {
+					// An enemy piece was encountered.
+					if(step_sq == slider_sq) {
+						// We reached the checker or pinner -> decide.
+						if(info == INFO_NONE) {
+							// No pinner was marked. Must be a check.
+							check_counter++;
+							b->check_info = slider_sq;
+							info = INFO_MASK_CHECK;
+							break;
+						} else {
+							// It's a pinner
+							info = *pmarker;
+							(*pmarker)++;
+							break;
+						}
+					} else {
+						// An enemy piece is blocking the potential checker/pinner.
+						info = INFO_NONE;
+						break;
+					}
+				}
+			}
+
+			if(info & INFO_MASK_CHECK || info & INFO_MASK_PINNED) {
+				// A path that pins or checks was detected. It is now marked 
+				// in the info board to enrich move generation.
+				step_sq = slider_sq;
+				while(step_sq != king_sq) {
+					// TODO: should we mark the path only or include the slider square?
+					b->squares[to_info_index(step_sq)] = info;
+					step_sq = (Square)((Direction)(step_sq - diffdir));
+				}
+				// If it is a check we also need to mark the square behind the king.
+				if(info & INFO_MASK_CHECK) {
+					step_sq = (Square)((Direction)(king_sq - diffdir));
+					if(on_board(step_sq)) {
+						b->squares[to_info_index(step_sq)] = INFO_MASK_FORBIDDEN_ESCAPE;
+					}
+				}
+			} 
+
+			if(check_counter+ccount > 1) {
+				// Double check detected.. leave early.
+				return check_counter;
+			}
+		}
+	}
+
+	return check_counter;
 }
 
 Error Board__to_string(Board *b, char *str) {

@@ -18,16 +18,23 @@ typedef uint8_t Square;
 typedef uint8_t Info;
 typedef int8_t	Direction;
 
-const static Piece	INFO_NONE = 0;
-const static Square OTB	 = 0x7F;
+const static Square OTB = 0x7F;
 
 // All special check values are off-board.
 const static Square CHECK_NONE		   = OTB;
-const static Square CHECK_DOUBLE_CHECK = 0x0F; 
+const static Square CHECK_DOUBLE_CHECK = 0x0F;
 const static Square CHECK_CHECKMATE	   = 0x1F;
 
 // Other special constants.
-const static Piece PROMO_NONE;
+const static Piece PROMO_NONE; // TODO: this misses a value
+
+const static Info INFO_NONE				 = 0x0;
+const static Info INFO_PIN_COUNTER_START = 1;
+const static Info INFO_MASK_PINNED		 = 0x0F; // Bits 1-4 == space for possible pinner enumeration.
+// const static Info INFO_MASK_ATTACKED		 = 16;	 // Bit 5 == attacked?
+const static Info INFO_MASK_FORBIDDEN_ESCAPE = 32;	// Bit 6 == forbidden square for king (line of check).
+const static Info INFO_MASK_MAYBE_PINNED	 = 64;	// Bit 7 == mark for pinning.
+const static Info INFO_MASK_CHECK			 = 128; // Bit 8 == check.
 
 // Colors
 const static Color BLACK		   = 0;
@@ -177,6 +184,11 @@ static inline Square square_diff(const Square from, const Square to) {
 
 static inline bool contains_piece_type(const Piece pieces, const Piece p) {
 	return p & pieces;
+}
+
+static inline Square to_info_index(const Square sq) {
+	// NOTE: does not check overflow. Must receive on-board square.
+	return sq + 8;
 }
 
 #endif

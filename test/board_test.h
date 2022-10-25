@@ -29,10 +29,18 @@ struct IsSqAttackedTestCase {
 	const bool attacked_by_white[64];
 };
 
+typedef struct DetectChecksAndPinsTestCase DetectChecksAndPinsTestCase;
+struct DetectChecksAndPinsTestCase {
+	const char *name;
+	const char *fen;
+	const Board expected_board;
+};
+
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
 MunitResult test_board__clear_funcs(const MunitParameter params[], void *data);
 MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data);
+MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 

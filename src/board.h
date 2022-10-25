@@ -50,6 +50,7 @@ struct Board {
 	size_t pawns_size[2];
 };
 
+// TODO convert all Board * to Board * const ?
 void Board__set_starting_position(Board *b);
 Error Board__set_fen(Board *b, const char *fen);
 void Board__add_piece(Board *b, Square sq, Piece p);
@@ -60,6 +61,8 @@ void Board__clear_meta(Board *b);
 // TODO: test
 bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color);
 bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ignore_sq, Color color);
+void Board__detect_checks_and_pins(Board *b, Color color);
+int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, const int ccount, size_t plist_len, Square const *const plist, Piece ptype);
 Error Board__to_string(Board *b, char *str);
 
 #endif
