@@ -8,7 +8,8 @@
 #include "base.h"
 #include "errors.h"
 
-// Board contains all information for a chess board state, including the board itself as 0x88 board.
+// Board contains all information for a chess board state, 
+// including the board itself as 0x88 board.
 //
 //   +------------------------+
 // 8 |70 71 72 73 74 75 76 77 | 78 79 7a 7b 7c 7d 7e 7f
@@ -23,7 +24,7 @@
 //     a  b  c  d  e  f  g  h
 //
 // All indexes shown are in HEX. The left board represents the actual playing board,
-// whereas there right board is for detection of illegal moves without heavy use of conditionals.
+// whereas there right board is used as meta information board aiding move generation.
 typedef struct Board Board;
 struct Board {
 	Piece squares[64*2];
