@@ -400,7 +400,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.expected_board = {
 				.check_info = 0x33,
 				.ep_square	= OTB,
-				.player		= BLACK,
 				.squares = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -420,7 +419,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.expected_board = {
 				.check_info = 0x35,
 				.ep_square	= OTB,
-				.player		= WHITE,
 				.squares = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -440,7 +438,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.expected_board = {
 				.check_info = 0x72,
 				.ep_square	= OTB,
-				.player		= WHITE,
 				.squares = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -460,7 +457,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.expected_board = {
 				.check_info = 0x31,
 				.ep_square	= OTB,
-				.player		= WHITE,
 				.squares = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -480,7 +476,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.expected_board = {
 				.check_info = 0x61,
 				.ep_square	= OTB,
-				.player		= WHITE,
 				.squares = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -491,6 +486,25 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_MASK_CHECK, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+				}
+			}
+		},
+		{
+			.name = "black pins multiple pieces to the white king",
+			.fen  = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1",
+			.expected_board = {
+				.check_info = OTB,
+				.ep_square	= OTB,
+				.squares = {
+					// We only care for the info board .. thus the regular squares are just set to EMPTY.
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,         1,         1,         1,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE,         3,         2, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE,         3, INFO_NONE,         2, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE,         3, INFO_NONE, INFO_NONE,         2, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	        3, INFO_NONE, INFO_NONE, INFO_NONE,         2, INFO_NONE, INFO_NONE, INFO_NONE,
 				}
 			}
 		},
