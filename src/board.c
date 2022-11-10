@@ -409,19 +409,22 @@ EXIT_PAWN_CHECK:
 
 	// Detect checks and pins by sliders.
 	// Queens
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->queens_size[opp_color], b->queens[opp_color], QUEEN);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->queens_size[opp_color], b->queens[opp_color], QUEEN);
 	if(check_counter > 1) {
 		// Double check -> exit early.
 		return;
 	}
 	// Rooks
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->rooks_size[opp_color], b->rooks[opp_color], ROOK);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->rooks_size[opp_color], b->rooks[opp_color], ROOK);
 	if(check_counter > 1) {
 		// Double check -> exit early.
 		return;
 	}
 	// Bishops
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter, b->bishops_size[opp_color], b->bishops[opp_color], BISHOP);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->bishops_size[opp_color], b->bishops[opp_color], BISHOP);
 	if(check_counter > 1) {
 		// Double check -> exit early.
 		return;
@@ -429,31 +432,30 @@ EXIT_PAWN_CHECK:
 }
 
 int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, const int ccount, size_t plist_len, Square const *const plist, Piece ptype) {
-	const Square king_sq = b->kings[color];
-	int check_counter = 0;
+	const Square king_sq	   = b->kings[color];
+	int			 check_counter = 0;
 
 	for(size_t i = 0; i < plist_len; i++) {
 		const Square slider_sq = plist[i];
-		const Square diff = square_diff(king_sq, slider_sq);
+		const Square diff	   = square_diff(king_sq, slider_sq);
 		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
 			// The slider possible checks the king or pins a piece in front of the king.
 			const Direction diffdir = DIFF_DIR_MAP[diff];
- 			// Starting from the king we step through the path in question towards the enemy slider.
-			Info info = INFO_NONE;
+			// Starting from the king we step through the path in question towards the enemy slider.
+			Info   info	   = INFO_NONE;
 			Square step_sq = (Square)((Direction)king_sq + diffdir);
 			while(true) {
 				Piece cur_piece = b->squares[step_sq];
 				if(cur_piece == EMPTY) {
-					step_sq = (Direction)step_sq + diffdir;
-					continue;
+					// Continue after stepping below if block.
 				} else if(has_color(cur_piece, color)) {
 					// A friendly piece was encountered on the path.
 					if(info == INFO_NONE) {
 						// First friendly piece on the path -> mark as possible pin.
-						info = INFO_MASK_MAYBE_PINNED;	
+						info = INFO_MASK_MAYBE_PINNED;
 					} else {
 						// Another piece was previously marked -> two pieces on path means no pin.
- 						// (There is an exception for EP capture but those are handled elsewhere.
+						// (There is an exception for EP capture but those are handled elsewhere.
 						info = INFO_NONE;
 						break; // This path contains no pin.
 					}
@@ -465,7 +467,7 @@ int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, c
 							// No pinner was marked. Must be a check.
 							check_counter++;
 							b->check_info = slider_sq;
-							info = INFO_MASK_CHECK;
+							info		  = INFO_MASK_CHECK;
 							break;
 						} else {
 							// It's a pinner
@@ -479,16 +481,17 @@ int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, c
 						break;
 					}
 				}
+				step_sq = (Direction)step_sq + diffdir;
 			}
 
 			if(info & INFO_MASK_CHECK || info & INFO_MASK_PINNED) {
-				// A path that pins or checks was detected. It is now marked 
+				// A path that pins or checks was detected. It is now marked
 				// in the info board to enrich move generation.
 				step_sq = slider_sq;
 				while(step_sq != king_sq) {
 					// TODO: should we mark the path only or include the slider square?
 					b->squares[to_info_index(step_sq)] = info;
-					step_sq = (Square)((Direction)(step_sq - diffdir));
+					step_sq							   = (Square)((Direction)(step_sq - diffdir));
 				}
 				// If it is a check we also need to mark the square behind the king.
 				if(info & INFO_MASK_CHECK) {
@@ -497,9 +500,9 @@ int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, c
 						b->squares[to_info_index(step_sq)] = INFO_MASK_FORBIDDEN_ESCAPE;
 					}
 				}
-			} 
+			}
 
-			if(check_counter+ccount > 1) {
+			if(check_counter + ccount > 1) {
 				// Double check detected.. leave early.
 				return check_counter;
 			}
