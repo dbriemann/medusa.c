@@ -508,6 +508,44 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 				}
 			}
 		},
+		{
+			.name = "white pins eight pieces to the black king",
+			.fen  = "1B1R1Q2/ppqnr2p/Q1bkr2Q/2ppp3/1Q6/P7/1P1R3B/K7 b - - 0 1",
+			.expected_board = {
+				.check_info = OTB,
+				.ep_square	= OTB,
+				.squares = {
+					// We only care for the info board .. thus the regular squares are just set to EMPTY.
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE,         5, INFO_NONE, INFO_NONE, INFO_NONE,         7,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE,         5, INFO_NONE, INFO_NONE,         7, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE,         1, INFO_NONE,         5, INFO_NONE,         7, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE,         1,         5,         7, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	        2,         2,         2, INFO_NONE,         3,         3,         3,         3,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE,         8,         6,         4, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE,         8, INFO_NONE,         6, INFO_NONE,         4, INFO_NONE, INFO_NONE,
+				}
+			}
+		},
+		{
+			.name = "white pins nothing",
+			.fen  = "6R1/6N1/Q3nnk1/5rb1/4r1b1/8/PP6/KB4R1 b - - 0 1",
+			.expected_board = {
+				.check_info = OTB,
+				.ep_square	= OTB,
+				.squares = {
+					// We only care for the info board .. thus the regular squares are just set to EMPTY.
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,		INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 	INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+				}
+			}
+		},
 	};
 	// clang-format on
 
@@ -526,7 +564,7 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 		for(size_t i = 0; i < 2 * 64; i++) {
 			// Only check info board squares.. this test does not care about the pieces.
 			if(!on_board(i)) {
-				// munit_logf(MUNIT_LOG_INFO, "i: %zu\n", i);
+				// munit_logf(MUNIT_LOG_INFO, "i: %zu, piece: %d\n", i, board.squares[i]);
 				munit_assert_int(testcases[tc].expected_board.squares[i], ==, board.squares[i]);
 			}
 		}
