@@ -2,6 +2,7 @@
 #include "../src/plist.h"
 #include "../src/bitmove.h"
 #include "../src/base.h"
+#include "../src/mlist.h"
 
 MunitResult test_piecelist__add(const MunitParameter params[], void *data) {
 	Square sq		  = 0x34; // e4
@@ -140,12 +141,38 @@ MunitResult test_utility_functions(const MunitParameter params[], void *data) {
 	return MUNIT_OK;
 }
 
+MunitResult test_movelist_all(const MunitParameter params[], void *data) {
+	MoveList mlist;
+	mlist.size = 0;
+
+	munit_log(MUNIT_LOG_INFO, "testcase: put & get");
+	for(size_t i = 0; i < 512; i++) {
+		MoveList__put(&mlist, (BitMove)i);
+	}
+	for(size_t i = 0; i < 512; i++) {
+		BitMove move = MoveList__get(&mlist, i);
+		munit_assert_int((BitMove)i, ==, move);
+	}
+
+	munit_log(MUNIT_LOG_INFO, "testcase: clear");
+	MoveList__clear(&mlist);
+	munit_assert_int(mlist.size, ==, 0);
+	// Does not change contents of list.
+	for(size_t i = 0; i < 512; i++) {
+		BitMove move = MoveList__get(&mlist, i);
+		munit_assert_int((BitMove)i, ==, move);
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_diverse_suite[] = {
 	{"piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"bitmove__all", test_bitmove_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"utility_functions", test_utility_functions, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"movelist_all", test_movelist_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };
