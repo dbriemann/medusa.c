@@ -6,10 +6,12 @@
 #include "base.h"
 #include "bitmove.h"
 
+#define MLIST_SIZE 512
+
 typedef struct MoveList MoveList;
 struct MoveList {
 	size_t size;
-	BitMove moves[512]; 
+	BitMove moves[MLIST_SIZE]; 
 	// TODO: if a game has more than 512 half-moves this will blow up.
 	// Option a) ignore because it will never happen in millions of games.
 	// Option b) dynamically allocate 256 or so and resize if actually needed.
