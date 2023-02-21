@@ -1,3 +1,4 @@
+#define _DEFAULT_SOURCE // strdup
 #include <string.h>
 #include <stdlib.h>
 
@@ -19,7 +20,7 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 	char delim[] = " "; // Spaces splits fen into 6 groups.
 	Error error = ERR_UNKNOWN;
 
-	do { // This loop runs only ONCE.. so we do not need to free for many returns
+	do { // Runs only once. Defers free call for each error case.
 		// Group 1 : pieces
 		char *strpos = strtok(cpy, delim);
 		if(strpos == NULL) {
