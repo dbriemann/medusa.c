@@ -13,8 +13,9 @@ struct MoveList {
 	size_t size;
 	BitMove moves[MLIST_SIZE]; 
 	// TODO: if a game has more than 512 half-moves this will blow up.
-	// Option a) ignore because it will never happen in millions of games.
-	// Option b) dynamically allocate 256 or so and resize if actually needed.
+	// Option a) Ignore because it will never happen in millions of games.
+	// Option b) Dynamically allocate 256 or so and resize if actually needed.
+	// Option c) Delete early game history if maximum is reached.
 	// NOTE: other game modes from classical might have different "maxima" here.
 };
 

@@ -3,12 +3,15 @@
 #include <stdbool.h>
 #include <assert.h>
 
+#include "base.h"
+#include "bitmove.h"
 #include "board.h"
 #include "fen.h"
 #include "plist.h"
+#include "mlist.h"
 #include "errors.h"
 
-void Board__clear(Board *b) {
+void Board__clear(Board* b) {
 	// NOTE: this is only needed for testing.. no need to optimize.
 
 	for(size_t i = 0; i < 2 * 64; i++) {
@@ -52,7 +55,7 @@ void Board__clear(Board *b) {
 	}
 }
 
-void Board__clear_meta(Board *b) {
+void Board__clear_meta(Board* b) {
 	// This function is called often and thus the "loop" is manually unrolled.
 	// It is a lot faster than any looping construct.
 	b->check_info = OTB;
@@ -123,14 +126,14 @@ void Board__clear_meta(Board *b) {
 	b->squares[0x7f] = INFO_NONE;
 }
 
-void Board__set_starting_position(Board *b) {
+void Board__set_starting_position(Board* b) {
 	assert(b != NULL);
 
 	Error err = Board__set_fen(b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	assert(err == OK);
 }
 
-Error Board__set_fen(Board *b, const char *fen) {
+Error Board__set_fen(Board* b, const char* fen) {
 	if(b == NULL || fen == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -216,7 +219,7 @@ Error Board__set_fen(Board *b, const char *fen) {
 // TODO: NULL check?
 // TODO: what if square has a piece already?
 // TODO: check if plists are full? (should never happen [maybe in chess variants])
-void Board__add_piece(Board *b, Square sq, Piece p) {
+void Board__add_piece(Board* b, Square sq, Piece p) {
 	if(!on_board(sq)) {
 		return;
 	}
@@ -248,7 +251,7 @@ void Board__add_piece(Board *b, Square sq, Piece p) {
 }
 
 // TODO: NULL check?
-void Board__del_piece(Board *b, Square sq) {
+void Board__del_piece(Board* b, Square sq) {
 	if(!on_board(sq)) {
 		return;
 	}
@@ -279,7 +282,7 @@ void Board__del_piece(Board *b, Square sq) {
 	}
 }
 
-bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color) {
+bool Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq, Color color) {
 	const Color opp_color = flip_color(color);
 
 	// TODO: benchmark if order of piece types has a significant impact here.
@@ -326,7 +329,7 @@ bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Co
 	return false;
 }
 
-bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ignore_sq, Color color) {
+bool Board__is_sq_attacked_by_slider(Board* b, const Square sq, const Square ignore_sq, Color color) {
 	const Color opp_color = flip_color(color);
 
 	for(size_t i = 0; i < b->sliders_size[opp_color]; i++) {
@@ -366,7 +369,7 @@ bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ign
 	return false;
 }
 
-void Board__detect_checks_and_pins(Board *b, Color color) {
+void Board__detect_checks_and_pins(Board* b, Color color) {
 	Board__clear_meta(b);
 	const Color opp_color = flip_color(color);
 
@@ -431,7 +434,8 @@ EXIT_PAWN_CHECK:
 	}
 }
 
-int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, const int ccount, size_t plist_len, Square const *const plist, Piece ptype) {
+int Board__detect_slider_checks_and_pins(
+	Board* b, Color color, Info* pmarker, const int ccount, size_t plist_len, Square const* const plist, Piece ptype) {
 	const Square king_sq	   = b->kings[color];
 	int			 check_counter = 0;
 
@@ -512,7 +516,46 @@ int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, c
 	return check_counter;
 }
 
-Error Board__to_string(Board *b, char *str) {
+void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
+	// from, to := OTB, OTB
+	Square	from   = OTB;
+	Square	to	   = OTB;
+	Piece	tpiece = EMPTY;
+	BitMove move;
+
+	bool is_check = on_board(board->check_info);
+	// Iterate all knights of 'color'.
+	for(size_t i = 0; i < board->knights_size[color]; i++) {
+		from = board->knights[color][i];
+		if(pinval(board->squares[to_info_index(from)]) != 0) {
+			continue;
+		}
+		// Try all possible directions for a knight.
+		for(size_t d = 0; d < KNIGHT_DIRS_LEN; d++) {
+			Direction dir = KNIGHT_DIRS[d];
+			to			  = (Direction)from + dir;
+			if(on_board(to)) {
+				tpiece = board->squares[to];
+
+				bool to_sq_prevents_check = is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
+				if(is_check && !to_sq_prevents_check) {
+					// If there is a check but the move's target does not
+					// prevent it -> impossible move -> skip move.
+					continue;
+				} else if(!has_color(tpiece, color)) {
+					Color opp_color = flip_color(color);
+					bool is_capture = has_color(tpiece, opp_color);
+
+					// Add a normal or a capture move.
+					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, is_capture);
+					MoveList__put(mlist, move);
+				} // Else the square is occupied by a piece of the same color.
+			}	  // Else target is off the board.
+		}
+	}
+}
+
+Error Board__to_string(Board* b, char* str) {
 	if(b == NULL || str == NULL) {
 		return ERR_NULL_PTR;
 	}

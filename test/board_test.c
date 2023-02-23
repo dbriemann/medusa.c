@@ -1,5 +1,6 @@
 #include "board_test.h"
 #include "../src/base.h"
+#include "../src/mlist.h"
 #include "../src/board.h"
 
 MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
@@ -576,12 +577,43 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 	return MUNIT_OK;
 }
 
+MunitResult test_board__generate_knight_moves(const MunitParameter params[], void *data) {
+	const GenerateMovesTestCase testcases[] = {
+		{
+			.name = "white knight in the center",
+			.fen = "8/8/8/8/4N3/8/8/8 w - - 0 1",
+			.expected_moves = {},	
+		}
+	};
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board board;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		MoveList moves;
+		Board__generate_knight_moves(&board, &moves, board.player);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			munit_assert_int(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
+
+	return MUNIT_OK;
+}
+
+
 MunitTest test_board_suite[] = {
 	{"board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__clear_funcs", test_board__clear_funcs, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__is_sq_attacked", test_board__is_sq_attacked, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 	{"board__detect_checks_and_pins", test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"Board__generate_knight_moves", test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
 	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

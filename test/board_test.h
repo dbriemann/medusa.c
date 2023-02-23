@@ -2,6 +2,7 @@
 #define BOARD_TEST_H
 
 #include "../src/board.h"
+#include "../src/mlist.h"
 #include "../src/errors.h"
 
 #define MUNIT_ENABLE_ASSERT_ALIASES
@@ -36,11 +37,19 @@ struct DetectChecksAndPinsTestCase {
 	const Board expected_board;
 };
 
+typedef struct GenerateMovesTestCase GenerateMovesTestCase;
+struct GenerateMovesTestCase {
+	const char *name;
+	const char *fen;
+	const MoveList expected_moves;
+};
+
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
 MunitResult test_board__clear_funcs(const MunitParameter params[], void *data);
 MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data);
 MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data);
+MunitResult test_board__generate_knight_moves(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 

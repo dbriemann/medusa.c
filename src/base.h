@@ -26,7 +26,7 @@ const static Square CHECK_DOUBLE_CHECK = 0x0F;
 const static Square CHECK_CHECKMATE	   = 0x1F;
 
 // Other special constants.
-const static Piece PROMO_NONE; // TODO: this misses a value
+const static Piece PROMO_NONE = 0;
 
 const static Info INFO_NONE				 = 0x0;
 const static Info INFO_PIN_COUNTER_START = 1;
@@ -118,6 +118,17 @@ const static size_t	   CASTLING_LEN				   = 2;
 // 	0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
 // };
 
+const static char LOOKUP_SQUARE_NAMES[128][2] = {
+	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", "l1", "m1", "n1", "o1", "p1",
+	"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", "l2", "m2", "n2", "o2", "p2",
+	"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3", "i3", "j3", "k3", "l3", "m3", "n3", "o3", "p3",
+	"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "i4", "j4", "k4", "l4", "m4", "n4", "o4", "p4",
+	"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "i5", "j5", "k5", "l5", "m5", "n5", "o5", "p5",
+	"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "i6", "j6", "k6", "l6", "m6", "n6", "o6", "p6",
+	"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "i7", "j7", "k7", "l7", "m7", "n7", "o7", "p7",
+	"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "i8", "j8", "k8", "l8", "m8", "n8", "o8", "p8",
+};
+
 // 0x88 board:
 const static Square LOOKUP_0x88[64] = {
 	// clang-format off
@@ -166,29 +177,45 @@ const static Direction DIFF_DIR_MAP[240] = {
 	// clang-format on
 };
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline bool has_color(const Piece p, const Color c) {
 	return (COLOR_TEST_MASK & p) == c;
 }
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline bool on_board(Square sq) {
 	return !(sq & 0x88);
 }
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline Color flip_color(const Color c) {
 	return c ^ 1;
 }
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline Square square_diff(const Square from, const Square to) {
 	return (Square)(0x77 + ((Direction)to - (Direction)from));
 }
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline bool contains_piece_type(const Piece pieces, const Piece p) {
 	return p & pieces;
 }
 
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline Square to_info_index(const Square sq) {
 	// NOTE: does not check overflow. Must receive on-board square.
 	return sq + 8;
+}
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline Square pinval(Info i) {
+	return i & INFO_MASK_PINNED;
+}
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline bool is_mask_set(Info i, Info mask) {
+	return i & mask;
 }
 
 #endif

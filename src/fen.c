@@ -1,4 +1,3 @@
-#define _DEFAULT_SOURCE // strdup
 #include <string.h>
 #include <stdlib.h>
 
@@ -12,10 +11,12 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 		return ERR_NULL_PTR;
 	}
 
-	char *cpy = strdup(fen);
-	if(cpy == NULL) {
+	size_t len = strlen(fen)+1;
+	char *cpy = calloc(len, sizeof(char));
+	if(!cpy) {
 		return ERR_UNKNOWN;
 	}
+	memcpy(cpy, fen, len);
 
 	char delim[] = " "; // Spaces splits fen into 6 groups.
 	Error error = ERR_UNKNOWN;
