@@ -39,9 +39,9 @@ struct DetectChecksAndPinsTestCase {
 
 typedef struct GenerateMovesTestCase GenerateMovesTestCase;
 struct GenerateMovesTestCase {
-	const char *name;
-	const char *fen;
-	const MoveList expected_moves;
+	char *name;
+	char *fen;
+	MoveList expected_moves;
 };
 
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);

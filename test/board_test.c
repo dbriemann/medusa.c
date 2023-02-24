@@ -3,7 +3,7 @@
 #include "../src/mlist.h"
 #include "../src/board.h"
 
-MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
+MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
 	// clang-format off
 	const BoardSetFenTestCase testcases[] = {
 		{
@@ -75,7 +75,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 		munit_assert_int(testcases[tc].expected_result, ==, error);
 
 		if(error == OK) {
-			const Board *expb = &testcases[tc].expected_board;
+			const Board* expb = &testcases[tc].expected_board;
 			for(size_t i = 0; i < 2 * 64; i++) {
 				munit_assert_int(expb->squares[i], ==, out_board.squares[i]);
 			}
@@ -132,50 +132,50 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_board__add_del_piece(const MunitParameter params[], void *data) {
+MunitResult test_board__add_del_piece(const MunitParameter params[], void* data) {
 	// Set up a starting position and validate the correctness including plists.
 	const BoardAddDelPieceTestCase testcases[] = {
-		{.piece = WPAWN, .sq = 0x10},
-		{.piece = WPAWN, .sq = 0x11},
-		{.piece = WPAWN, .sq = 0x12},
-		{.piece = WPAWN, .sq = 0x13},
-		{.piece = WPAWN, .sq = 0x14},
-		{.piece = WPAWN, .sq = 0x15},
-		{.piece = WPAWN, .sq = 0x16},
-		{.piece = WPAWN, .sq = 0x17},
-		{.piece = WROOK, .sq = 0x00},
+		{	 .piece = WPAWN, .sq = 0x10},
+		{	 .piece = WPAWN, .sq = 0x11},
+		{	 .piece = WPAWN, .sq = 0x12},
+		{	 .piece = WPAWN, .sq = 0x13},
+		{	 .piece = WPAWN, .sq = 0x14},
+		{	 .piece = WPAWN, .sq = 0x15},
+		{	 .piece = WPAWN, .sq = 0x16},
+		{	 .piece = WPAWN, .sq = 0x17},
+		{	 .piece = WROOK, .sq = 0x00},
 		{.piece = WKNIGHT, .sq = 0x01},
 		{.piece = WBISHOP, .sq = 0x02},
-		{.piece = WQUEEN, .sq = 0x03},
-		{.piece = WKING, .sq = 0x04},
+		{ .piece = WQUEEN, .sq = 0x03},
+		{	 .piece = WKING, .sq = 0x04},
 		{.piece = WBISHOP, .sq = 0x05},
 		{.piece = WKNIGHT, .sq = 0x06},
-		{.piece = WROOK, .sq = 0x07},
+		{	 .piece = WROOK, .sq = 0x07},
 
-		{.piece = BPAWN, .sq = 0x60},
-		{.piece = BPAWN, .sq = 0x61},
-		{.piece = BPAWN, .sq = 0x62},
-		{.piece = BPAWN, .sq = 0x63},
-		{.piece = BPAWN, .sq = 0x64},
-		{.piece = BPAWN, .sq = 0x65},
-		{.piece = BPAWN, .sq = 0x66},
-		{.piece = BPAWN, .sq = 0x67},
-		{.piece = BROOK, .sq = 0x70},
+		{	 .piece = BPAWN, .sq = 0x60},
+		{	 .piece = BPAWN, .sq = 0x61},
+		{	 .piece = BPAWN, .sq = 0x62},
+		{	 .piece = BPAWN, .sq = 0x63},
+		{	 .piece = BPAWN, .sq = 0x64},
+		{	 .piece = BPAWN, .sq = 0x65},
+		{	 .piece = BPAWN, .sq = 0x66},
+		{	 .piece = BPAWN, .sq = 0x67},
+		{	 .piece = BROOK, .sq = 0x70},
 		{.piece = BKNIGHT, .sq = 0x71},
 		{.piece = BBISHOP, .sq = 0x72},
-		{.piece = BQUEEN, .sq = 0x73},
-		{.piece = BKING, .sq = 0x74},
+		{ .piece = BQUEEN, .sq = 0x73},
+		{	 .piece = BKING, .sq = 0x74},
 		{.piece = BBISHOP, .sq = 0x75},
 		{.piece = BKNIGHT, .sq = 0x76},
-		{.piece = BROOK, .sq = 0x77},
+		{	 .piece = BROOK, .sq = 0x77},
 
-		// Plus one nonsense add operation outside of board. Should be ignored.
-		{.piece = BQUEEN, .sq = OTB},
+ // Plus one nonsense add operation outside of board. Should be ignored.
+		{ .piece = BQUEEN,  .sq = OTB},
 	};
 
 	// Manually set up a starting board for comparison.
 	Board starting_board = {
-		// clang-format off
+	// clang-format off
 		.squares = {
 			WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,	
 			WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
@@ -217,7 +217,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 			{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
 		},
 		.pawns_size = {8, 8},
-		// clang-format on
+	// clang-format on
 	};
 
 	Board out_board;
@@ -286,7 +286,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void *data)
 	return MUNIT_OK;
 }
 
-MunitResult test_board__clear_funcs(const MunitParameter params[], void *data) {
+MunitResult test_board__clear_funcs(const MunitParameter params[], void* data) {
 	Board board;
 
 	munit_log(MUNIT_LOG_INFO, "Board__clear");
@@ -314,9 +314,9 @@ MunitResult test_board__clear_funcs(const MunitParameter params[], void *data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data) {
+MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data) {
 	const IsSqAttackedTestCase testcases[] = {
-		// clang-format off
+	// clang-format off
 		{
 			.name = "constructed, only pawns",
 			.fen = "k7/7p/5ppP/3ppPP1/1ppPP3/pPP5/P7/7K w - - 0 1",
@@ -365,7 +365,7 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 				false, false, false, false, false, false, false, false,
 			},
 		},
-		// clang-format on
+	// clang-format on
 	};
 
 	const size_t len = sizeof(testcases) / sizeof(IsSqAttackedTestCase);
@@ -392,9 +392,11 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 	return MUNIT_OK;
 }
 
-MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data) {
-	const DetectChecksAndPinsTestCase testcases[] = {
-		// clang-format off
+MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void* data) {
+	const DetectChecksAndPinsTestCase
+		testcases[] =
+			{
+				// clang-format off
 		{
 			.name = "white pawn checks black king",
 			.fen  = "8/8/8/2k1p3/3P4/4K3/8/8 b - - 0 1",
@@ -577,35 +579,55 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 	return MUNIT_OK;
 }
 
-MunitResult test_board__generate_knight_moves(const MunitParameter params[], void *data) {
-	const GenerateMovesTestCase testcases[] = {
-		{
-			.name = "white knight in the center",
-			.fen = "8/8/8/8/4N3/8/8/8 w - - 0 1",
-			.expected_moves = {},	
-		}
-	};
-	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data) {
+	GenerateMovesTestCase testcase;
+	testcase.name					 = "white knight in the center";
+	testcase.fen					 = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1";
+	testcase.expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, true);
+	testcase.expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, true);
+	testcase.expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, false);
+	testcase.expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, false);
+	testcase.expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, false);
+	testcase.expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, false);
+	testcase.expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, false);
+	testcase.expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, false);
 
 	Board board;
 
-	for(size_t tc = 0; tc < len; tc++) {
-		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+	munit_logf(MUNIT_LOG_INFO, "testcase 0: %s", testcase.name);
 
-		Error error = Board__set_fen(&board, testcases[tc].fen);
-		munit_assert_int(OK, ==, error);
+	Error error = Board__set_fen(&board, testcase.fen);
+	munit_assert_int(OK, ==, error);
 
-		MoveList moves;
-		Board__generate_knight_moves(&board, &moves, board.player);
+	MoveList moves;
+	Board__generate_knight_moves(&board, &moves, board.player);
 
-		for(size_t i = 0; i < moves.size; i++) {
-			munit_assert_int(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
-		}
+	for(size_t i = 0; i < moves.size; i++) {
+		munit_assert_int(testcase.expected_moves.moves[i], ==, moves.moves[i]);
+	}
+
+	testcase.name					 = "black knight in the corner";
+	testcase.fen					 = "7n/8/6PP/8/8/8/8/8 b - - 0 1";
+	testcase.expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, true);
+	testcase.expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, false);
+
+	munit_logf(MUNIT_LOG_INFO, "testcase 1: %s", testcase.name);
+
+	error = Board__set_fen(&board, testcase.fen);
+	munit_assert_int(OK, ==, error);
+
+	MoveList__clear(&moves);
+	Board__generate_knight_moves(&board, &moves, board.player);
+
+	for(size_t i = 0; i < moves.size; i++) {
+		char* m = BitMove__to_notation(moves.moves[i]);
+		munit_log(MUNIT_LOG_INFO, m);
+		free(m);
+		munit_assert_int(testcase.expected_moves.moves[i], ==, moves.moves[i]);
 	}
 
 	return MUNIT_OK;
 }
-
 
 MunitTest test_board_suite[] = {
 	{"board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
