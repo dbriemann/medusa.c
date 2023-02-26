@@ -21,13 +21,13 @@ void Board__clear(Board* b) {
 	b->castle_short[WHITE] = false;
 	b->castle_long[BLACK]  = false;
 	b->castle_long[WHITE]  = false;
-	b->move_number		   = 1;
-	b->draw_counter		   = 0;
-	b->ep_square		   = OTB;
-	b->player			   = WHITE;
+	b->move_number         = 1;
+	b->draw_counter        = 0;
+	b->ep_square           = OTB;
+	b->player              = WHITE;
 
 	for(Color c = BLACK; c <= WHITE; c++) {
-		b->kings[c]		   = OTB;
+		b->kings[c]        = OTB;
 		b->sliders_size[c] = 0;
 		for(size_t i = 0; i < 13; i++) {
 			b->sliders[c][i] = OTB;
@@ -60,14 +60,14 @@ void Board__clear_meta(Board* b) {
 	// It is a lot faster than any looping construct.
 	b->check_info = OTB;
 
-	b->squares[0x8]	 = INFO_NONE;
-	b->squares[0x9]	 = INFO_NONE;
-	b->squares[0xa]	 = INFO_NONE;
-	b->squares[0xb]	 = INFO_NONE;
-	b->squares[0xc]	 = INFO_NONE;
-	b->squares[0xd]	 = INFO_NONE;
-	b->squares[0xe]	 = INFO_NONE;
-	b->squares[0xf]	 = INFO_NONE;
+	b->squares[0x8]  = INFO_NONE;
+	b->squares[0x9]  = INFO_NONE;
+	b->squares[0xa]  = INFO_NONE;
+	b->squares[0xb]  = INFO_NONE;
+	b->squares[0xc]  = INFO_NONE;
+	b->squares[0xd]  = INFO_NONE;
+	b->squares[0xe]  = INFO_NONE;
+	b->squares[0xf]  = INFO_NONE;
 	b->squares[0x18] = INFO_NONE;
 	b->squares[0x19] = INFO_NONE;
 	b->squares[0x1a] = INFO_NONE;
@@ -139,7 +139,7 @@ Error Board__set_fen(Board* b, const char* fen) {
 	}
 
 	MinBoard mb;
-	Error	 err = parse_fen(fen, &mb);
+	Error    err = parse_fen(fen, &mb);
 	if(err != OK) {
 		return err;
 	}
@@ -159,7 +159,7 @@ Error Board__set_fen(Board* b, const char* fen) {
 	}
 
 	// Copy over data from minboard.
-	b->move_number	= mb.move_num;
+	b->move_number  = mb.move_num;
 	b->draw_counter = mb.half_moves;
 
 	if(mb.ep_square != OTB) {
@@ -176,10 +176,10 @@ Error Board__set_fen(Board* b, const char* fen) {
 	b->player = mb.color;
 
 	for(size_t i = 0; i < 64; i++) {
-		const Square sq	   = LOOKUP_0x88[i];
-		const Piece	 piece = mb.squares[i];
-		const Piece	 ptype = piece & PIECE_MASK;
-		const Piece	 pcol  = piece & COLOR_ONLY_MASK;
+		const Square sq    = LOOKUP_0x88[i];
+		const Piece  piece = mb.squares[i];
+		const Piece  ptype = piece & PIECE_MASK;
+		const Piece  pcol  = piece & COLOR_ONLY_MASK;
 
 		if(piece == EMPTY) {
 			b->squares[sq] = EMPTY;
@@ -255,7 +255,7 @@ void Board__del_piece(Board* b, Square sq) {
 	if(!on_board(sq)) {
 		return;
 	}
-	const Piece p	  = b->squares[sq];
+	const Piece p     = b->squares[sq];
 	const Piece ptype = p & PIECE_MASK;
 	const Piece pcol  = p & COLOR_ONLY_MASK;
 
@@ -321,7 +321,7 @@ bool Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq, Co
 
 	// Detect attacks by kings.
 	const Square opp_king_sq = b->kings[opp_color];
-	Square		 diff		 = square_diff(opp_king_sq, sq);
+	Square       diff        = square_diff(opp_king_sq, sq);
 	if(contains_piece_type(DIFF_ATTACK_MAP[diff], KING)) {
 		return true;
 	}
@@ -339,7 +339,7 @@ bool Board__is_sq_attacked_by_slider(Board* b, const Square sq, const Square ign
 			// If a pawn captured a piece, it still is in the piece list and must be ignored here.
 			continue;
 		}
-		const Piece	 ptype = b->squares[slider_sq] & PIECE_MASK;
+		const Piece  ptype = b->squares[slider_sq] & PIECE_MASK;
 		const Square diff  = square_diff(sq, slider_sq);
 
 		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
@@ -373,14 +373,14 @@ void Board__detect_checks_and_pins(Board* b, Color color) {
 	Board__clear_meta(b);
 	const Color opp_color = flip_color(color);
 
-	const Square king_sq	   = b->kings[color];
-	int			 check_counter = 0;
-	Info		 pin_marker	   = INFO_PIN_COUNTER_START;
+	const Square king_sq       = b->kings[color];
+	int          check_counter = 0;
+	Info         pin_marker    = INFO_PIN_COUNTER_START;
 
 	// Detect checks by knigts.
 	for(size_t i = 0; i < b->knights_size[opp_color]; i++) {
 		const Square knight_sq = b->knights[opp_color][i];
-		const Square diff	   = square_diff(knight_sq, king_sq);
+		const Square diff      = square_diff(knight_sq, king_sq);
 		if(contains_piece_type(DIFF_ATTACK_MAP[diff], KNIGHT)) {
 			// A knight checks the king. Safe the info and break the loop.
 			// There can never be a double check of two knights.
@@ -396,7 +396,7 @@ void Board__detect_checks_and_pins(Board* b, Color color) {
 		const Square pawn_sq = b->pawns[opp_color][i];
 		for(int d = 0; d < PAWN_PUSH_CAPTURE_LEN; d++) {
 			Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
-			Square	  to  = (Square)((Direction)pawn_sq + dir);
+			Square    to  = (Square)((Direction)pawn_sq + dir);
 			if(king_sq == to) {
 				// A pawn checks the king. Safe the info and break the loop.
 				// There can never be a double check of two pawns.
@@ -436,17 +436,17 @@ EXIT_PAWN_CHECK:
 
 int Board__detect_slider_checks_and_pins(
 	Board* b, Color color, Info* pmarker, const int ccount, size_t plist_len, Square const* const plist, Piece ptype) {
-	const Square king_sq	   = b->kings[color];
-	int			 check_counter = 0;
+	const Square king_sq       = b->kings[color];
+	int          check_counter = 0;
 
 	for(size_t i = 0; i < plist_len; i++) {
 		const Square slider_sq = plist[i];
-		const Square diff	   = square_diff(king_sq, slider_sq);
+		const Square diff      = square_diff(king_sq, slider_sq);
 		if(contains_piece_type(DIFF_ATTACK_MAP[diff], ptype)) {
 			// The slider possible checks the king or pins a piece in front of the king.
 			const Direction diffdir = DIFF_DIR_MAP[diff];
 			// Starting from the king we step through the path in question towards the enemy slider.
-			Info   info	   = INFO_NONE;
+			Info   info    = INFO_NONE;
 			Square step_sq = (Square)((Direction)king_sq + diffdir);
 			while(true) {
 				Piece cur_piece = b->squares[step_sq];
@@ -471,7 +471,7 @@ int Board__detect_slider_checks_and_pins(
 							// No pinner was marked. Must be a check.
 							check_counter++;
 							b->check_info = slider_sq;
-							info		  = INFO_MASK_CHECK;
+							info          = INFO_MASK_CHECK;
 							break;
 						} else {
 							// It's a pinner
@@ -495,7 +495,7 @@ int Board__detect_slider_checks_and_pins(
 				while(step_sq != king_sq) {
 					// TODO: should we mark the path only or include the slider square?
 					b->squares[to_info_index(step_sq)] = info;
-					step_sq							   = (Square)((Direction)(step_sq - diffdir));
+					step_sq                            = (Square)((Direction)(step_sq - diffdir));
 				}
 				// If it is a check we also need to mark the square behind the king.
 				if(info & INFO_MASK_CHECK) {
@@ -518,9 +518,9 @@ int Board__detect_slider_checks_and_pins(
 
 void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 	// from, to := OTB, OTB
-	Square	from   = OTB;
-	Square	to	   = OTB;
-	Piece	tpiece = EMPTY;
+	Square  from   = OTB;
+	Square  to     = OTB;
+	Piece   tpiece = EMPTY;
 	BitMove move;
 
 	bool is_check = on_board(board->check_info);
@@ -533,7 +533,7 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 		// Try all possible directions for a knight.
 		for(size_t d = 0; d < KNIGHT_DIRS_LEN; d++) {
 			Direction dir = KNIGHT_DIRS[d];
-			to			  = (Direction)from + dir;
+			to            = (Direction)from + dir;
 			if(on_board(to)) {
 				tpiece = board->squares[to];
 
@@ -544,13 +544,13 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 					continue;
 				} else if(!has_color(tpiece, color)) {
 					Color opp_color = flip_color(color);
-					bool is_capture = has_color(tpiece, opp_color);
+					bool  is_capture = has_color(tpiece, opp_color);
 
 					// Add a normal or a capture move.
 					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, is_capture);
 					MoveList__put(mlist, move);
 				} // Else the square is occupied by a piece of the same color.
-			}	  // Else target is off the board.
+			}     // Else target is off the board.
 		}
 	}
 }

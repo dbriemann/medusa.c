@@ -36,8 +36,8 @@ bool BitMove__is_capture(const BitMove bm) {
 }
 
 BitMove BitMove__add_feature(BitMove move, BitMove mask, BitMove shift, Square bits) {
-	move &= ~mask;					// Erase existing bits in the mask's region.
-	bits <<= shift;					// Move bits to the right place
+	move &= ~mask;                  // Erase existing bits in the mask's region.
+	bits <<= shift;                 // Move bits to the right place
 	move |= ((BitMove)bits) & mask; // Add them to the move,
 	return move;
 }
@@ -45,10 +45,10 @@ BitMove BitMove__add_feature(BitMove move, BitMove mask, BitMove shift, Square b
 char* BitMove__to_notation(const BitMove move) {
 	// TODO
 	// e2-e4, Nb1-c3, Rd3xd7, 0-0, 0-0-0, c7-c8=Q
-	Square from		  = BitMove__from(move);
-	Square to		  = BitMove__to(move);
-	Piece  promo	  = BitMove__promoted_piece(move);
-	Piece  piece	  = BitMove__piece(move);
+	Square from       = BitMove__from(move);
+	Square to         = BitMove__to(move);
+	Piece  promo      = BitMove__promoted_piece(move);
+	Piece  piece      = BitMove__piece(move);
 	bool   is_capture = BitMove__is_capture(move);
 
 	char* notation = NULL;
@@ -69,11 +69,11 @@ char* BitMove__to_notation(const BitMove move) {
 			memcpy(notation, "0-0-0", 5);
 		}
 	} else {
-		const char* from_s	= LOOKUP_SQUARE_NAMES[from];
-		const char* to_s	= LOOKUP_SQUARE_NAMES[to];
-		const char	piece_s = Piece_to_notation(piece);
+		const char* from_s  = LOOKUP_SQUARE_NAMES[from];
+		const char* to_s    = LOOKUP_SQUARE_NAMES[to];
+		const char  piece_s = Piece_to_notation(piece);
 
-		notation			= calloc(6 + 1, sizeof(char));
+		notation            = calloc(6 + 1, sizeof(char));
 		if(!notation) {
 			return NULL;
 		}
@@ -104,8 +104,8 @@ char* BitMove__to_notation(const BitMove move) {
 }
 
 char Piece_to_notation(const Piece piece) {
-	Color c	 = piece & COLOR_ONLY_MASK;
-	Piece p	 = piece & PIECE_MASK;
+	Color c  = piece & COLOR_ONLY_MASK;
+	Piece p  = piece & PIECE_MASK;
 	char  ps = ' ';
 
 	if(p & KNIGHT) {

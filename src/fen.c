@@ -6,24 +6,24 @@
 #include "minboard.h"
 
 // TODO: ensure amount of certain pieces?! e.g. 16 queens will blow up the piece list.
-Error parse_fen(const char fen[], MinBoard *mb) {
+Error parse_fen(const char fen[], MinBoard* mb) {
 	if(fen == NULL || mb == NULL) {
 		return ERR_NULL_PTR;
 	}
 
-	size_t len = strlen(fen)+1;
-	char *cpy = calloc(len, sizeof(char));
+	size_t len = strlen(fen) + 1;
+	char*  cpy = calloc(len, sizeof(char));
 	if(!cpy) {
 		return ERR_UNKNOWN;
 	}
 	memcpy(cpy, fen, len);
 
-	char delim[] = " "; // Spaces splits fen into 6 groups.
+	char  delim[] = " "; // Spaces splits fen into 6 groups.
 	Error error = ERR_UNKNOWN;
 
 	do { // Runs only once. Defers free call for each error case.
 		// Group 1 : pieces
-		char *strpos = strtok(cpy, delim);
+		char* strpos = strtok(cpy, delim);
 		if(strpos == NULL) {
 			error = ERR_INVALID_INPUT;
 			break;
@@ -95,28 +95,28 @@ Error parse_fen(const char fen[], MinBoard *mb) {
 			break;
 		}
 		error = OK;
-	} while(false);
+	} while (false);
 
 	free(cpy);
 	return error;
 }
 
 /**
-	Parses the first FEN group which represents the pieces on the board.
-	Stores the result in 'squares' which has the following layout:
+    Parses the first FEN group which represents the pieces on the board.
+    Stores the result in 'squares' which has the following layout:
 
-	   a b c d e f g h
-	 +----------------
-	8|56,..         63] <- array index 63 is black rook @ H8
-	7|48,..
-	6|40,..
-	5|32,..
-	4|24,..
-	3|16,..
-	2| 8,..
-	1|[0,1,2,3,4,5,6,7, <- array index 0 is white rook @ A1
-	 +-----------------
-*/
+       a b c d e f g h
+ +----------------
+    8|56,..         63] <- array index 63 is black rook @ H8
+    7|48,..
+    6|40,..
+    5|32,..
+    4|24,..
+    3|16,..
+    2| 8,..
+    1|[0,1,2,3,4,5,6,7, <- array index 0 is white rook @ A1
+ +-----------------
+ */
 Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	if(fen == NULL || squares == NULL) {
 		return ERR_NULL_PTR;
@@ -126,7 +126,7 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 		squares[i] = EMPTY;
 	}
 
-	size_t pos		= 0;
+	size_t pos      = 0;
 	size_t boardpos = 0;
 
 	while(fen[pos] != 0) {
@@ -185,18 +185,18 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	}
 
 	/*
-	We now mirror the ranks in the array to be compatible with the internal engine board type:
+	   We now mirror the ranks in the array to be compatible with the internal engine board type:
 
-	a1 b1 c1 .. h1             a8 b8 c8 .. h8             56 57 58 .. 63
-	a2 b2 c2 .. h2   ======>   .            .   where     .            .
-	.            .   becomes   .            .   indexes   .            .
-	.            .             a2 b2 c2 .. h2   are       08 09 10 .. 15
-	a8 b8 c8 .. h8             a1 b1 c1 .. h1             01 02 03 .. 07
+	   a1 b1 c1 .. h1             a8 b8 c8 .. h8             56 57 58 .. 63
+	   a2 b2 c2 .. h2   ======>   .            .   where     .            .
+	   .            .   becomes   .            .   indexes   .            .
+	   .            .             a2 b2 c2 .. h2   are       08 09 10 .. 15
+	   a8 b8 c8 .. h8             a1 b1 c1 .. h1             01 02 03 .. 07
 
-	*/
+	 */
 
 	for(size_t lo = 0, hi = 56; lo < 32; lo++, hi++) {
-		Piece tmp	= squares[lo];
+		Piece tmp   = squares[lo];
 		squares[lo] = squares[hi];
 		squares[hi] = tmp;
 		if((hi + 1) % 8 == 0) {
@@ -208,7 +208,7 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	return OK;
 }
 
-Error fen_parse_color_to_move(const char fen[], Color *color) {
+Error fen_parse_color_to_move(const char fen[], Color* color) {
 	if(fen == NULL || color == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -255,7 +255,7 @@ Error fen_parse_castling_rights(const char fen[], bool oo[2], bool ooo[2]) {
 	return OK;
 }
 
-Error fen_square_to_index(const char fensq[static 2], Square *sq) {
+Error fen_square_to_index(const char fensq[static 2], Square* sq) {
 	if(fensq == NULL || sq == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -279,7 +279,7 @@ Error fen_square_to_index(const char fensq[static 2], Square *sq) {
 	return OK;
 }
 
-Error fen_parse_ep_square(const char fen[], Square *sq) {
+Error fen_parse_ep_square(const char fen[], Square* sq) {
 	if(fen == NULL || sq == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -301,14 +301,14 @@ Error fen_parse_ep_square(const char fen[], Square *sq) {
 	return fen_square_to_index(fen, sq);
 }
 
-Error fen_parse_half_move_clock(const char fen[], uint16_t *num) {
+Error fen_parse_half_move_clock(const char fen[], uint16_t* num) {
 	if(fen == NULL || num == NULL) {
 		return ERR_NULL_PTR;
 	}
 
 	// Half move counter can be 0.
-	char *		  endptr = NULL;
-	unsigned long ul	 = strtoul(fen, &endptr, 10);
+	char*         endptr = NULL;
+	unsigned long ul     = strtoul(fen, &endptr, 10);
 	if(endptr != NULL && *endptr != '\0') {
 		return ERR_INVALID_INPUT;
 	}
@@ -316,7 +316,7 @@ Error fen_parse_half_move_clock(const char fen[], uint16_t *num) {
 	return OK;
 }
 
-Error fen_parse_move_number(const char fen[], uint16_t *num) {
+Error fen_parse_move_number(const char fen[], uint16_t* num) {
 	if(fen == NULL || num == NULL) {
 		return ERR_NULL_PTR;
 	}

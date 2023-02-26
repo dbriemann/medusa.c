@@ -10,8 +10,8 @@
 int main() {
 	Board board;
 
-	const char *name = "DEBUG POS";
-	const char *fen  = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1";
+	const char* name = "DEBUG POS";
+	const char* fen  = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
 

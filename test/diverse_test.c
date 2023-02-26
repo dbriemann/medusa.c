@@ -5,9 +5,9 @@
 #include "../src/mlist.h"
 
 MunitResult test_piecelist__add(const MunitParameter params[], void* data) {
-	Square sq		  = 0x34; // e4
-	Piece  bqueens[9] = {0};
-	size_t len		  = 0;
+	Square sq         = 0x34; // e4
+	Piece  bqueens[9] = { 0 };
+	size_t len        = 0;
 
 	PieceList__add(bqueens, &len, sq);
 
@@ -18,12 +18,12 @@ MunitResult test_piecelist__add(const MunitParameter params[], void* data) {
 }
 
 MunitResult test_piecelist__del(const MunitParameter params[], void* data) {
-	Piece  pieces[8] = {0x11, 0x56, 0x22, 0, 0, 0, 0, 0};
-	size_t len		 = 3;
+	Piece  pieces[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 };
+	size_t len       = 3;
 
 	// Not in list, no changes.
-	Piece  want_pieces1[8] = {0x11, 0x56, 0x22, 0, 0, 0, 0, 0};
-	size_t want_len1	   = 3;
+	Piece  want_pieces1[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 };
+	size_t want_len1       = 3;
 	PieceList__del(pieces, &len, 0x88);
 	munit_assert_int(want_len1, ==, len);
 	for(size_t i = 0; i < 8; i++) {
@@ -33,8 +33,8 @@ MunitResult test_piecelist__del(const MunitParameter params[], void* data) {
 
 	// First element is replaced by last. which then remains in the list twice
 	// and len is reduced by 1, rendering the duplicate "dead".
-	Piece  want_pieces2[8] = {0x22, 0x56, 0x22, 0, 0, 0, 0, 0};
-	size_t want_len2	   = 2;
+	Piece  want_pieces2[8] = { 0x22, 0x56, 0x22, 0, 0, 0, 0, 0 };
+	size_t want_len2       = 2;
 	PieceList__del(pieces, &len, 0x11);
 	munit_assert_int(want_len2, ==, len);
 	for(size_t i = 0; i < 8; i++) {
@@ -46,14 +46,14 @@ MunitResult test_piecelist__del(const MunitParameter params[], void* data) {
 }
 
 MunitResult test_piecelist__del_index(const MunitParameter params[], void* data) {
-	Piece  pieces[8] = {0x11, 0x56, 0x22, 0, 0, 0, 0, 0};
-	size_t len		 = 3;
+	Piece  pieces[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 };
+	size_t len       = 3;
 
 	// Delete element at index 0 until len == 0:
 	// 1. {0x22, 0x56, 0x22, 0, 0, 0, 0, 0} --> len 2
 	// 2. {0x56, 0x56, 0x22, 0, 0, 0, 0, 0} --> len 1
 	// 3. {0x56, 0x56, 0x22, 0, 0, 0, 0, 0} --> len 0
-	Piece want_pieces1[8] = {0x56, 0x56, 0x22, 0, 0, 0, 0, 0};
+	Piece want_pieces1[8] = { 0x56, 0x56, 0x22, 0, 0, 0, 0, 0 };
 	while(len > 0) {
 		PieceList__del_index(pieces, &len, 0);
 	}
@@ -81,8 +81,8 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 	munit_assert_string_equal(" e2-e4", e2e4str);
 	free(e2e4str);
 
-	const Square  g7	= 0x66;
-	const Square  g8	= 0x76;
+	const Square  g7    = 0x66;
+	const Square  g8    = 0x76;
 	const BitMove g7g8Q = BitMove__new(WPAWN, g7, g8, WQUEEN, false);
 	munit_assert_int(g7, ==, BitMove__from(g7g8Q));
 	munit_assert_int(g8, ==, BitMove__to(g7g8Q));
@@ -94,8 +94,8 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 	munit_assert_string_equal(" g7-g8=Q", g7g8Qstr);
 	free(g7g8Qstr);
 
-	const Square  a1	= 0x0;
-	const Square  h8	= 0x77;
+	const Square  a1    = 0x0;
+	const Square  h8    = 0x77;
 	const BitMove ba1h8 = BitMove__new(BBISHOP, a1, h8, PROMO_NONE, true);
 	munit_assert_int(a1, ==, BitMove__from(ba1h8));
 	munit_assert_int(h8, ==, BitMove__to(ba1h8));
@@ -114,7 +114,7 @@ MunitResult test_utility_functions(const MunitParameter params[], void* data) {
 	munit_log(MUNIT_LOG_INFO, "func on_board");
 	for(Square sq = 0; sq < 2 * 64; sq++) {
 		bool is_on_board = on_board(sq);
-		bool result		 = false;
+		bool result      = false;
 		for(size_t i = 0; i < 64; i++) {
 			if(LOOKUP_0x88[i] == sq) {
 				result = true;
@@ -191,12 +191,12 @@ MunitResult test_movelist_all(const MunitParameter params[], void* data) {
 }
 
 MunitTest test_diverse_suite[] = {
-	{"piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"bitmove__all", test_bitmove_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"utility_functions", test_utility_functions, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"movelist_all", test_movelist_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{ "piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "bitmove__all", test_bitmove_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "utility_functions", test_utility_functions, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "movelist_all", test_movelist_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
-	{0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };

@@ -11,7 +11,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 	// Zero arrays.
 	for(size_t i = 0; i < 240; i++) {
 		square_diffs[i] = 0;
-		diff_dirs[i]	= 0;
+		diff_dirs[i]    = 0;
 	}
 
 	// Iterate and save all possible from-to square relations for each piece type.
@@ -19,7 +19,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 	// Knights
 	for(size_t x = 0; x < KNIGHT_DIRS_LEN; x++) {
 		Direction dir  = KNIGHT_DIRS[x];
-		uint8_t	  diff = (uint8_t)(0x77 + dir);
+		uint8_t   diff = (uint8_t)(0x77 + dir);
 
 		square_diffs[diff] |= KNIGHT;
 		diff_dirs[diff] = dir;
@@ -28,7 +28,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 	// Kings
 	for(size_t x = 0; x < KING_DIRS_LEN; x++) {
 		Direction dir  = KING_DIRS[x];
-		uint8_t	  diff = (uint8_t)(0x77 + dir);
+		uint8_t   diff = (uint8_t)(0x77 + dir);
 
 		square_diffs[diff] |= KING;
 		diff_dirs[diff] = dir;
@@ -39,7 +39,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 		Direction dir = ORTHOGONAL_DIRS[x];
 		for(size_t step = 1; step < 8; step++) {
 			Direction muldir = dir * (Direction)step;
-			uint8_t	  diff	 = (uint8_t)(0x77 + muldir);
+			uint8_t   diff   = (uint8_t)(0x77 + muldir);
 			square_diffs[diff] |= ROOK | QUEEN;
 			diff_dirs[diff] = dir;
 		}
@@ -50,10 +50,9 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 		Direction dir = DIAGONAL_DIRS[x];
 		for(size_t step = 1; step < 8; step++) {
 			Direction muldir = dir * (Direction)step;
-			uint8_t	  diff	 = (uint8_t)(0x77 + muldir);
+			uint8_t   diff   = (uint8_t)(0x77 + muldir);
 			square_diffs[diff] |= BISHOP | QUEEN;
 			diff_dirs[diff] = dir;
 		}
 	}
 }
-

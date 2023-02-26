@@ -9,7 +9,7 @@
 #include "mlist.h"
 #include "errors.h"
 
-// Board contains all information for a chess board state, 
+// Board contains all information for a chess board state,
 // including the board itself as 0x88 board.
 //
 //   +------------------------+
@@ -28,7 +28,7 @@
 // whereas there right board is used as meta information board aiding move generation.
 typedef struct Board Board;
 struct Board {
-	Piece squares[64*2];
+	Piece squares[64 * 2];
 	bool castle_short[2];
 	bool castle_long[2];
 	uint16_t move_number;
@@ -53,17 +53,17 @@ struct Board {
 };
 
 // TODO convert all Board * to Board * const ?
-void Board__set_starting_position(Board *b);
-Error Board__set_fen(Board *b, const char *fen);
-void Board__add_piece(Board *b, Square sq, Piece p);
-void Board__del_piece(Board *b, Square sq);
-void Board__clear(Board *b);
-void Board__clear_meta(Board *b);
-bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color);
-bool Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ignore_sq, Color color);
-void Board__detect_checks_and_pins(Board *b, Color color);
-int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker, const int ccount, size_t plist_len, Square const *const plist, Piece ptype);
-void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color);
-Error Board__to_string(Board *b, char *str);
+void Board__set_starting_position(Board* b);
+Error Board__set_fen(Board* b, const char* fen);
+void Board__add_piece(Board* b, Square sq, Piece p);
+void Board__del_piece(Board* b, Square sq);
+void Board__clear(Board* b);
+void Board__clear_meta(Board* b);
+bool Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq, Color color);
+bool Board__is_sq_attacked_by_slider(Board* b, const Square sq, const Square ignore_sq, Color color);
+void Board__detect_checks_and_pins(Board* b, Color color);
+int Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker, const int ccount, size_t plist_len, Square const* const plist, Piece ptype);
+void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color);
+Error Board__to_string(Board* b, char* str);
 
 #endif
