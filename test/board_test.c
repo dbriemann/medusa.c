@@ -572,50 +572,49 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 }
 
 MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data) {
-	GenerateMovesTestCase testcase;
-	testcase.name                    = "white knight in the center";
-	testcase.fen                     = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1";
-	testcase.expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, true);
-	testcase.expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, true);
-	testcase.expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, false);
-	testcase.expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, false);
-	testcase.expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, false);
-	testcase.expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, false);
-	testcase.expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, false);
-	testcase.expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, false);
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name                    = "white knight in the center",
+			.fen                     = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1",
+		},
+		{
+			.name                    = "black knight in the corner",
+			.fen                     = "7n/8/6PP/8/8/8/8/8 b - - 0 1",
+		}
+	};
+
+	testcases[0].expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, true);
+	testcases[0].expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, true);
+	testcases[0].expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, false);
+
+	testcases[1].expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, true);
+	testcases[1].expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, false);
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
 
 	Board board;
-
-	munit_logf(MUNIT_LOG_INFO, "testcase 0: %s", testcase.name);
-
-	Error error = Board__set_fen(&board, testcase.fen);
-	munit_assert_int(OK, ==, error);
-
 	MoveList moves;
-	Board__generate_knight_moves(&board, &moves, board.player);
 
-	for(size_t i = 0; i < moves.size; i++) {
-		munit_assert_int(testcase.expected_moves.moves[i], ==, moves.moves[i]);
-	}
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
 
-	testcase.name                    = "black knight in the corner";
-	testcase.fen                     = "7n/8/6PP/8/8/8/8/8 b - - 0 1";
-	testcase.expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, true);
-	testcase.expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, false);
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
 
-	munit_logf(MUNIT_LOG_INFO, "testcase 1: %s", testcase.name);
+		Board__generate_knight_moves(&board, &moves, board.player);
 
-	error = Board__set_fen(&board, testcase.fen);
-	munit_assert_int(OK, ==, error);
-
-	MoveList__clear(&moves);
-	Board__generate_knight_moves(&board, &moves, board.player);
-
-	for(size_t i = 0; i < moves.size; i++) {
-		char* m = BitMove__to_notation(moves.moves[i]);
-		munit_log(MUNIT_LOG_INFO, m);
-		free(m);
-		munit_assert_int(testcase.expected_moves.moves[i], ==, moves.moves[i]);
+		for(size_t i = 0; i < moves.size; i++) {
+			char* m = BitMove__to_notation(moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, m);
+			free(m);
+			munit_assert_int(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
 	}
 
 	return MUNIT_OK;
