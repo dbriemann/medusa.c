@@ -17,6 +17,11 @@ typedef uint8_t Color;
 typedef uint8_t Square;
 typedef uint8_t Info;
 typedef int8_t Direction;
+typedef uint8_t CastleType;
+
+const static CastleType CASTLE_NONE = 0x0;
+const static CastleType CASTLE_OO   = 0x1;
+const static CastleType CASTLE_OOO  = 0x2;
 
 const static Square OTB = 0x7F;
 
@@ -86,7 +91,7 @@ const static size_t    PAWN_BASE_RANK_LEN      = 2;
 const static Square    PAWN_PROMOTE_RANK[2]    = { 0, 7 };
 const static size_t    PAWN_PROMOTE_RANK_LEN   = 2;
 
-const static Direction KNIGHT_DIRS[8]              = {
+const static Direction KNIGHT_DIRS[8] = {
 	UP + UP_LEFT, UP + UP_RIGHT, DOWN + DOWN_LEFT, DOWN + DOWN_RIGHT,
 	LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT
 };

@@ -19,7 +19,7 @@ Error parse_fen(const char fen[], MinBoard* mb) {
 	memcpy(cpy, fen, len);
 
 	char  delim[] = " "; // Spaces splits fen into 6 groups.
-	Error error = ERR_UNKNOWN;
+	Error error   = ERR_UNKNOWN;
 
 	do { // Runs only once. Defers free call for each error case.
 		// Group 1 : pieces
@@ -196,7 +196,7 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	 */
 
 	for(size_t lo = 0, hi = 56; lo < 32; lo++, hi++) {
-		Piece tmp   = squares[lo];
+		Piece tmp = squares[lo];
 		squares[lo] = squares[hi];
 		squares[hi] = tmp;
 		if((hi + 1) % 8 == 0) {
@@ -244,9 +244,9 @@ Error fen_parse_castling_rights(const char fen[], bool oo[2], bool ooo[2]) {
 	}
 	while(fen[pos] != 0) {
 		switch(fen[pos]) {
-		case 'K': oo[WHITE] = true; break;
+		case 'K': oo[WHITE]  = true; break;
 		case 'Q': ooo[WHITE] = true; break;
-		case 'k': oo[BLACK] = true; break;
+		case 'k': oo[BLACK]  = true; break;
 		case 'q': ooo[BLACK] = true; break;
 		default: return ERR_INVALID_INPUT;
 		}

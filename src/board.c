@@ -533,7 +533,7 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 		// Try all possible directions for a knight.
 		for(size_t d = 0; d < KNIGHT_DIRS_LEN; d++) {
 			Direction dir = KNIGHT_DIRS[d];
-			to            = (Direction)from + dir;
+			to = (Direction)from + dir;
 			if(on_board(to)) {
 				tpiece = board->squares[to];
 
@@ -543,11 +543,10 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 					// prevent it -> impossible move -> skip move.
 					continue;
 				} else if(!has_color(tpiece, color)) {
-					Color opp_color = flip_color(color);
-					bool  is_capture = has_color(tpiece, opp_color);
+					// TODO: only use minimal move for internal purpose.
 
 					// Add a normal or a capture move.
-					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, is_capture);
+					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
 					MoveList__put(mlist, move);
 				} // Else the square is occupied by a piece of the same color.
 			}     // Else target is off the board.

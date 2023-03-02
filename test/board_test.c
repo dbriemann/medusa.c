@@ -9,15 +9,15 @@ MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
 			.name            = "Strange position (valid)",
 			.input_fen       = "1nbqkb1r/1ppppp1p/r4n2/p5pP/8/2N4R/PPPPPPP1/R1BQKBN1 w Qk g6 0 5",
 			.expected_result = OK,
-			.expected_board = {
+			.expected_board  = {
 				.castle_short = { true, false },
-				.castle_long = { false, true },
-				.move_number = 5,
+				.castle_long  = { false, true },
+				.move_number  = 5,
 				.draw_counter = 0,
-				.check_info = OTB,
-				.ep_square = 0x56, // g6
-				.player = WHITE,
-				.squares = {
+				.check_info   = OTB,
+				.ep_square    = 0x56, // g6
+				.player       = WHITE,
+				.squares      = {
 					WROOK, EMPTY, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, EMPTY,      EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 					WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, EMPTY,             EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 					EMPTY, EMPTY, WKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, WROOK,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
@@ -27,33 +27,33 @@ MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
 					EMPTY, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, EMPTY, BPAWN,             EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 					EMPTY, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, EMPTY, BROOK,      EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 				},
-				.kings = { 0x74, 0x04 },
+				.kings  = { 0x74, 0x04 },
 				.queens = {
 					{ 0x73, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0x03, 0, 0, 0, 0, 0, 0, 0, 0 },
 				},
 				.queens_size = { 1, 1 },
-				.rooks = {
+				.rooks       = {
 					{ 0x50, 0x77, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0x00, 0x27, 0, 0, 0, 0, 0, 0, 0, 0 },
 				},
 				.rooks_size = { 2, 2 },
-				.bishops = {
+				.bishops    = {
 					{ 0x72, 0x75, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0x02, 0x05, 0, 0, 0, 0, 0, 0, 0, 0 },
 				},
 				.bishops_size = { 2, 2 },
-				.sliders = {
+				.sliders      = {
 					{ 0x50, 0x72, 0x73, 0x75, 0x77, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0x00, 0x02, 0x03, 0x05, 0x27, 0, 0, 0, 0, 0, 0, 0, 0 },
 				},
 				.sliders_size = { 5, 5 },
-				.knights = {
+				.knights      = {
 					{ 0x55, 0x71, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0x06, 0x22, 0, 0, 0, 0, 0, 0, 0, 0 },
 				},
 				.knights_size = { 2, 2 },
-				.pawns = {
+				.pawns        = {
 					{ 0x40, 0x46, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67 },
 					{ 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x47 },
 				},
@@ -183,33 +183,33 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void* data)
 			BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,             EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 			BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 		},
-		.kings = { 0x74, 0x04 },
+		.kings  = { 0x74, 0x04 },
 		.queens = {
 			{ 0x73, 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0x03, 0, 0, 0, 0, 0, 0, 0, 0 },
 		},
 		.queens_size = { 1, 1 },
-		.rooks = {
+		.rooks       = {
 			{ 0x70, 0x77, 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0x00, 0x07, 0, 0, 0, 0, 0, 0, 0, 0 },
 		},
 		.rooks_size = { 2, 2 },
-		.bishops = {
+		.bishops    = {
 			{ 0x72, 0x75, 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0x02, 0x05, 0, 0, 0, 0, 0, 0, 0, 0 },
 		},
 		.bishops_size = { 2, 2 },
-		.sliders = {
+		.sliders      = {
 			{ 0x70, 0x72, 0x73, 0x75, 0x77, 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0x00, 0x02, 0x03, 0x05, 0x07, 0, 0, 0, 0, 0, 0, 0, 0 },
 		},
 		.sliders_size = { 5, 5 },
-		.knights = {
+		.knights      = {
 			{ 0x71, 0x76, 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0x01, 0x06, 0, 0, 0, 0, 0, 0, 0, 0 },
 		},
 		.knights_size = { 2, 2 },
-		.pawns = {
+		.pawns        = {
 			{ 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67 },
 			{ 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 },
 		},
@@ -313,8 +313,8 @@ MunitResult test_board__clear_funcs(const MunitParameter params[], void* data) {
 MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data) {
 	const IsSqAttackedTestCase testcases[] = {
 		{
-			.name = "constructed, only pawns",
-			.fen = "k7/7p/5ppP/3ppPP1/1ppPP3/pPP5/P7/7K w - - 0 1",
+			.name              = "constructed, only pawns",
+			.fen               = "k7/7p/5ppP/3ppPP1/1ppPP3/pPP5/P7/7K w - - 0 1",
 			.attacked_by_black = {
 				false, false, false, false, false, false, false, false,
 				false, true, false, false, false, false, false, false,
@@ -337,8 +337,8 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data
 			},
 		},
 		{
-			.name = "real position: sevian vs. caruana (usc 2022)",
-			.fen = "r1bqr1k1/3n1pp1/3b1n1p/1ppP4/8/P1NNB3/1P2B1PP/R2Q1RK1 w - - 2 17",
+			.name              = "real position: sevian vs. caruana (usc 2022)",
+			.fen               = "r1bqr1k1/3n1pp1/3b1n1p/1ppP4/8/P1NNB3/1P2B1PP/R2Q1RK1 w - - 2 17",
 			.attacked_by_black = {
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, true,
@@ -388,15 +388,15 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data
 
 MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void* data) {
 	const DetectChecksAndPinsTestCase
-	    testcases[] =
+		testcases[] =
 	{
 		{
-			.name = "white pawn checks black king",
-			.fen  = "8/8/8/2k1p3/3P4/4K3/8/8 b - - 0 1",
+			.name           = "white pawn checks black king",
+			.fen            = "8/8/8/2k1p3/3P4/4K3/8/8 b - - 0 1",
 			.expected_board = {
 				.check_info = 0x33,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -410,12 +410,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "black knight checks white king",
-			.fen  = "8/8/8/8/5nk1/8/6K1/8 w - - 0 1",
+			.name           = "black knight checks white king",
+			.fen            = "8/8/8/8/5nk1/8/6K1/8 w - - 0 1",
 			.expected_board = {
 				.check_info = 0x35,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -429,12 +429,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "white bishop checks black king",
-			.fen  = "2B5/8/8/8/6k1/8/6K1/8 b - - 0 1",
+			.name           = "white bishop checks black king",
+			.fen            = "2B5/8/8/8/6k1/8/6K1/8 b - - 0 1",
 			.expected_board = {
 				.check_info = 0x72,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -448,12 +448,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "white rook checks black king",
-			.fen  = "8/8/8/8/1R3k2/8/5K2/8 b - - 0 1",
+			.name           = "white rook checks black king",
+			.fen            = "8/8/8/8/1R3k2/8/5K2/8 b - - 0 1",
 			.expected_board = {
 				.check_info = 0x31,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -467,12 +467,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "white queen checks black king (mate)",
-			.fen  = "k7/1Q6/1K6/8/8/8/8/8 b - - 0 1",
+			.name           = "white queen checks black king (mate)",
+			.fen            = "k7/1Q6/1K6/8/8/8/8/8 b - - 0 1",
 			.expected_board = {
 				.check_info = 0x61,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -486,12 +486,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "black pins multiple pieces to the white king",
-			.fen  = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1",
+			.name           = "black pins multiple pieces to the white king",
+			.fen            = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1",
 			.expected_board = {
 				.check_info = OTB,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -505,12 +505,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "white pins eight pieces to the black king",
-			.fen  = "1B1R1Q2/ppqnr2p/Q1bkr2Q/2ppp3/1Q6/P7/1P1R3B/K7 b - - 0 1",
+			.name           = "white pins eight pieces to the black king",
+			.fen            = "1B1R1Q2/ppqnr2p/Q1bkr2Q/2ppp3/1Q6/P7/1P1R3B/K7 b - - 0 1",
 			.expected_board = {
 				.check_info = OTB,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE,         5, INFO_NONE, INFO_NONE, INFO_NONE,         7,
@@ -524,12 +524,12 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			}
 		},
 		{
-			.name = "white pins nothing",
-			.fen  = "6R1/6N1/Q3nnk1/5rb1/4r1b1/8/PP6/KB4R1 b - - 0 1",
+			.name           = "white pins nothing",
+			.fen            = "6R1/6N1/Q3nnk1/5rb1/4r1b1/8/PP6/KB4R1 b - - 0 1",
 			.expected_board = {
 				.check_info = OTB,
 				.ep_square  = OTB,
-				.squares = {
+				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,     INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -574,30 +574,30 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data) {
 	GenerateMovesTestCase testcases[] = {
 		{
-			.name                    = "white knight in the center",
-			.fen                     = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1",
+			.name = "white knight in the center",
+			.fen  = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1",
 		},
 		{
-			.name                    = "black knight in the corner",
-			.fen                     = "7n/8/6PP/8/8/8/8/8 b - - 0 1",
+			.name = "black knight in the corner",
+			.fen  = "7n/8/6PP/8/8/8/8/8 b - - 0 1",
 		}
 	};
 
-	testcases[0].expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, true);
-	testcases[0].expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, true);
-	testcases[0].expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, false);
-	testcases[0].expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, false);
-	testcases[0].expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, false);
-	testcases[0].expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, false);
-	testcases[0].expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, false);
-	testcases[0].expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, false);
+	testcases[0].expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, BPAWN, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, BPAWN, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false);
 
-	testcases[1].expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, true);
-	testcases[1].expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, false);
+	testcases[1].expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, WPAWN, CASTLE_NONE, false);
+	testcases[1].expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, EMPTY, CASTLE_NONE, false);
 
 	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
 
-	Board board;
+	Board    board;
 	MoveList moves;
 
 	for(size_t tc = 0; tc < len; tc++) {

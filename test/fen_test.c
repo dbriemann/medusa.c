@@ -425,13 +425,13 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void* 
 
 MunitResult test_parse_fen(const MunitParameter params[], void* data) {
 	ParseFenTestCase
-	    testcases[] =
+		testcases[] =
 	{
 		{
 			.name            = "Start position",
 			.input_fen       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 			.expected_result = OK,
-			.expected_mb =
+			.expected_mb     =
 			{
 				.squares =
 				{
@@ -456,7 +456,7 @@ MunitResult test_parse_fen(const MunitParameter params[], void* data) {
 			.name            = "Ep passent & no castles",
 			.input_fen       = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
 			.expected_result = OK,
-			.expected_mb =
+			.expected_mb     =
 			{
 				.squares =
 				{

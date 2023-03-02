@@ -19,8 +19,8 @@ struct MoveList {
 	// NOTE: other game modes from classical might have different "maxima" here.
 };
 
-void MoveList__clear(MoveList* list);
-void MoveList__put(MoveList* list, BitMove move);
+void    MoveList__clear(MoveList* list);
+void    MoveList__put(MoveList* list, BitMove move);
 BitMove MoveList__get(MoveList* list, size_t n);
 
 #endif

@@ -22,7 +22,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 		uint8_t   diff = (uint8_t)(0x77 + dir);
 
 		square_diffs[diff] |= KNIGHT;
-		diff_dirs[diff] = dir;
+		diff_dirs[diff]     = dir;
 	}
 
 	// Kings
@@ -31,7 +31,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 		uint8_t   diff = (uint8_t)(0x77 + dir);
 
 		square_diffs[diff] |= KING;
-		diff_dirs[diff] = dir;
+		diff_dirs[diff]     = dir;
 	}
 
 	// Orthogonal sliders (rooks, queens)
@@ -41,7 +41,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 			Direction muldir = dir * (Direction)step;
 			uint8_t   diff   = (uint8_t)(0x77 + muldir);
 			square_diffs[diff] |= ROOK | QUEEN;
-			diff_dirs[diff] = dir;
+			diff_dirs[diff]     = dir;
 		}
 	}
 
@@ -52,7 +52,7 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 			Direction muldir = dir * (Direction)step;
 			uint8_t   diff   = (uint8_t)(0x77 + muldir);
 			square_diffs[diff] |= BISHOP | QUEEN;
-			diff_dirs[diff] = dir;
+			diff_dirs[diff]     = dir;
 		}
 	}
 }

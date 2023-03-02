@@ -69,43 +69,106 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 	// We don't care about the underlying representation in the test,
 	// just that what is put into a BitMove also comes back out of it
 	// using the extraction functions.
-	const Square  e2   = 0x14;
-	const Square  e4   = 0x34;
-	const BitMove e2e4 = BitMove__new(WPAWN, e2, e4, PROMO_NONE, false);
-	munit_assert_int(e2, ==, BitMove__from(e2e4));
-	munit_assert_int(e4, ==, BitMove__to(e2e4));
-	munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(e2e4));
-	munit_assert_int(WPAWN, ==, BitMove__piece(e2e4));
-	munit_assert_int(false, ==, BitMove__is_capture(e2e4));
-	char* e2e4str = BitMove__to_notation(e2e4);
-	munit_assert_string_equal(" e2-e4", e2e4str);
-	free(e2e4str);
+	{
+		const Square  e2   = 0x14;
+		const Square  e4   = 0x34;
+		const BitMove e2e4 = BitMove__new(WPAWN, e2, e4, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+		munit_assert_int(e2, ==, BitMove__from(e2e4));
+		munit_assert_int(e4, ==, BitMove__to(e2e4));
+		munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(e2e4));
+		munit_assert_int(WPAWN, ==, BitMove__piece(e2e4));
+		munit_assert_int(EMPTY, ==, BitMove__captured_piece(e2e4));
+		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(e2e4));
+		munit_assert_int(false, ==, BitMove__en_passent(e2e4));
+		char* e2e4str = BitMove__to_notation(e2e4);
+		munit_assert_string_equal(" e2-e4", e2e4str);
+		free(e2e4str);
+	}
 
-	const Square  g7    = 0x66;
-	const Square  g8    = 0x76;
-	const BitMove g7g8Q = BitMove__new(WPAWN, g7, g8, WQUEEN, false);
-	munit_assert_int(g7, ==, BitMove__from(g7g8Q));
-	munit_assert_int(g8, ==, BitMove__to(g7g8Q));
-	munit_assert_int(WQUEEN, ==, BitMove__promoted_piece(g7g8Q));
-	munit_assert_int(WPAWN, ==, BitMove__piece(g7g8Q));
-	munit_assert_int(false, ==, BitMove__is_capture(g7g8Q));
-	munit_log(MUNIT_LOG_INFO, BitMove__to_notation(g7g8Q));
-	char* g7g8Qstr = BitMove__to_notation(g7g8Q);
-	munit_assert_string_equal(" g7-g8=Q", g7g8Qstr);
-	free(g7g8Qstr);
+	{
+		const Square  g7    = 0x66;
+		const Square  g8    = 0x76;
+		const BitMove g7g8Q = BitMove__new(WPAWN, g7, g8, WQUEEN, EMPTY, CASTLE_NONE, false);
+		munit_assert_int(g7, ==, BitMove__from(g7g8Q));
+		munit_assert_int(g8, ==, BitMove__to(g7g8Q));
+		munit_assert_int(WQUEEN, ==, BitMove__promoted_piece(g7g8Q));
+		munit_assert_int(WPAWN, ==, BitMove__piece(g7g8Q));
+		munit_assert_int(EMPTY, ==, BitMove__captured_piece(g7g8Q));
+		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(g7g8Q));
+		munit_assert_int(false, ==, BitMove__en_passent(g7g8Q));
+		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(g7g8Q));
+		char* g7g8Qstr = BitMove__to_notation(g7g8Q);
+		munit_assert_string_equal(" g7-g8=Q", g7g8Qstr);
+		free(g7g8Qstr);
+	}
 
-	const Square  a1    = 0x0;
-	const Square  h8    = 0x77;
-	const BitMove ba1h8 = BitMove__new(BBISHOP, a1, h8, PROMO_NONE, true);
-	munit_assert_int(a1, ==, BitMove__from(ba1h8));
-	munit_assert_int(h8, ==, BitMove__to(ba1h8));
-	munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(ba1h8));
-	munit_assert_int(BBISHOP, ==, BitMove__piece(ba1h8));
-	munit_assert_int(true, ==, BitMove__is_capture(ba1h8));
-	munit_log(MUNIT_LOG_INFO, BitMove__to_notation(ba1h8));
-	char* ba1h8str = BitMove__to_notation(ba1h8);
-	munit_assert_string_equal("ba1xh8", ba1h8str);
-	free(ba1h8str);
+	{
+		const Square  a1    = 0x0;
+		const Square  h8    = 0x77;
+		const BitMove ba1h8 = BitMove__new(BBISHOP, a1, h8, PROMO_NONE, WQUEEN, CASTLE_NONE, false);
+		munit_assert_int(a1, ==, BitMove__from(ba1h8));
+		munit_assert_int(h8, ==, BitMove__to(ba1h8));
+		munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(ba1h8));
+		munit_assert_int(BBISHOP, ==, BitMove__piece(ba1h8));
+		munit_assert_int(WQUEEN, ==, BitMove__captured_piece(ba1h8));
+		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(ba1h8));
+		munit_assert_int(false, ==, BitMove__en_passent(ba1h8));
+		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(ba1h8));
+		char* ba1h8str = BitMove__to_notation(ba1h8);
+		munit_assert_string_equal("ba1xh8", ba1h8str);
+		free(ba1h8str);
+	}
+
+	{
+		const Square  d4     = 0x33;
+		const Square  c3     = 0x22;
+		const BitMove d4c3ep = BitMove__new(BPAWN, d4, c3, PROMO_NONE, WPAWN, CASTLE_NONE, true);
+		munit_assert_int(d4, ==, BitMove__from(d4c3ep));
+		munit_assert_int(c3, ==, BitMove__to(d4c3ep));
+		munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(d4c3ep));
+		munit_assert_int(BPAWN, ==, BitMove__piece(d4c3ep));
+		munit_assert_int(WPAWN, ==, BitMove__captured_piece(d4c3ep));
+		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(d4c3ep));
+		munit_assert_int(true, ==, BitMove__en_passent(d4c3ep));
+		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(d4c3ep));
+		char* d4c3epstr = BitMove__to_notation(d4c3ep);
+		munit_assert_string_equal(" d4xc3ep", d4c3epstr);
+		free(d4c3epstr);
+	}
+
+	{
+		const Square  e1 = 0x04;
+		const Square  g1 = 0x06;
+		const BitMove oo = BitMove__new(WKING, e1, g1, PROMO_NONE, EMPTY, CASTLE_OO, false);
+		munit_assert_int(e1, ==, BitMove__from(oo));
+		munit_assert_int(g1, ==, BitMove__to(oo));
+		munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(oo));
+		munit_assert_int(WKING, ==, BitMove__piece(oo));
+		munit_assert_int(EMPTY, ==, BitMove__captured_piece(oo));
+		munit_assert_int(CASTLE_OO, ==, BitMove__castle_type(oo));
+		munit_assert_int(false, ==, BitMove__en_passent(oo));
+		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(oo));
+		char* oostr = BitMove__to_notation(oo);
+		munit_assert_string_equal("0-0", oostr);
+		free(oostr);
+	}
+
+	{
+		const Square  e1 = 0x04;
+		const Square  c1 = 0x02;
+		const BitMove oo = BitMove__new(WKING, e1, c1, PROMO_NONE, EMPTY, CASTLE_OOO, false);
+		munit_assert_int(e1, ==, BitMove__from(oo));
+		munit_assert_int(c1, ==, BitMove__to(oo));
+		munit_assert_int(PROMO_NONE, ==, BitMove__promoted_piece(oo));
+		munit_assert_int(WKING, ==, BitMove__piece(oo));
+		munit_assert_int(EMPTY, ==, BitMove__captured_piece(oo));
+		munit_assert_int(CASTLE_OOO, ==, BitMove__castle_type(oo));
+		munit_assert_int(false, ==, BitMove__en_passent(oo));
+		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(oo));
+		char* oostr = BitMove__to_notation(oo);
+		munit_assert_string_equal("0-0-0", oostr);
+		free(oostr);
+	}
 
 	return MUNIT_OK;
 }
