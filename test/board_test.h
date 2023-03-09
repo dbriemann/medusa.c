@@ -50,6 +50,7 @@ MunitResult test_board__clear_funcs(const MunitParameter params[], void* data);
 MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data);
 MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void* data);
 MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data);
+MunitResult test_board__generate_king_moves(const MunitParameter params[], void* data);
 
 extern MunitTest test_board_suite[];
 

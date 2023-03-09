@@ -516,8 +516,90 @@ int Board__detect_slider_checks_and_pins(
 	return check_counter;
 }
 
+void  Board__generate_king_moves(Board* board, MoveList* mlist, Color color) {
+	Square  from   = board->kings[color];
+	Square  to     = OTB;
+	Piece   tpiece = EMPTY;
+	BitMove move;
+
+	// Define all possible target squares for the king to move to and add all legal normal moves.
+	bool targets[8] = { 0 };
+
+	for(size_t i = 0; i < KING_DIRS_LEN; i++) {
+		Direction dir = KING_DIRS[i];
+		to = (Direction)from + dir;
+
+		if(on_board(to)) {
+			tpiece = board->squares[to];
+			if(has_color(tpiece, color)) {
+				// Own man.
+				continue;
+			}
+			// TODO: cache attacked squares?
+			if(Board__is_sq_attacked(board, to, OTB, color)) {
+				// Attacked square.
+				continue;
+			}
+
+			targets[i] = true;
+			if(!is_mask_set(board->squares[to_info_index(to)], INFO_MASK_FORBIDDEN_ESCAPE)) {
+				if(!has_color(tpiece, color)) {
+					move = BitMove__new(KING | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
+					MoveList__put(mlist, move);
+				}
+			}
+		}
+	}
+
+	if(board->check_info != CHECK_NONE) {
+		// Cannot castle when in check.
+		return;
+	}
+
+	// a. Try castle king-side
+	// Is it still allowed?
+	if(board->castle_short[color]) {
+		Square sq1 = CASTLING_PATH_SHORT[color][0];
+		Square sq2 = CASTLING_PATH_SHORT[color][1];
+
+		// Test if the squares on short castling path are empty.
+		Piece sq1Piece = board->squares[sq1];
+		Piece sq2Piece = board->squares[sq2];
+		if(sq1Piece == EMPTY && sq2Piece == EMPTY) {
+			// Test if both squares are not attacked.
+			if(targets[0] && !Board__is_sq_attacked(board, sq2, OTB, color)) {
+				// Castling to king-side is possible.
+				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, tpiece, CASTLE_OO, false);
+				MoveList__put(mlist, move);
+			}
+
+		}
+	}
+
+	// b. Try castle queen-side
+	// Is it still allowed?
+	if(board->castle_long[color]) {
+		Square sq1 = CASTLING_PATH_LONG[color][0];
+		Square sq2 = CASTLING_PATH_LONG[color][1];
+		Square sq3 = CASTLING_PATH_LONG[color][2];
+
+		// Test if the squares on long castling path are empty.
+		Piece sq1Piece = board->squares[sq1];
+		Piece sq2Piece = board->squares[sq2];
+		Piece sq3Piece = board->squares[sq3];
+		if(sq1Piece == EMPTY && sq2Piece == EMPTY && sq3Piece == EMPTY) {
+			// Test if both squares are not attacked.
+			if(targets[1] && !Board__is_sq_attacked(board, sq2, OTB, color)) {
+				// Castling to queen-side is possible.
+				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, tpiece, CASTLE_OOO, false);
+				MoveList__put(mlist, move);
+			}
+
+		}
+	}
+}
+
 void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
-	// from, to := OTB, OTB
 	Square  from   = OTB;
 	Square  to     = OTB;
 	Piece   tpiece = EMPTY;

@@ -620,6 +620,29 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 	return MUNIT_OK;
 }
 
+MunitResult test_board__generate_king_moves(const MunitParameter params[], void* data) {
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name = "white king in the center",
+			.fen  = "",
+		},
+		{
+			.name = "black king can castle both sides",
+			.fen  = "",
+		},
+		{
+			.name = "white king in check: no castling",
+			.fen  = "",
+		},
+		{
+			.name = "black kings castles blocked by attacks",
+			.fen  = "",
+		},
+	};
+	// TODO..
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{ "board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
@@ -627,6 +650,7 @@ MunitTest test_board_suite[] = {
 	{ "board__is_sq_attacked", test_board__is_sq_attacked, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__detect_checks_and_pins", test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_knight_moves", test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_king_moves", test_board__generate_king_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };

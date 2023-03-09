@@ -64,6 +64,7 @@ bool  Board__is_sq_attacked_by_slider(Board* b, const Square sq, const Square ig
 void  Board__detect_checks_and_pins(Board* b, Color color);
 int   Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker, const int ccount, size_t plist_len, Square const* const plist, Piece ptype);
 void  Board__generate_knight_moves(Board* board, MoveList* mlist, Color color);
+void  Board__generate_king_moves(Board* board, MoveList* mlist, Color color);
 Error Board__to_string(Board* b, char* str);
 
 #endif
