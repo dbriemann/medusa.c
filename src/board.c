@@ -569,10 +569,9 @@ void  Board__generate_king_moves(Board* board, MoveList* mlist, Color color) {
 			// Test if both squares are not attacked.
 			if(targets[0] && !Board__is_sq_attacked(board, sq2, OTB, color)) {
 				// Castling to king-side is possible.
-				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, tpiece, CASTLE_OO, false);
+				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, EMPTY, CASTLE_OO, false);
 				MoveList__put(mlist, move);
 			}
-
 		}
 	}
 
@@ -591,7 +590,7 @@ void  Board__generate_king_moves(Board* board, MoveList* mlist, Color color) {
 			// Test if both squares are not attacked.
 			if(targets[1] && !Board__is_sq_attacked(board, sq2, OTB, color)) {
 				// Castling to queen-side is possible.
-				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, tpiece, CASTLE_OOO, false);
+				move = BitMove__new(KING | color, from, sq2, PROMO_NONE, EMPTY, CASTLE_OOO, false);
 				MoveList__put(mlist, move);
 			}
 

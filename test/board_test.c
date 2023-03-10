@@ -591,9 +591,11 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 	testcases[0].expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false);
 	testcases[0].expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false);
 	testcases[0].expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.size     = 8;
 
 	testcases[1].expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, WPAWN, CASTLE_NONE, false);
 	testcases[1].expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[1].expected_moves.size     = 2;
 
 	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
 
@@ -607,13 +609,15 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 		Error error = Board__set_fen(&board, testcases[tc].fen);
 		munit_assert_int(OK, ==, error);
 
+		Board__detect_checks_and_pins(&board, board.player);
 		Board__generate_knight_moves(&board, &moves, board.player);
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
 		for(size_t i = 0; i < moves.size; i++) {
 			char* m = BitMove__to_notation(moves.moves[i]);
 			munit_log(MUNIT_LOG_INFO, m);
 			free(m);
-			munit_assert_int(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
 		}
 	}
 
@@ -621,25 +625,78 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 }
 
 MunitResult test_board__generate_king_moves(const MunitParameter params[], void* data) {
+	// TODO
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name = "white king in the center",
-			.fen  = "",
+			.fen  = "k7/8/8/8/4K3/8/8/8 w - - 0 1",
 		},
 		{
 			.name = "black king can castle both sides",
-			.fen  = "",
+			.fen  = "r3k2r/pppbqppp/2np1n2/1Bb1p3/4P3/P1NPBN2/1PP2PPP/R2Q2KR b kq - 0 1",
 		},
 		{
-			.name = "white king in check: no castling",
-			.fen  = "",
+			.name = "white king has no moves & cannot castle",
+			.fen  = "3rk2r/ppp2ppp/8/1b6/1B6/8/PPP2PPP/R3K2R w KQk - 0 1",
 		},
 		{
-			.name = "black kings castles blocked by attacks",
-			.fen  = "",
+			.name = "white king in check, only move",
+			.fen  = "3rk2r/ppp2ppp/8/8/1b6/1B6/PPP2PPP/R3K2R w KQk - 0 1",
 		},
 	};
-	// TODO..
+
+	testcases[0].expected_moves.moves[0] = BitMove__new(WKING, 0x34, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[1] = BitMove__new(WKING, 0x34, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[2] = BitMove__new(WKING, 0x34, 0x44, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[3] = BitMove__new(WKING, 0x34, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[4] = BitMove__new(WKING, 0x34, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[5] = BitMove__new(WKING, 0x34, 0x45, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[6] = BitMove__new(WKING, 0x34, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.moves[7] = BitMove__new(WKING, 0x34, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[0].expected_moves.size     = 8;
+
+	testcases[1].expected_moves.moves[0] = BitMove__new(BKING, 0x74, 0x75, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[1].expected_moves.moves[1] = BitMove__new(BKING, 0x74, 0x73, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[1].expected_moves.moves[2] = BitMove__new(BKING, 0x74, 0x76, PROMO_NONE, EMPTY, CASTLE_OO, false);
+	testcases[1].expected_moves.moves[3] = BitMove__new(BKING, 0x74, 0x72, PROMO_NONE, EMPTY, CASTLE_OOO, false);
+	testcases[1].expected_moves.size     = 4;
+
+	// testcase[2] no moves.
+	testcases[2].expected_moves.size = 0;
+
+	testcases[3].expected_moves.moves[0] = BitMove__new(WKING, 0x04, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[3].expected_moves.moves[1] = BitMove__new(WKING, 0x04, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false);
+	testcases[3].expected_moves.size     = 2;
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_king_moves(&board, &moves, board.player);
+
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		// TODO: compare move list sizes
+		for(size_t i = 0; i < moves.size; i++) {
+			char* m = BitMove__to_notation(moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, m);
+			free(m);
+			m = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, m);
+			free(m);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
+
 	return MUNIT_OK;
 }
 
