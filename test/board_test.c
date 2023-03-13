@@ -611,12 +611,15 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 
 		Board__detect_checks_and_pins(&board, board.player);
 		Board__generate_knight_moves(&board, &moves, board.player);
+
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
 		for(size_t i = 0; i < moves.size; i++) {
-			char* m = BitMove__to_notation(moves.moves[i]);
-			munit_log(MUNIT_LOG_INFO, m);
-			free(m);
+			// TODO: assert move notation.
+
+			// char* m = BitMove__to_notation(moves.moves[i]);
+			// munit_log(MUNIT_LOG_INFO, m);
+			// free(m);
 			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
 		}
 	}
@@ -685,14 +688,12 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void*
 
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
-		// TODO: compare move list sizes
 		for(size_t i = 0; i < moves.size; i++) {
-			char* m = BitMove__to_notation(moves.moves[i]);
-			munit_log(MUNIT_LOG_INFO, m);
-			free(m);
-			m = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
-			munit_log(MUNIT_LOG_INFO, m);
-			free(m);
+			// TODO: assert move notation.
+
+			// char* m = BitMove__to_notation(moves.moves[i]);
+			// munit_log(MUNIT_LOG_INFO, m);
+			// free(m);
 			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
 		}
 	}

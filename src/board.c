@@ -635,6 +635,80 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 	}
 }
 
+void  Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color, Piece ptype, Direction dirs[4], Square *pieces, size_t pieces_size) {
+	Square  from   = OTB;
+	Square  to     = OTB;
+	Piece   tpiece = EMPTY;
+	BitMove move;
+	Color oppColor = flip_color(color);
+
+	bool is_check = on_board(board->check_info);
+}
+
+// GenerateSlidingMoves generates all legal sliding moves for the given color
+// and stores them in the given MoveList. This can be diagonal or orthogonal moves.
+// This function is used to create all bishop, rook and queen moves.
+func (b *Board) GenerateSlidingMoves(mlist *MoveList, color Color, ptype Piece, dirs [4]int8, plist *PieceList) {
+	from, to := OTB, OTB
+	tpiece := EMPTY
+	var move BitMove
+	oppColor := color.Flip()
+
+	isCheck := b.CheckInfo.OnBoard()
+
+	// Iterate all specific pieces.
+	for i := uint8(0); i < plist.Size; i++ {
+		from = plist.Pieces[i]
+		isPinned := (b.Squares[from.ToInfoIndex()].Pinval() != 0)
+
+		// For every direction a slider can go..
+		//		for _, dir := range dirs {
+		for i := 0; i < 4; i++ {
+			dir := dirs[i]
+
+			// -> repeat until a stop condition occurs.
+			for steps := int8(1); ; steps++ {
+				to = Square(int8(from) + dir*steps)
+
+				if !to.OnBoard() {
+					// Target is out of board -> next direction.
+					break
+				} else if isPinned && b.Squares[to.ToInfoIndex()] != b.Squares[from.ToInfoIndex()] {
+					// Piece is pinned but target is not on pin path -> next direction.
+					break
+				} else if isCheck && !b.Squares[to.ToInfoIndex()].IsSet(INFO_MASK_CHECK) {
+					tpiece = b.Squares[to]
+					if !tpiece.IsEmpty() {
+						// King is in check but the move does neither capture the checker
+						// nor does it block the check -> skip direction.
+						break
+					}
+				} else {
+					tpiece = b.Squares[to]
+					if tpiece.HasColor(color) {
+						// Target is blocked by own piece -> next direction.
+						break
+					} else {
+						if tpiece.IsEmpty() {
+							// Add a normal move.
+							move = NewBitMove(from, to, NONE)
+							mlist.Put(move)
+							// And continue in current direction.
+						} else if tpiece.HasColor(oppColor) {
+							// Add a capture move.
+							move = NewBitMove(from, to, NONE)
+							mlist.Put(move)
+							// And go to next direction.
+							break
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
+
 Error Board__to_string(Board* b, char* str) {
 	if(b == NULL || str == NULL) {
 		return ERR_NULL_PTR;
