@@ -574,28 +574,34 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data) {
 	GenerateMovesTestCase testcases[] = {
 		{
-			.name = "white knight in the center",
-			.fen  = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1",
+			.name           = "white knight in the center",
+			.fen            = "8/ppp3pp/3p1p2/8/4N3/8/8/8 w - - 0 1",
+			.expected_moves = {
+				.moves = {
+					BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+				.size = 8,
+			}
 		},
 		{
-			.name = "black knight in the corner",
-			.fen  = "7n/8/6PP/8/8/8/8/8 b - - 0 1",
+			.name           = "black knight in the corner",
+			.fen            = "7n/8/6PP/8/8/8/8/8 b - - 0 1",
+			.expected_moves = {
+				.moves = {
+					BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, WPAWN, CASTLE_NONE, false),
+					BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+				.size = 2,
+			}
 		}
 	};
-
-	testcases[0].expected_moves.moves[0] = BitMove__new(WKNIGHT, 0x34, 0x53, PROMO_NONE, BPAWN, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[1] = BitMove__new(WKNIGHT, 0x34, 0x55, PROMO_NONE, BPAWN, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[2] = BitMove__new(WKNIGHT, 0x34, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[3] = BitMove__new(WKNIGHT, 0x34, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[4] = BitMove__new(WKNIGHT, 0x34, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[5] = BitMove__new(WKNIGHT, 0x34, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[6] = BitMove__new(WKNIGHT, 0x34, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[7] = BitMove__new(WKNIGHT, 0x34, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.size     = 8;
-
-	testcases[1].expected_moves.moves[0] = BitMove__new(BKNIGHT, 0x77, 0x56, PROMO_NONE, WPAWN, CASTLE_NONE, false);
-	testcases[1].expected_moves.moves[1] = BitMove__new(BKNIGHT, 0x77, 0x65, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[1].expected_moves.size     = 2;
 
 	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
 
@@ -631,45 +637,55 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void*
 	// TODO
 	GenerateMovesTestCase testcases[] = {
 		{
-			.name = "white king in the center",
-			.fen  = "k7/8/8/8/4K3/8/8/8 w - - 0 1",
+			.name           = "white king in the center",
+			.fen            = "k7/8/8/8/4K3/8/8/8 w - - 0 1",
+			.expected_moves = {
+				.moves = {
+					BitMove__new(WKING, 0x34, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x44, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x45, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x34, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+				.size = 8,
+			}
+
 		},
 		{
-			.name = "black king can castle both sides",
-			.fen  = "r3k2r/pppbqppp/2np1n2/1Bb1p3/4P3/P1NPBN2/1PP2PPP/R2Q2KR b kq - 0 1",
+			.name           = "black king can castle both sides",
+			.fen            = "r3k2r/pppbqppp/2np1n2/1Bb1p3/4P3/P1NPBN2/1PP2PPP/R2Q2KR b kq - 0 1",
+			.expected_moves = {
+				.moves = {
+					BitMove__new(BKING, 0x74, 0x75, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BKING, 0x74, 0x73, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BKING, 0x74, 0x76, PROMO_NONE, EMPTY, CASTLE_OO, false),
+					BitMove__new(BKING, 0x74, 0x72, PROMO_NONE, EMPTY, CASTLE_OOO, false),
+				},
+				.size = 4,
+			}
 		},
 		{
-			.name = "white king has no moves & cannot castle",
-			.fen  = "3rk2r/ppp2ppp/8/1b6/1B6/8/PPP2PPP/R3K2R w KQk - 0 1",
+			.name           = "white king has no moves & cannot castle",
+			.fen            = "3rk2r/ppp2ppp/8/1b6/1B6/8/PPP2PPP/R3K2R w KQk - 0 1",
+			.expected_moves = {
+				.size = 0,
+			}
 		},
 		{
-			.name = "white king in check, only move",
-			.fen  = "3rk2r/ppp2ppp/8/8/1b6/1B6/PPP2PPP/R3K2R w KQk - 0 1",
+			.name           = "white king in check, only move",
+			.fen            = "3rk2r/ppp2ppp/8/8/1b6/1B6/PPP2PPP/R3K2R w KQk - 0 1",
+			.expected_moves = {
+				.moves = {
+					BitMove__new(WKING, 0x04, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x04, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+				.size = 2,
+			},
 		},
 	};
-
-	testcases[0].expected_moves.moves[0] = BitMove__new(WKING, 0x34, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[1] = BitMove__new(WKING, 0x34, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[2] = BitMove__new(WKING, 0x34, 0x44, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[3] = BitMove__new(WKING, 0x34, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[4] = BitMove__new(WKING, 0x34, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[5] = BitMove__new(WKING, 0x34, 0x45, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[6] = BitMove__new(WKING, 0x34, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.moves[7] = BitMove__new(WKING, 0x34, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[0].expected_moves.size     = 8;
-
-	testcases[1].expected_moves.moves[0] = BitMove__new(BKING, 0x74, 0x75, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[1].expected_moves.moves[1] = BitMove__new(BKING, 0x74, 0x73, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[1].expected_moves.moves[2] = BitMove__new(BKING, 0x74, 0x76, PROMO_NONE, EMPTY, CASTLE_OO, false);
-	testcases[1].expected_moves.moves[3] = BitMove__new(BKING, 0x74, 0x72, PROMO_NONE, EMPTY, CASTLE_OOO, false);
-	testcases[1].expected_moves.size     = 4;
-
-	// testcase[2] no moves.
-	testcases[2].expected_moves.size = 0;
-
-	testcases[3].expected_moves.moves[0] = BitMove__new(WKING, 0x04, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[3].expected_moves.moves[1] = BitMove__new(WKING, 0x04, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false);
-	testcases[3].expected_moves.size     = 2;
 
 	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
 
@@ -701,6 +717,12 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void*
 	return MUNIT_OK;
 }
 
+MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void* data) {
+	// TODO
+
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{ "board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
@@ -709,6 +731,7 @@ MunitTest test_board_suite[] = {
 	{ "board__detect_checks_and_pins", test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_knight_moves", test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_king_moves", test_board__generate_king_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_sliding_moves", test_board__generate_sliding_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };
