@@ -2,12 +2,12 @@
 #define BOARD_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "base.h"
-#include "mlist.h"
 #include "errors.h"
+#include "mlist.h"
 
 // Board contains all information for a chess board state,
 // including the board itself as 0x88 board.
@@ -24,8 +24,9 @@
 //   +------------------------+
 //     a  b  c  d  e  f  g  h
 //
-// All indexes shown are in HEX. The left board represents the actual playing board,
-// whereas there right board is used as meta information board aiding move generation.
+// All indexes shown are in HEX. The left board represents the actual playing
+// board, whereas there right board is used as meta information board aiding
+// move generation.
 typedef struct Board Board;
 struct Board {
 	Piece squares[64 * 2];
@@ -59,13 +60,20 @@ void  Board__add_piece(Board* b, Square sq, Piece p);
 void  Board__del_piece(Board* b, Square sq);
 void  Board__clear(Board* b);
 void  Board__clear_meta(Board* b);
-bool  Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq, Color color);
-bool  Board__is_sq_attacked_by_slider(Board* b, const Square sq, const Square ignore_sq, Color color);
-void  Board__detect_checks_and_pins(Board* b, Color color);
-int   Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker, const int ccount, size_t plist_len, Square const* const plist, Piece ptype);
-void  Board__generate_knight_moves(Board* board, MoveList* mlist, Color color);
-void  Board__generate_king_moves(Board* board, MoveList* mlist, Color color);
-void  Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color, Piece ptype, Direction dirs[4], Square *pieces, size_t pieces_siz);
+bool  Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq,
+							Color color);
+bool Board__is_sq_attacked_by_slider(Board* b, const Square sq,
+									 const Square ignore_sq, Color color);
+void Board__detect_checks_and_pins(Board* b, Color color);
+int  Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker,
+										  const int ccount, size_t plist_len,
+										  Square const* const plist,
+										  Piece ptype);
+void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color);
+void Board__generate_king_moves(Board* board, MoveList* mlist, Color color);
+void Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color,
+								   Piece ptype, Direction dirs[4],
+								   Square* pieces, size_t pieces_size);
 Error Board__to_string(Board* b, char* str);
 
 #endif
