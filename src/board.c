@@ -681,7 +681,7 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 // orthogonal moves. This function is used to create all bishop, rook and queen
 // moves.
 void Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color,
-								   Piece ptype, Direction dirs[4],
+								   Piece ptype, const Direction dirs[4],
 								   Square* pieces, size_t pieces_size) {
 	Square  from   = OTB;
 	Square  to     = OTB;

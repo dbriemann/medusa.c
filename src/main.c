@@ -8,14 +8,23 @@
 #include "errors.h"
 
 int main() {
-	Board board;
+	Board    board;
+	MoveList moves;
 
-	const char* name = "DEBUG POS";
-	const char* fen  = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1";
+	const char* fen = "6k1/5ppp/4p3/8/8/8/NP6/QK6 w - - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
+	if(error != OK) {
+		printf("OUCH: %d\n", error);
+		return 1;
+	}
+
+	printf("YAY\n");
+
 
 	Board__detect_checks_and_pins(&board, board.player);
+	Board__generate_sliding_moves(&board, &moves, board.player, QUEEN, ORTHOGONAL_DIRS, board.queens[board.player], board.queens_size[board.player]);
+
 
 	// for(size_t i = 0; i < 64; i++) {
 	// 	const Square sq = LOOKUP_0x88[i];

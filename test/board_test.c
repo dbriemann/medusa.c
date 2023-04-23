@@ -634,7 +634,6 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 }
 
 MunitResult test_board__generate_king_moves(const MunitParameter params[], void* data) {
-	// TODO
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name           = "white king in the center",
@@ -718,7 +717,42 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void*
 }
 
 MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void* data) {
-	// TODO
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name           = "white queen with no (sliding) moves",
+			.fen            = "6k1/5ppp/4p3/8/8/8/NP6/QK6 w - - 0 1",
+			.expected_moves = {
+				.size = 0,
+			}
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_sliding_moves(&board, &moves, board.player, QUEEN, ORTHOGONAL_DIRS, board.queens[board.player], board.queens_size[board.player]);
+
+		// munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			// TODO: assert move notation.
+
+			char* m = BitMove__to_notation(moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, m);
+			free(m);
+			// munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
 
 	return MUNIT_OK;
 }
