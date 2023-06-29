@@ -5,7 +5,7 @@ SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))
 TEST_SOURCES=$(wildcard test/*.c)
 
-DEBUG_CFLAGS=-Wall -Wextra -Weverything -Wno-declaration-after-statement -Werror -g -O0
+DEBUG_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -g -O0
 DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_EXE=$(DEBUG_DIR)/medusa
@@ -14,14 +14,14 @@ GENERATOR_DIR=bin/generator
 GENERATOR_OBJECTS=$(GENERATOR_DIR)/gen.o $(GENERATOR_DIR)/generate.o
 GENERATOR_EXE=$(GENERATOR_DIR)/gen
 
-TEST_CFLAGS=-Wall -Wextra -Weverything -Wno-declaration-after-statement -fprofile-instr-generate -fcoverage-mapping -g -O0
+TEST_CFLAGS=-Wall -Wextra -pedantic-errors -fprofile-instr-generate -fcoverage-mapping -g -O0
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
 TEST_EXE=$(TEST_DIR)/test
 
 # TODO: for release only compile sources that are needed (no generators etc)
-RELEASE_CFLAGS=-Wall -Wextra -Weverything -Wno-declaration-after-statement -Werror # TODO
+RELEASE_CFLAGS=-Wall -Wextra -pedantic-errors -Werror # TODO
 RELEASE_DIR=bin/release
 RELEASE_EXE=$(RELEASE_DIR)/medusa # TODO
 
