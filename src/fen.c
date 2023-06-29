@@ -6,13 +6,13 @@
 #include "minboard.h"
 
 // TODO: ensure amount of certain pieces?! e.g. 16 queens will blow up the piece list.
-Error parse_fen(const char fen[], MinBoard* mb) {
+Error parse_fen(const char fen[], MinBoard *mb) {
 	if(fen == NULL || mb == NULL) {
 		return ERR_NULL_PTR;
 	}
 
 	size_t len = strlen(fen) + 1;
-	char*  cpy = calloc(len, sizeof(char));
+	char * cpy = calloc(len, sizeof(char));
 	if(!cpy) {
 		return ERR_UNKNOWN;
 	}
@@ -23,7 +23,7 @@ Error parse_fen(const char fen[], MinBoard* mb) {
 
 	do { // Runs only once. Defers free call for each error case.
 		// Group 1 : pieces
-		char* strpos = strtok(cpy, delim);
+		char *strpos = strtok(cpy, delim);
 		if(strpos == NULL) {
 			error = ERR_INVALID_INPUT;
 			break;
@@ -133,7 +133,7 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 		char token = fen[pos];
 		// Check if strpos hold 1-8 (number of continues empty squares).
 		if(token >= '1' && token <= '8') {
-			int empty_squares = token - '0';
+			unsigned int empty_squares = token - '0';
 			for(size_t i = 0; i < empty_squares; i++) {
 				squares[boardpos] = EMPTY;
 				boardpos++;
@@ -208,7 +208,7 @@ Error fen_parse_pieces(const char fen[], Piece squares[64]) {
 	return OK;
 }
 
-Error fen_parse_color_to_move(const char fen[], Color* color) {
+Error fen_parse_color_to_move(const char fen[], Color *color) {
 	if(fen == NULL || color == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -255,7 +255,7 @@ Error fen_parse_castling_rights(const char fen[], bool oo[2], bool ooo[2]) {
 	return OK;
 }
 
-Error fen_square_to_index(const char fensq[static 2], Square* sq) {
+Error fen_square_to_index(const char fensq[static 2], Square *sq) {
 	if(fensq == NULL || sq == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -279,7 +279,7 @@ Error fen_square_to_index(const char fensq[static 2], Square* sq) {
 	return OK;
 }
 
-Error fen_parse_ep_square(const char fen[], Square* sq) {
+Error fen_parse_ep_square(const char fen[], Square *sq) {
 	if(fen == NULL || sq == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -301,13 +301,13 @@ Error fen_parse_ep_square(const char fen[], Square* sq) {
 	return fen_square_to_index(fen, sq);
 }
 
-Error fen_parse_half_move_clock(const char fen[], uint16_t* num) {
+Error fen_parse_half_move_clock(const char fen[], uint16_t *num) {
 	if(fen == NULL || num == NULL) {
 		return ERR_NULL_PTR;
 	}
 
 	// Half move counter can be 0.
-	char*         endptr = NULL;
+	char *        endptr = NULL;
 	unsigned long ul     = strtoul(fen, &endptr, 10);
 	if(endptr != NULL && *endptr != '\0') {
 		return ERR_INVALID_INPUT;
@@ -316,7 +316,7 @@ Error fen_parse_half_move_clock(const char fen[], uint16_t* num) {
 	return OK;
 }
 
-Error fen_parse_move_number(const char fen[], uint16_t* num) {
+Error fen_parse_move_number(const char fen[], uint16_t *num) {
 	if(fen == NULL || num == NULL) {
 		return ERR_NULL_PTR;
 	}

@@ -1,7 +1,6 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-typedef enum Error Error;
 enum Error {
 	OK,
 	ERR_NULL_PTR,
@@ -14,5 +13,6 @@ enum Error {
 	ERR_PARSE_FEN_HALF_MOVE,
 	ERR_PARSE_FEN_MOVE,
 };
+typedef enum Error Error;
 
 #endif

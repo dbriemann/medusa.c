@@ -7,7 +7,9 @@
 #include "../src/fen.h"
 #include "fen_test.h"
 
-MunitResult test_fen_parse_pieces(const MunitParameter params[], void* data) {
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 	const FenParsePiecesTestCase testcases[] = {
 		{
 			.name            = "Starting position (valid)",
@@ -73,19 +75,16 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void* data) {
 			.name            = "Too many ranks (invalid)",
 			.input_fen       = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/pppPPppP",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_pieces = {},
 		},
 		{
 			.name            = "Wrong number of empty fields (invalid)",
 			.input_fen       = "rnbqkbnr/pp1ppppp/7/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_pieces = {},
 		},
 		{
 			.name            = "Unknown piece character (invalid)",
 			.input_fen       = "rnbqkbnr/pp1pppop/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_pieces = {},
 		},
 	};
 	Piece                        output[64];
@@ -114,7 +113,7 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void* data) {
+MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *data) {
 	Color c;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: color string is black: \"b\" (valid)");
@@ -144,7 +143,7 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void* da
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void* data) {
+MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *data) {
 	const FenParseCastlingRightsTestCase testcases[] = {
 		{
 			.name            = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
@@ -178,22 +177,16 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void* 
 			.name            = "Empty string (invalid)",
 			.input_fen       = "",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_oo     = {},
-			.expected_ooo    = {},
 		},
 		{
 			.name            = "White: 0-0, unknown char (invalid)",
 			.input_fen       = "Qx",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_oo     = {},
-			.expected_ooo    = {},
 		},
 		{
 			.name            = "Too many chars (invalid)",
 			.input_fen       = "KQkqK",
 			.expected_result = ERR_INVALID_INPUT,
-			.expected_oo     = {},
-			.expected_ooo    = {},
 		},
 	};
 
@@ -233,8 +226,8 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void* 
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_square_to_index(const MunitParameter params[], void* data) {
-	const char*  valid_squares[64] = {
+MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) {
+	const char * valid_squares[64] = {
 		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
 		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -268,29 +261,37 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void* data) 
 
 	munit_log(MUNIT_LOG_INFO, "testcase: fantasy squares (invalid)");
 	size_t      len               = 6;
-	const char* fantasy_squares[] = { "a0", "l8", "c9", "i2", "zz", "33" };
+	const char *fantasy_squares[] = { "a0", "l8", "c9", "i2", "zz", "33" };
 	for(size_t i = 0; i < len; i++) {
 		Error error = fen_square_to_index(fantasy_squares[i], &sq);
 		munit_assert_int(ERR_INVALID_INPUT, ==, error);
 	}
 
+	// Ignore warning to test case where string is empty.
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Warray-bounds"
 	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
 	Error error = fen_square_to_index("", &sq);
 	munit_assert_int(ERR_INVALID_INPUT, ==, error);
+	#pragma clang diagnostic pop
 	error = fen_square_to_index("a88", &sq);
 	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
+	// Ignore warning to test case where string is NULL.
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wnonnull"
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
 	error = fen_square_to_index(NULL, &sq);
 	munit_assert_int(ERR_NULL_PTR, ==, error);
+	#pragma clang diagnostic pop
 	error = fen_square_to_index("does not matter", NULL);
 	munit_assert_int(ERR_NULL_PTR, ==, error);
 
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_parse_ep_square(const MunitParameter params[], void* data) {
-	const char* valid_squares[16] = {
+MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) {
+	const char *valid_squares[16] = {
 		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
 		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
 	};
@@ -311,7 +312,7 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void* data) 
 		}
 	}
 
-	const char* invalid_squares[48] = {
+	const char *invalid_squares[48] = {
 		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
 		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
@@ -346,7 +347,7 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void* data) 
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_parse_move_number(const MunitParameter params[], void* data) {
+MunitResult test_fen_parse_move_number(const MunitParameter params[], void *data) {
 	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
@@ -384,7 +385,7 @@ MunitResult test_fen_parse_move_number(const MunitParameter params[], void* data
 	return MUNIT_OK;
 }
 
-MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void* data) {
+MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *data) {
 	uint16_t num;
 
 	munit_log(MUNIT_LOG_INFO, "testcase: move number 1 (valid)");
@@ -423,7 +424,7 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void* 
 	return MUNIT_OK;
 }
 
-MunitResult test_parse_fen(const MunitParameter params[], void* data) {
+MunitResult test_parse_fen(const MunitParameter params[], void *data) {
 	ParseFenTestCase
 		testcases[] =
 	{
@@ -490,7 +491,7 @@ MunitResult test_parse_fen(const MunitParameter params[], void* data) {
 		munit_assert_int(testcases[tc].expected_result, ==, error);
 
 		if(error == OK) {
-			const MinBoard* emb = &testcases[tc].expected_mb;
+			const MinBoard *emb = &testcases[tc].expected_mb;
 			munit_assert_int(emb->color, ==, out_board.color);
 			for(size_t i = BLACK; i <= WHITE; i++) {
 				munit_assert_int(emb->castle_short[i], ==, out_board.castle_short[i]);

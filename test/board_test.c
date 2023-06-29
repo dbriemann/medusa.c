@@ -3,7 +3,9 @@
 #include "../src/mlist.h"
 #include "../src/board.h"
 
-MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 	const BoardSetFenTestCase testcases[] = {
 		{
 			.name            = "Strange position (valid)",
@@ -73,7 +75,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
 		munit_assert_int(testcases[tc].expected_result, ==, error);
 
 		if(error == OK) {
-			const Board* expb = &testcases[tc].expected_board;
+			const Board *expb = &testcases[tc].expected_board;
 			for(size_t i = 0; i < 2 * 64; i++) {
 				munit_assert_int(expb->squares[i], ==, out_board.squares[i]);
 			}
@@ -130,7 +132,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_board__add_del_piece(const MunitParameter params[], void* data) {
+MunitResult test_board__add_del_piece(const MunitParameter params[], void *data) {
 	// Set up a starting position and validate the correctness including plists.
 	const BoardAddDelPieceTestCase testcases[] = {
 		{ .piece = WPAWN, .sq = 0x10 },
@@ -282,7 +284,7 @@ MunitResult test_board__add_del_piece(const MunitParameter params[], void* data)
 	return MUNIT_OK;
 }
 
-MunitResult test_board__clear_funcs(const MunitParameter params[], void* data) {
+MunitResult test_board__clear_funcs(const MunitParameter params[], void *data) {
 	Board board;
 
 	munit_log(MUNIT_LOG_INFO, "Board__clear");
@@ -310,7 +312,7 @@ MunitResult test_board__clear_funcs(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data) {
+MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data) {
 	const IsSqAttackedTestCase testcases[] = {
 		{
 			.name              = "constructed, only pawns",
@@ -386,7 +388,7 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void* data
 	return MUNIT_OK;
 }
 
-MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void* data) {
+MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data) {
 	const DetectChecksAndPinsTestCase
 		testcases[] =
 	{
@@ -571,7 +573,7 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 	return MUNIT_OK;
 }
 
-MunitResult test_board__generate_knight_moves(const MunitParameter params[], void* data) {
+MunitResult test_board__generate_knight_moves(const MunitParameter params[], void *data) {
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name           = "white knight in the center",
@@ -633,7 +635,7 @@ MunitResult test_board__generate_knight_moves(const MunitParameter params[], voi
 	return MUNIT_OK;
 }
 
-MunitResult test_board__generate_king_moves(const MunitParameter params[], void* data) {
+MunitResult test_board__generate_king_moves(const MunitParameter params[], void *data) {
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name           = "white king in the center",
@@ -716,7 +718,7 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void*
 	return MUNIT_OK;
 }
 
-MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void* data) {
+MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void *data) {
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name           = "white queen with no (sliding) moves",
@@ -747,7 +749,7 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 		for(size_t i = 0; i < moves.size; i++) {
 			// TODO: assert move notation.
 
-			char* m = BitMove__to_notation(moves.moves[i]);
+			char *m = BitMove__to_notation(moves.moves[i]);
 			munit_log(MUNIT_LOG_INFO, m);
 			free(m);
 			// munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);

@@ -11,7 +11,7 @@
 #include "mlist.h"
 #include "plist.h"
 
-void Board__clear(Board* b) {
+void Board__clear(Board *b) {
 	// NOTE: this is only needed for testing.. no need to optimize.
 
 	for (size_t i = 0; i < 2 * 64; i++) {
@@ -55,7 +55,7 @@ void Board__clear(Board* b) {
 	}
 }
 
-void Board__clear_meta(Board* b) {
+void Board__clear_meta(Board *b) {
 	// This function is called often and thus the "loop" is manually unrolled.
 	// It is a lot faster than any looping construct.
 	b->check_info = OTB;
@@ -126,7 +126,7 @@ void Board__clear_meta(Board* b) {
 	b->squares[0x7f] = INFO_NONE;
 }
 
-void Board__set_starting_position(Board* b) {
+void Board__set_starting_position(Board *b) {
 	assert(b != NULL);
 
 	Error err = Board__set_fen(
@@ -134,7 +134,7 @@ void Board__set_starting_position(Board* b) {
 	assert(err == OK);
 }
 
-Error Board__set_fen(Board* b, const char* fen) {
+Error Board__set_fen(Board *b, const char *fen) {
 	if (b == NULL || fen == NULL) {
 		return ERR_NULL_PTR;
 	}
@@ -187,33 +187,26 @@ Error Board__set_fen(Board* b, const char* fen) {
 			continue;
 		}
 
-		switch (ptype) {
-		case PAWN:
+		if (ptype == PAWN) {
 			PieceList__add(b->pawns[pcol], &(b->pawns_size[pcol]), sq);
-			break;
-		case KNIGHT:
+		} else if (ptype == KNIGHT) {
 			PieceList__add(b->knights[pcol], &(b->knights_size[pcol]), sq);
-			break;
-		case BISHOP:
+		} else if (ptype == BISHOP) {
 			PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
 			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-			break;
-		case ROOK:
+		} else if (ptype == ROOK) {
 			PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
 			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-			break;
-		case QUEEN:
+		} else if (ptype == QUEEN) {
 			PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq);
 			PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-			break;
-		case KING:
-			b->squares[sq] = piece;
+		} else if (ptype == KING) {
 			b->kings[pcol] = sq;
-			break;
-		default:
+		} else {
 			printf("ptype: %d\n", ptype);
 			return ERR_INVALID_INPUT; // Skips squares assignment.
 		}
+
 		b->squares[sq] = piece;
 	}
 
@@ -227,7 +220,7 @@ Error Board__set_fen(Board* b, const char* fen) {
 // TODO: what if square has a piece already?
 // TODO: check if plists are full? (should never happen [maybe in chess
 // variants])
-void Board__add_piece(Board* b, Square sq, Piece p) {
+void Board__add_piece(Board *b, Square sq, Piece p) {
 	if (!on_board(sq)) {
 		return;
 	}
@@ -235,37 +228,31 @@ void Board__add_piece(Board* b, Square sq, Piece p) {
 	const Piece ptype = p & PIECE_MASK;
 	const Piece pcol  = p & COLOR_ONLY_MASK;
 
-	switch (ptype) {
-	case PAWN:
+	if (ptype == PAWN) {
 		PieceList__add(b->pawns[pcol], &(b->pawns_size[pcol]), sq);
-		break;
-	case KNIGHT:
+	} else if (ptype == KNIGHT) {
 		PieceList__add(b->knights[pcol], &(b->knights_size[pcol]), sq);
-		break;
-	case BISHOP:
+	} else if (ptype == BISHOP) {
 		PieceList__add(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
 		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case ROOK:
+	} else if (ptype == ROOK) {
 		PieceList__add(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
 		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case QUEEN:
+	} else if (ptype == QUEEN) {
 		PieceList__add(b->queens[pcol], &(b->queens_size[pcol]), sq);
 		PieceList__add(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case KING:
+	} else if (ptype == KING) {
 		b->kings[pcol] = sq;
-		break;
-	default:
+	} else {
 		// This should never happen. Ignore all other values.
 		return; // Skips squares assignment.
 	}
+
 	b->squares[sq] = p;
 }
 
 // TODO: NULL check?
-void Board__del_piece(Board* b, Square sq) {
+void Board__del_piece(Board *b, Square sq) {
 	if (!on_board(sq)) {
 		return;
 	}
@@ -274,35 +261,28 @@ void Board__del_piece(Board* b, Square sq) {
 	const Piece pcol  = p & COLOR_ONLY_MASK;
 
 	b->squares[sq] = EMPTY;
-	switch (ptype) {
-	case PAWN:
+	if (ptype == PAWN) {
 		PieceList__del(b->pawns[pcol], &(b->pawns_size[pcol]), sq);
-		break;
-	case KNIGHT:
+	} else if (ptype == KNIGHT) {
 		PieceList__del(b->knights[pcol], &(b->knights_size[pcol]), sq);
-		break;
-	case BISHOP:
+	} else if (ptype == BISHOP) {
 		PieceList__del(b->bishops[pcol], &(b->bishops_size[pcol]), sq);
 		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case ROOK:
+	} else if (ptype == ROOK) {
 		PieceList__del(b->rooks[pcol], &(b->rooks_size[pcol]), sq);
 		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case QUEEN:
+	} else if (ptype == QUEEN) {
 		PieceList__del(b->queens[pcol], &(b->queens_size[pcol]), sq);
 		PieceList__del(b->sliders[pcol], &(b->sliders_size[pcol]), sq);
-		break;
-	case KING:
+	} else if (ptype == KING) {
 		b->kings[pcol] = sq;
-		break;
-	default:
+	} else {
 		// This should never happen. Ignore all other values.
-		break;
+		return;
 	}
 }
 
-bool Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq,
+bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq,
 						   Color color) {
 	const Color opp_color = flip_color(color);
 
@@ -353,7 +333,7 @@ bool Board__is_sq_attacked(Board* b, const Square sq, const Square ignore_sq,
 	return false;
 }
 
-bool Board__is_sq_attacked_by_slider(Board* b, const Square sq,
+bool Board__is_sq_attacked_by_slider(Board *b, const Square sq,
 									 const Square ignore_sq, Color color) {
 	const Color opp_color = flip_color(color);
 
@@ -396,7 +376,7 @@ bool Board__is_sq_attacked_by_slider(Board* b, const Square sq,
 	return false;
 }
 
-void Board__detect_checks_and_pins(Board* b, Color color) {
+void Board__detect_checks_and_pins(Board *b, Color color) {
 	Board__clear_meta(b);
 	const Color opp_color = flip_color(color);
 
@@ -421,7 +401,7 @@ void Board__detect_checks_and_pins(Board* b, Color color) {
 	// Detect checks by pawns.
 	for (size_t i = 0; i < b->pawns_size[opp_color]; i++) {
 		const Square pawn_sq = b->pawns[opp_color][i];
-		for (int d = 0; d < PAWN_PUSH_CAPTURE_LEN; d++) {
+		for (size_t d = 0; d < PAWN_PUSH_CAPTURE_LEN; d++) {
 			Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
 			Square    to  = (Square)((Direction)pawn_sq + dir);
 			if (king_sq == to) {
@@ -464,9 +444,9 @@ EXIT_PAWN_CHECK:
 	}
 }
 
-int Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker,
+int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker,
 										 const int ccount, size_t plist_len,
-										 Square const* const plist,
+										 Square const *const plist,
 										 Piece ptype) {
 	const Square king_sq       = b->kings[color];
 	int          check_counter = 0;
@@ -551,7 +531,7 @@ int Board__detect_slider_checks_and_pins(Board* b, Color color, Info* pmarker,
 	return check_counter;
 }
 
-void Board__generate_king_moves(Board* board, MoveList* mlist, Color color) {
+void Board__generate_king_moves(Board *board, MoveList *mlist, Color color) {
 	Square  from   = board->kings[color];
 	Square  to     = OTB;
 	Piece   tpiece = EMPTY;
@@ -637,7 +617,7 @@ void Board__generate_king_moves(Board* board, MoveList* mlist, Color color) {
 	}
 }
 
-void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
+void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 	Square  from   = OTB;
 	Square  to     = OTB;
 	Piece   tpiece = EMPTY;
@@ -680,9 +660,9 @@ void Board__generate_knight_moves(Board* board, MoveList* mlist, Color color) {
 // color and stores them in the given MoveList. This can be diagonal or
 // orthogonal moves. This function is used to create all bishop, rook and queen
 // moves.
-void Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color,
+void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 								   Piece ptype, const Direction dirs[4],
-								   Square* pieces, size_t pieces_size) {
+								   Square *pieces, size_t pieces_size) {
 	Square  from   = OTB;
 	Square  to     = OTB;
 	Piece   fpiece = ptype | color;
@@ -743,7 +723,7 @@ void Board__generate_sliding_moves(Board* board, MoveList* mlist, Color color,
 	}
 }
 
-Error Board__to_string(Board* b, char* str) {
+Error Board__to_string(Board *b, char *str) {
 	if (b == NULL || str == NULL) {
 		return ERR_NULL_PTR;
 	}

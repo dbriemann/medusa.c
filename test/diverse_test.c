@@ -4,7 +4,9 @@
 #include "../src/base.h"
 #include "../src/mlist.h"
 
-MunitResult test_piecelist__add(const MunitParameter params[], void* data) {
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+MunitResult test_piecelist__add(const MunitParameter params[], void *data) {
 	Square sq         = 0x34; // e4
 	Piece  bqueens[9] = { 0 };
 	size_t len        = 0;
@@ -17,7 +19,7 @@ MunitResult test_piecelist__add(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_piecelist__del(const MunitParameter params[], void* data) {
+MunitResult test_piecelist__del(const MunitParameter params[], void *data) {
 	Piece  pieces[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 };
 	size_t len       = 3;
 
@@ -45,7 +47,7 @@ MunitResult test_piecelist__del(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_piecelist__del_index(const MunitParameter params[], void* data) {
+MunitResult test_piecelist__del_index(const MunitParameter params[], void *data) {
 	Piece  pieces[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 };
 	size_t len       = 3;
 
@@ -65,7 +67,7 @@ MunitResult test_piecelist__del_index(const MunitParameter params[], void* data)
 	return MUNIT_OK;
 }
 
-MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
+MunitResult test_bitmove_all(const MunitParameter params[], void *data) {
 	// We don't care about the underlying representation in the test,
 	// just that what is put into a BitMove also comes back out of it
 	// using the extraction functions.
@@ -80,7 +82,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(EMPTY, ==, BitMove__captured_piece(e2e4));
 		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(e2e4));
 		munit_assert_int(false, ==, BitMove__en_passent(e2e4));
-		char* e2e4str = BitMove__to_notation(e2e4);
+		char *e2e4str = BitMove__to_notation(e2e4);
 		munit_assert_string_equal(" e2-e4", e2e4str);
 		free(e2e4str);
 	}
@@ -97,7 +99,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(g7g8Q));
 		munit_assert_int(false, ==, BitMove__en_passent(g7g8Q));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(g7g8Q));
-		char* g7g8Qstr = BitMove__to_notation(g7g8Q);
+		char *g7g8Qstr = BitMove__to_notation(g7g8Q);
 		munit_assert_string_equal(" g7-g8=Q", g7g8Qstr);
 		free(g7g8Qstr);
 	}
@@ -114,7 +116,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(ba1h8));
 		munit_assert_int(false, ==, BitMove__en_passent(ba1h8));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(ba1h8));
-		char* ba1h8str = BitMove__to_notation(ba1h8);
+		char *ba1h8str = BitMove__to_notation(ba1h8);
 		munit_assert_string_equal("ba1xh8", ba1h8str);
 		free(ba1h8str);
 	}
@@ -131,7 +133,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(CASTLE_NONE, ==, BitMove__castle_type(d4c3ep));
 		munit_assert_int(true, ==, BitMove__en_passent(d4c3ep));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(d4c3ep));
-		char* d4c3epstr = BitMove__to_notation(d4c3ep);
+		char *d4c3epstr = BitMove__to_notation(d4c3ep);
 		munit_assert_string_equal(" d4xc3ep", d4c3epstr);
 		free(d4c3epstr);
 	}
@@ -148,7 +150,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(CASTLE_OO, ==, BitMove__castle_type(oo));
 		munit_assert_int(false, ==, BitMove__en_passent(oo));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(oo));
-		char* oostr = BitMove__to_notation(oo);
+		char *oostr = BitMove__to_notation(oo);
 		munit_assert_string_equal("0-0", oostr);
 		free(oostr);
 	}
@@ -165,7 +167,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 		munit_assert_int(CASTLE_OOO, ==, BitMove__castle_type(oo));
 		munit_assert_int(false, ==, BitMove__en_passent(oo));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(oo));
-		char* oostr = BitMove__to_notation(oo);
+		char *oostr = BitMove__to_notation(oo);
 		munit_assert_string_equal("0-0-0", oostr);
 		free(oostr);
 	}
@@ -173,7 +175,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_utility_functions(const MunitParameter params[], void* data) {
+MunitResult test_utility_functions(const MunitParameter params[], void *data) {
 	munit_log(MUNIT_LOG_INFO, "func on_board");
 	for(Square sq = 0; sq < 2 * 64; sq++) {
 		bool is_on_board = on_board(sq);
@@ -228,7 +230,7 @@ MunitResult test_utility_functions(const MunitParameter params[], void* data) {
 	return MUNIT_OK;
 }
 
-MunitResult test_movelist_all(const MunitParameter params[], void* data) {
+MunitResult test_movelist_all(const MunitParameter params[], void *data) {
 	MoveList mlist;
 	mlist.size = 0;
 

@@ -7,11 +7,11 @@
 #include "board.h"
 #include "errors.h"
 
-int main() {
+int main(void) {
 	Board    board;
 	MoveList moves;
 
-	const char* fen = "6k1/5ppp/4p3/8/8/8/NP6/QK6 w - - 0 1";
+	const char *fen = "6k1/5ppp/4p3/8/8/8/NP6/QK6 w - - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
 	if(error != OK) {
