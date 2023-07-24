@@ -744,7 +744,7 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 		Board__detect_checks_and_pins(&board, board.player);
 		Board__generate_sliding_moves(&board, &moves, board.player, QUEEN, ORTHOGONAL_DIRS, board.queens[board.player], board.queens_size[board.player]);
 
-		// munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
 		for(size_t i = 0; i < moves.size; i++) {
 			// TODO: assert move notation.
@@ -752,7 +752,7 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 			char *m = BitMove__to_notation(moves.moves[i]);
 			munit_log(MUNIT_LOG_INFO, m);
 			free(m);
-			// munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
 		}
 	}
 

@@ -541,8 +541,8 @@ void Board__generate_king_moves(Board *board, MoveList *mlist, Color color) {
 	// legal normal moves.
 	bool targets[8] = { 0 };
 
-	for (size_t i = 0; i < KING_DIRS_LEN; i++) {
-		Direction dir = KING_DIRS[i];
+	for (size_t i = 0; i < ALL_DIRS_LEN; i++) {
+		Direction dir = ALL_DIRS[i];
 		to = (Direction)from + dir;
 
 		if (on_board(to)) {
@@ -684,7 +684,7 @@ void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 			for (Direction steps = 1; /*forever*/; steps++) {
 				to = (Direction)from + dir * steps;
 
-				if (on_board(to)) {
+				if (!on_board(to)) {
 					// Target is off the board -> next direction.
 					break;
 				} else if (is_pinned && board->squares[to_info_index(to)] !=
