@@ -24,7 +24,7 @@ int main(void) {
 
 	Board__detect_checks_and_pins(&board, board.player);
 	Board__generate_sliding_moves(&board, &moves, board.player, QUEEN,
-								  ORTHOGONAL_DIRS, board.queens[board.player],
+								  ALL_DIRS, ALL_DIRS_LEN, board.queens[board.player],
 								  board.queens_size[board.player]);
 
 	// for(size_t i = 0; i < 64; i++) {

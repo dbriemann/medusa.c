@@ -96,10 +96,9 @@ const static Direction KNIGHT_DIRS[8] = {
 	LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT
 };
 const static size_t    KNIGHT_DIRS_LEN             = 8;
-const static Direction SLIDER_DIRS                 = 4;
 const static Direction DIAGONAL_DIRS[4]            = { UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
 const static size_t    DIAGONAL_DIRS_LEN           = 4;
-const static Direction ORTHOGONAL_DIRS[4]          = { LEFT, UP, RIGHT, DOWN };
+const static Direction ORTHOGONAL_DIRS[4]          = { RIGHT, LEFT, UP, DOWN };
 const static size_t    ORTHOGONAL_DIRS_LEN         = 4;
 const static Direction ALL_DIRS[8]                 = { RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
 const static size_t    ALL_DIRS_LEN                = 8;

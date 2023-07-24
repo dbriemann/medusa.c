@@ -661,7 +661,7 @@ void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 // orthogonal moves. This function is used to create all bishop, rook and queen
 // moves.
 void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
-								   Piece ptype, const Direction dirs[4],
+								   Piece ptype, const Direction *dirs, const size_t dir_len,
 								   Square *pieces, size_t pieces_size) {
 	Square  from   = OTB;
 	Square  to     = OTB;
@@ -677,7 +677,7 @@ void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 		bool is_pinned = pinval(board->squares[to_info_index(from)]) != 0;
 
 		// For every direction a slider can go..
-		for (size_t d = 0; d < SLIDER_DIRS; d++) {
+		for (size_t d = 0; d < dir_len; d++) {
 			Direction dir = dirs[d];
 
 			// -> repeat until a stop condition occurs.

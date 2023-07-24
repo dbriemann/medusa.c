@@ -72,7 +72,7 @@ int  Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker,
 void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color);
 void Board__generate_king_moves(Board *board, MoveList *mlist, Color color);
 void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
-								   Piece ptype, const Direction dirs[4],
+								   Piece ptype, const Direction *dirs, const size_t dir_len,
 								   Square *pieces, size_t pieces_size);
 Error Board__to_string(Board *b, char *str);
 

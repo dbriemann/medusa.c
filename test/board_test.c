@@ -727,6 +727,69 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 				.size = 0,
 			}
 		},
+		{
+			.name           = "white queen, centered, all moves are free",
+			.fen            = "6k1/5p1p/4p1p1/8/3Q4/1N6/2P5/2K5 w - - 0 1",
+			.expected_moves = {
+				.size  = 27,
+				.moves = {
+					BitMove__new(WQUEEN, 0x33, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x53, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x63, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x73, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x03, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x51, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x60, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x44, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x55, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x66, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x77, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x11, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x00, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x06, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			}
+		},
+		{
+			.name           = "white queen, centered, hitting enemy pieces",
+			.fen            = "7k/3b1p1p/1r3p2/4p3/1r1Q3p/1N2n3/1bP5/1K1n4 w - - 0 1",
+			.expected_moves = {
+				.size  = 18,
+				.moves = {
+					BitMove__new(WQUEEN, 0x33, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x37, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x31, PROMO_NONE, BROOK, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x53, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x63, PROMO_NONE, BBISHOP, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x03, PROMO_NONE, BKNIGHT, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x51, PROMO_NONE, BROOK, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x44, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x11, PROMO_NONE, BBISHOP, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x33, 0x24, PROMO_NONE, BKNIGHT, CASTLE_NONE, false),
+				},
+			}
+		},
 	};
 
 	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
@@ -742,14 +805,20 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 		munit_assert_int(OK, ==, error);
 
 		Board__detect_checks_and_pins(&board, board.player);
-		Board__generate_sliding_moves(&board, &moves, board.player, QUEEN, ORTHOGONAL_DIRS, board.queens[board.player], board.queens_size[board.player]);
+		Board__generate_sliding_moves(&board, &moves, board.player, QUEEN, ALL_DIRS, ALL_DIRS_LEN, board.queens[board.player], board.queens_size[board.player]);
 
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
 		for(size_t i = 0; i < moves.size; i++) {
 			// TODO: assert move notation.
 
-			char *m = BitMove__to_notation(moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, "expected move:");
+			char *m = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			munit_log(MUNIT_LOG_INFO, m);
+			free(m);
+
+			munit_log(MUNIT_LOG_INFO, "actual move:");
+			m = BitMove__to_notation(moves.moves[i]);
 			munit_log(MUNIT_LOG_INFO, m);
 			free(m);
 			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
