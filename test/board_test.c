@@ -718,7 +718,8 @@ MunitResult test_board__generate_king_moves(const MunitParameter params[], void 
 	return MUNIT_OK;
 }
 
-MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void *data) {
+
+MunitResult test_board__generate_sliding_moves_queens(const MunitParameter params[], void *data) {
 	GenerateMovesTestCase testcases[] = {
 		{
 			.name           = "white queen with no (sliding) moves",
@@ -810,17 +811,122 @@ MunitResult test_board__generate_sliding_moves(const MunitParameter params[], vo
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
 		for(size_t i = 0; i < moves.size; i++) {
-			// TODO: assert move notation.
+			char *expected_move = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			char *actual_move   = BitMove__to_notation(moves.moves[i]);
+			munit_assert_string_equal(expected_move, actual_move);
+			free(expected_move);
+			free(actual_move);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
 
-			munit_log(MUNIT_LOG_INFO, "expected move:");
-			char *m = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
-			munit_log(MUNIT_LOG_INFO, m);
-			free(m);
+	return MUNIT_OK;
+}
 
-			munit_log(MUNIT_LOG_INFO, "actual move:");
-			m = BitMove__to_notation(moves.moves[i]);
-			munit_log(MUNIT_LOG_INFO, m);
-			free(m);
+MunitResult test_board__generate_sliding_moves_rooks(const MunitParameter params[], void *data) {
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name           = "black rooks, roaming on the board",
+			.fen            = "6k1/1pR2p1p/6p1/8/5nr1/P7/1PP4P/1KR3r1 b - - 0 1",
+			.expected_moves = {
+				.size  = 11,
+				.moves = {
+					BitMove__new(BROOK, 0x06, 0x07, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x04, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x03, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x02, PROMO_NONE, WROOK, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x16, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x06, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x36, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x36, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x36, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(BROOK, 0x36, 0x16, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_sliding_moves(&board, &moves, board.player, ROOK, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN, board.rooks[board.player], board.rooks_size[board.player]);
+
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			char *expected_move = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			char *actual_move   = BitMove__to_notation(moves.moves[i]);
+			munit_assert_string_equal(expected_move, actual_move);
+			free(expected_move);
+			free(actual_move);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
+
+	return MUNIT_OK;
+}
+
+MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter params[], void *data) {
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name           = "white bishops, roaming on the board",
+			.fen            = "8/6k1/p1bp1bpp/1pp2p2/8/3BBP1P/PPP3P1/2K5 w - - 0 1",
+			.expected_moves = {
+				.size  = 14,
+				.moves = {
+					BitMove__new(WBISHOP, 0x23, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x41, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x45, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x42, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x57, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x24, 0x06, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_sliding_moves(&board, &moves, board.player, BISHOP, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN, board.bishops[board.player], board.bishops_size[board.player]);
+
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			char *expected_move = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			char *actual_move   = BitMove__to_notation(moves.moves[i]);
+			munit_assert_string_equal(expected_move, actual_move);
+			free(expected_move);
+			free(actual_move);
 			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
 		}
 	}
@@ -836,7 +942,9 @@ MunitTest test_board_suite[] = {
 	{ "board__detect_checks_and_pins", test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_knight_moves", test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_king_moves", test_board__generate_king_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
-	{ "Board__generate_sliding_moves", test_board__generate_sliding_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_sliding_moves_queens", test_board__generate_sliding_moves_queens, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_sliding_moves_rooks", test_board__generate_sliding_moves_rooks, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_sliding_moves_bishops", test_board__generate_sliding_moves_bishops, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };
