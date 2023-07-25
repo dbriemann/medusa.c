@@ -401,7 +401,7 @@ void Board__detect_checks_and_pins(Board *b, Color color) {
 	// Detect checks by pawns.
 	for (size_t i = 0; i < b->pawns_size[opp_color]; i++) {
 		const Square pawn_sq = b->pawns[opp_color][i];
-		for (size_t d = 0; d < PAWN_PUSH_CAPTURE_LEN; d++) {
+		for (size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
 			Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
 			Square    to  = (Square)((Direction)pawn_sq + dir);
 			if (king_sq == to) {
@@ -637,8 +637,7 @@ void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 			if (on_board(to)) {
 				tpiece = board->squares[to];
 
-				bool to_sq_prevents_check =
-					is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
+				bool to_sq_prevents_check = is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
 				if (is_check && !to_sq_prevents_check) {
 					// If there is a check but the move's target does not
 					// prevent it -> impossible move -> skip move.
@@ -654,6 +653,218 @@ void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 			} // Else target is off the board.
 		}
 	}
+}
+
+// TODO: can we generate pawn moves in a simpler way?
+void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
+	// NOTE: Pawn moves can be very complicated and have strange effects on the board (en passent, promotion..).
+	// Because of this all pawn moves are tested for legality by 'fake-play'. This could be optimized by testing the 'easy' ones differently ( TODO:).
+	Square      from   = OTB;
+	Square      to     = OTB;
+	Piece       tpiece = EMPTY;
+	BitMove     move;
+	const Color opp_color = flip_color(color);
+	bool        legal     = false;
+
+	bool is_check = on_board(board->check_info);
+	for(size_t i = 0; i < board->pawns_size[color]; i++) {
+		from = board->pawns[color][i];
+
+		// Continue if pawn is pinned.
+		if (pinval(board->squares[to_info_index(from)]) != 0) {
+			continue;
+		}
+
+		// a. Find captures first.
+		for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
+			Direction capdir = PAWN_CAPTURE_DIRS[color][d];
+			to = (Direction)from + capdir;
+			if(on_board(to)) {
+				tpiece = board->squares[to];
+				bool to_sq_prevents_check = is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
+				if (is_check && !to_sq_prevents_check) {
+					// If there is a check but the move's target does not
+					// prevent it -> impossible move -> skip move.
+					continue;
+				} else if (!has_color(tpiece, color)) {
+					// Target square is not occupied by own piece.
+					// 1. Opp piece -> capture.
+					// 2. EP
+				}
+			}
+
+		}
+	}
+
+	// for i := uint8(0); i < b.Pawns[color].Size; i++ {
+	// 	// 0. Retrieve 'from' square from piece list.
+	// 	from = b.Pawns[color].Pieces[i]
+	//
+	// 	// a. Captures
+	// 	//		for _, capdir := range PAWN_CAPTURE_DIRS[color] {
+	// 	for d := 0; d < 2; d++ {
+	// 		capdir := PAWN_CAPTURE_DIRS[color][d]
+	// 		to = Square(int8(from) + capdir)
+	// 		// If the target square is on board and has the opponent's color
+	// 		// the capture is possible.
+	// 		if to.OnBoard() {
+	// 			tpiece = b.Squares[to]
+	// 			if tpiece.HasColor(oppColor) {
+	// 				// We also have to check if the capture is also a promotion.
+	// 				if to.IsPawnPromoting(color) {
+	// 					// If one type of promotion is legal, all are.
+	// 					legal = b.tryPawnMoveLegality(from, to, to, tpiece, color)
+	// 					if legal {
+	// 						for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
+	// 							move = NewBitMove(from, to, prom)
+	// 							mlist.Put(move)
+	// 						}
+	// 					}
+	// 				} else {
+	// 					move, legal = b.newPawnMoveIfLegal(color, from, to, piece, tpiece, EMPTY, EP_TYPE_NONE)
+	// 					if legal {
+	// 						mlist.Put(move)
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	//
+	// 	// b. Push by one.
+	// 	// Target square does never need legality check here.
+	// 	to = Square(int8(from) + PAWN_PUSH_DIRS[color])
+	// 	if b.Squares[to].IsEmpty() {
+	// 		if to.IsPawnPromoting(color) {
+	// 			// If one type of promotion is legal, all are.
+	// 			legal = b.tryPawnMoveLegality(from, to, to, EMPTY, color)
+	// 			if legal {
+	// 				for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
+	// 					move = NewBitMove(from, to, prom)
+	// 					mlist.Put(move)
+	// 				}
+	// 			}
+	//
+	// 		} else {
+	// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_NONE)
+	// 			if legal {
+	// 				mlist.Put(move)
+	// 			}
+	// 		}
+	//
+	// 		// c. Double push by advancing one more time, if the pawn was at base rank.
+	// 		if from.IsPawnBaseRank(color) {
+	// 			to = Square(int8(to) + PAWN_PUSH_DIRS[color])
+	// 			if b.Squares[to].IsEmpty() {
+	// 				move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_CREATE)
+	// 				if legal {
+	// 					mlist.Put(move)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+}
+
+
+void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
+	// NOTE: Pawn moves can be very complicated and have strange effects on the board (en passent, promotion..).
+	// Because of this all pawn moves are tested for legality by 'fake-play'. This could be optimized by testing the 'easy' ones differently ( TODO:).
+	// Square      from   = OTB;
+	// Square      to     = OTB;
+	// Piece       tpiece = EMPTY;
+	// BitMove     move;
+	// const Color opp_color = flip_color(color);
+	// bool        legal     = false;
+
+	// Possible en passent captures are detected backwards so we do not need
+	// to add another conditional to the capture loop below.
+	// if(board->ep_square != OTB) {
+	// 	to = board->ep_square;
+	// 	// We use the 'wrong' color to find e.p. captures by searching in the opposite direction.
+	// 	for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
+	// 		Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
+	// 		from   = (Direction)to + dir;
+	// 		tpiece = board->squares[from];
+	// 		if(on_board(from) && tpiece == (PAWN | color)) {
+	// 			// TODO: pseudomove
+	// 			// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, PAWN|oppColor, EMPTY, EP_TYPE_CAPTURE)
+	// 			// 			if legal {
+	// 			// 				mlist.Put(move)
+	// 			// 			}
+	// 		}
+	//
+	// 	}
+	// }
+
+	// ------->
+
+	// for i := uint8(0); i < b.Pawns[color].Size; i++ {
+	// 	// 0. Retrieve 'from' square from piece list.
+	// 	from = b.Pawns[color].Pieces[i]
+	//
+	// 	// a. Captures
+	// 	//		for _, capdir := range PAWN_CAPTURE_DIRS[color] {
+	// 	for d := 0; d < 2; d++ {
+	// 		capdir := PAWN_CAPTURE_DIRS[color][d]
+	// 		to = Square(int8(from) + capdir)
+	// 		// If the target square is on board and has the opponent's color
+	// 		// the capture is possible.
+	// 		if to.OnBoard() {
+	// 			tpiece = b.Squares[to]
+	// 			if tpiece.HasColor(oppColor) {
+	// 				// We also have to check if the capture is also a promotion.
+	// 				if to.IsPawnPromoting(color) {
+	// 					// If one type of promotion is legal, all are.
+	// 					legal = b.tryPawnMoveLegality(from, to, to, tpiece, color)
+	// 					if legal {
+	// 						for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
+	// 							move = NewBitMove(from, to, prom)
+	// 							mlist.Put(move)
+	// 						}
+	// 					}
+	// 				} else {
+	// 					move, legal = b.newPawnMoveIfLegal(color, from, to, piece, tpiece, EMPTY, EP_TYPE_NONE)
+	// 					if legal {
+	// 						mlist.Put(move)
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	//
+	// 	// b. Push by one.
+	// 	// Target square does never need legality check here.
+	// 	to = Square(int8(from) + PAWN_PUSH_DIRS[color])
+	// 	if b.Squares[to].IsEmpty() {
+	// 		if to.IsPawnPromoting(color) {
+	// 			// If one type of promotion is legal, all are.
+	// 			legal = b.tryPawnMoveLegality(from, to, to, EMPTY, color)
+	// 			if legal {
+	// 				for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
+	// 					move = NewBitMove(from, to, prom)
+	// 					mlist.Put(move)
+	// 				}
+	// 			}
+	//
+	// 		} else {
+	// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_NONE)
+	// 			if legal {
+	// 				mlist.Put(move)
+	// 			}
+	// 		}
+	//
+	// 		// c. Double push by advancing one more time, if the pawn was at base rank.
+	// 		if from.IsPawnBaseRank(color) {
+	// 			to = Square(int8(to) + PAWN_PUSH_DIRS[color])
+	// 			if b.Squares[to].IsEmpty() {
+	// 				move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_CREATE)
+	// 				if legal {
+	// 					mlist.Put(move)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 // Board__generate_sliding_moves generates all legal sliding moves for the given
