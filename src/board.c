@@ -282,8 +282,8 @@ void Board__del_piece(Board *b, Square sq) {
 	}
 }
 
-bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq,
-						   Color color) {
+// TODO: can we remove the ignore_sq?
+bool Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color) {
 	const Color opp_color = flip_color(color);
 
 	// TODO: benchmark if order of piece types has a significant impact here.
@@ -646,8 +646,7 @@ void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 					// TODO: only use minimal move for internal purpose.
 
 					// Add a normal or a capture move.
-					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, tpiece,
-										CASTLE_NONE, false);
+					move = BitMove__new(KNIGHT | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
 					MoveList__put(mlist, move);
 				} // Else the square is occupied by a piece of the same color.
 			} // Else target is off the board.
@@ -657,26 +656,55 @@ void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color) {
 
 // TODO: can we generate pawn moves in a simpler way?
 void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
-	// NOTE: Pawn moves can be very complicated and have strange effects on the board (en passent, promotion..).
-	// Because of this all pawn moves are tested for legality by 'fake-play'. This could be optimized by testing the 'easy' ones differently ( TODO:).
 	Square      from   = OTB;
 	Square      to     = OTB;
 	Piece       tpiece = EMPTY;
 	BitMove     move;
 	const Color opp_color = flip_color(color);
-	bool        legal     = false;
 
+	// a. Find en passents outside of pawns loop to save some checks.
+	if(board->ep_square != OTB) {
+		to = board->ep_square;
+		// There might be an EP opportunity. Check if there are actual pawns on the source squares
+		// by using the capture dirs for the opposing color.
+		for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
+			Direction capdir = PAWN_CAPTURE_DIRS[opp_color][d];
+			from = (Direction)to + capdir;
+			if(on_board(from) && board->squares[from] == (PAWN|color)) {
+				// The pawns are moved and captured here to allow legality checks afterwards.
+				Square capSq = (Square)((Direction)to+PAWN_PUSH_DIRS[opp_color]);
+				board->squares[capSq] = EMPTY;
+				board->squares[to] = board->squares[from];
+				board->squares[from] = EMPTY;
+				// Now it is checked if the king is attacked.
+				bool legal = !Board__is_sq_attacked(board, board->kings[color], OTB, color);
+				if(legal) {
+					move = BitMove__new(PAWN | color, from, to, PROMO_NONE, PAWN|opp_color, CASTLE_NONE, true);
+					MoveList__put(mlist, move);
+				}
+				// Put the pawns back to their places.
+				board->squares[from] = board->squares[to];
+				board->squares[to] = EMPTY;
+				board->squares[capSq] = PAWN|opp_color;
+			}
+		}
+	}
+	
 	bool is_check = on_board(board->check_info);
 	for(size_t i = 0; i < board->pawns_size[color]; i++) {
 		from = board->pawns[color][i];
+		bool is_pinned = pinval(board->squares[to_info_index(from)]) != 0;
 
-		// Continue if pawn is pinned.
-		if (pinval(board->squares[to_info_index(from)]) != 0) {
-			continue;
-		}
-
-		// a. Find captures first.
+		// b. Find captures (including en passen).
 		for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
+			// Continue with next if pawn is pinned.
+			// For captures this check is enough because the capture can never block an existing pin.
+			if (is_pinned) {
+				continue;
+			}
+
+			// TODO: check
+
 			Direction capdir = PAWN_CAPTURE_DIRS[color][d];
 			to = (Direction)from + capdir;
 			if(on_board(to)) {
@@ -688,47 +716,53 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 					continue;
 				} else if (!has_color(tpiece, color)) {
 					// Target square is not occupied by own piece.
-					// 1. Opp piece -> capture.
-					// 2. EP
+					// 1. Opposing piece => capture.
+					if (has_color(tpiece, opp_color)) {
+						if(is_pawn_promoting(color, to)) {
+							// For promotions we have to create a move for all possible pieces.
+							for(Piece prom = QUEEN; prom >= KNIGHT; prom >>= 1) {
+								move = BitMove__new(PAWN | color, from, to, prom | color, tpiece, CASTLE_NONE, false);
+								MoveList__put(mlist, move);
+							}
+						} else {
+							// Default capture move, no promotion, no ep.
+							move = BitMove__new(PAWN | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
+							MoveList__put(mlist, move);
+						}
+					} 
+					// else if(to == board->ep_square) {
+					// 	// 2. En passent capture
+					// 	// The pawns are moved and captured here to allow legality checks afterwards.
+					// 	Square capSq = (Square)((Direction)to+PAWN_PUSH_DIRS[opp_color]);
+					// 	board->squares[capSq] = EMPTY;
+					// 	board->squares[to] = board->squares[from];
+					// 	board->squares[from] = EMPTY;
+					// 	// Now it is checked if the king is attacked.
+					// 	bool legal = !Board__is_sq_attacked(board, board->kings[color], OTB, color);
+					// 	if(legal) {
+					// 		move = BitMove__new(PAWN | color, from, to, PROMO_NONE, PAWN|opp_color, CASTLE_NONE, true);
+					// 		MoveList__put(mlist, move);
+					// 	}
+					// 	// Put the pawns back to their places.
+					// 	board->squares[from] = board->squares[to];
+					// 	board->squares[to] = EMPTY;
+					// 	board->squares[capSq] = PAWN|opp_color;
+					// }
 				}
 			}
-
 		}
+
+		// c. Push by one
+		// Targe square does not need legality check because pawns are never on 8th rank.
+		if (is_pinned && board->squares[to_info_index(to)] != board->squares[to_info_index((from))]) {
+			// Pawb is pinned but target is not on the pin path -> next direction.
+			continue;
+		}
+
+			// TODO: check
+
 	}
 
-	// for i := uint8(0); i < b.Pawns[color].Size; i++ {
-	// 	// 0. Retrieve 'from' square from piece list.
-	// 	from = b.Pawns[color].Pieces[i]
-	//
-	// 	// a. Captures
-	// 	//		for _, capdir := range PAWN_CAPTURE_DIRS[color] {
-	// 	for d := 0; d < 2; d++ {
-	// 		capdir := PAWN_CAPTURE_DIRS[color][d]
-	// 		to = Square(int8(from) + capdir)
-	// 		// If the target square is on board and has the opponent's color
-	// 		// the capture is possible.
-	// 		if to.OnBoard() {
-	// 			tpiece = b.Squares[to]
-	// 			if tpiece.HasColor(oppColor) {
-	// 				// We also have to check if the capture is also a promotion.
-	// 				if to.IsPawnPromoting(color) {
-	// 					// If one type of promotion is legal, all are.
-	// 					legal = b.tryPawnMoveLegality(from, to, to, tpiece, color)
-	// 					if legal {
-	// 						for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
-	// 							move = NewBitMove(from, to, prom)
-	// 							mlist.Put(move)
-	// 						}
-	// 					}
-	// 				} else {
-	// 					move, legal = b.newPawnMoveIfLegal(color, from, to, piece, tpiece, EMPTY, EP_TYPE_NONE)
-	// 					if legal {
-	// 						mlist.Put(move)
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
 	//
 	// 	// b. Push by one.
 	// 	// Target square does never need legality check here.
@@ -766,7 +800,7 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 }
 
 
-void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
+// void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 	// NOTE: Pawn moves can be very complicated and have strange effects on the board (en passent, promotion..).
 	// Because of this all pawn moves are tested for legality by 'fake-play'. This could be optimized by testing the 'easy' ones differently ( TODO:).
 	// Square      from   = OTB;
@@ -865,7 +899,7 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 	// 		}
 	// 	}
 	// }
-}
+// }
 
 // Board__generate_sliding_moves generates all legal sliding moves for the given
 // color and stores them in the given MoveList. This can be diagonal or
@@ -900,11 +934,9 @@ void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 					break;
 				} else if (is_pinned && board->squares[to_info_index(to)] !=
 						   board->squares[to_info_index((from))]) {
-					// Piece is pinned but target is not on the pin path -> next
-					// direction.
+					// Piece is pinned but target is not on the pin path -> next direction.
 					break;
-				} else if (is_check && !is_mask_set(board->squares[to_info_index(to)],
-													INFO_MASK_CHECK)) {
+				} else if (is_check && !is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK)) {
 					tpiece = board->squares[to];
 
 					if (tpiece == EMPTY) {
@@ -919,8 +951,7 @@ void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 						break;
 					} else {
 						// Add the current move.
-						move = BitMove__new(fpiece, from, to, PROMO_NONE, tpiece,
-											CASTLE_NONE, false);
+						move = BitMove__new(fpiece, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
 						MoveList__put(mlist, move);
 
 						if (tpiece != EMPTY) {

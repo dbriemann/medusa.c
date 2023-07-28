@@ -174,6 +174,22 @@ const static Direction DIFF_DIR_MAP[240] = {
 	0, 17, 0, 0, 15, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 17, 0,
 };
 
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline bool rank(const Square sq) {
+	return sq >> 4;
+}
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline bool file(const Square sq) {
+	return sq & 7;
+}
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline bool is_pawn_promoting(const Color c, const Square sq) {
+	return PAWN_PROMOTE_RANK[c] == rank(sq);
+}
+
 // NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline bool has_color(const Piece p, const Color c) {
 	return (COLOR_TEST_MASK & p) == c;

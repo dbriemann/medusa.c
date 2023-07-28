@@ -26,8 +26,8 @@ void generateAttackMaps(Piece square_diffs[], Direction diff_dirs[]) {
 	}
 
 	// Kings
-	for(size_t x = 0; x < KING_DIRS_LEN; x++) {
-		Direction dir  = KING_DIRS[x];
+	for(size_t x = 0; x < ALL_DIRS_LEN; x++) {
+		Direction dir  = ALL_DIRS[x];
 		uint8_t   diff = (uint8_t)(0x77 + dir);
 
 		square_diffs[diff] |= KING;
