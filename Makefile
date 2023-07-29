@@ -74,6 +74,7 @@ generator: $(GENERATOR_DIR) $(GENERATOR_EXE)
 
 debug: $(DEBUG_DIR) $(DEBUG_EXE)
 
+.PHONY: test
 test: $(TEST_DIR) $(TEST_EXE)
 	# TODO: improve coverage reporting: https://llvm.org/docs/CommandGuide/llvm-cov.html
 	LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test --log-visible info --show-stderr

@@ -934,6 +934,86 @@ MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter para
 	return MUNIT_OK;
 }
 
+MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void *data) {
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name           = "starting position",
+			.fen            = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+			.expected_moves = {
+				.size  = 16,
+				.moves = {
+					BitMove__new(WPAWN, 0x10, 0x20, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x10, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x14, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x14, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+		{
+			.name           = "impossible en passent situation",
+			.fen            = "1nbqkb1r/1pppp1pp/7n/r3PpK1/p2P4/P1N5/1PP2PPP/R1BQ1BNR w k f6 0 10",
+			.expected_moves = {
+				.size  = 11,
+				.moves = {
+					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x33, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// TODO: fix next one
+					BitMove__new(WPAWN, 0x44, 0x54, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x44, 0x57, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_pawn_moves(&board, &moves, board.player);
+
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			char *expected_move = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			char *actual_move   = BitMove__to_notation(moves.moves[i]);
+			munit_assert_string_equal(expected_move, actual_move);
+			free(expected_move);
+			free(actual_move);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{ "board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
@@ -945,6 +1025,7 @@ MunitTest test_board_suite[] = {
 	{ "Board__generate_sliding_moves_queens", test_board__generate_sliding_moves_queens, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_sliding_moves_rooks", test_board__generate_sliding_moves_rooks, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_sliding_moves_bishops", test_board__generate_sliding_moves_bishops, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_pawn_moves", test_board__generate_pawn_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };

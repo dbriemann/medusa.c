@@ -667,6 +667,7 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 		to = board->ep_square;
 		// There might be an EP opportunity. Check if there are actual pawns on the source squares
 		// by using the capture dirs for the opposing color.
+		// EP captures must not be tested for pins or checks because the move is executed and checked.
 		for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
 			Direction capdir = PAWN_CAPTURE_DIRS[opp_color][d];
 			from = (Direction)to + capdir;
@@ -703,8 +704,6 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 				continue;
 			}
 
-			// TODO: check
-
 			Direction capdir = PAWN_CAPTURE_DIRS[color][d];
 			to = (Direction)from + capdir;
 			if(on_board(to)) {
@@ -730,176 +729,49 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 							MoveList__put(mlist, move);
 						}
 					} 
-					// else if(to == board->ep_square) {
-					// 	// 2. En passent capture
-					// 	// The pawns are moved and captured here to allow legality checks afterwards.
-					// 	Square capSq = (Square)((Direction)to+PAWN_PUSH_DIRS[opp_color]);
-					// 	board->squares[capSq] = EMPTY;
-					// 	board->squares[to] = board->squares[from];
-					// 	board->squares[from] = EMPTY;
-					// 	// Now it is checked if the king is attacked.
-					// 	bool legal = !Board__is_sq_attacked(board, board->kings[color], OTB, color);
-					// 	if(legal) {
-					// 		move = BitMove__new(PAWN | color, from, to, PROMO_NONE, PAWN|opp_color, CASTLE_NONE, true);
-					// 		MoveList__put(mlist, move);
-					// 	}
-					// 	// Put the pawns back to their places.
-					// 	board->squares[from] = board->squares[to];
-					// 	board->squares[to] = EMPTY;
-					// 	board->squares[capSq] = PAWN|opp_color;
-					// }
 				}
 			}
 		}
 
-		// c. Push by one
-		// Targe square does not need legality check because pawns are never on 8th rank.
+		// c. Single square push.
+		to = (Direction)from + PAWN_PUSH_DIRS[color];
+		tpiece = board->squares[to];
+		bool to_sq_prevents_check = is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
+		// Target square does not need legality check because pawns are never on 8th rank.
 		if (is_pinned && board->squares[to_info_index(to)] != board->squares[to_info_index((from))]) {
-			// Pawb is pinned but target is not on the pin path -> next direction.
+			// Pawn is pinned but target is not on the pin path -> next direction.
+			continue;
+		}else if (is_check && !to_sq_prevents_check) {
+			// If there is a check but the move's target does not prevent it => impossible move => skip.
+			continue;
+		} else if (tpiece != EMPTY) {
+			// Cannot push forward.
 			continue;
 		}
 
-			// TODO: check
+		if(is_pawn_promoting(color, to)) {
+			// For promotions we have to create a move for all possible pieces.
+			for(Piece prom = QUEEN; prom >= KNIGHT; prom >>= 1) {
+				move = BitMove__new(PAWN | color, from, to, prom | color, tpiece, CASTLE_NONE, false);
+				MoveList__put(mlist, move);
+			}
+		} else {
+			// Normal move by one.
+			move = BitMove__new(PAWN | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
+			MoveList__put(mlist, move);
 
+			// d. Double square push.
+			if(rank(from) == PAWN_BASE_RANK[color]) {
+				to = (Direction)to + PAWN_PUSH_DIRS[color];
+				tpiece = board->squares[to];
+				if(tpiece == EMPTY) {
+					move = BitMove__new(PAWN | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
+					MoveList__put(mlist, move);
+				}
+			}
+		}
 	}
-
-	//
-	// 	// b. Push by one.
-	// 	// Target square does never need legality check here.
-	// 	to = Square(int8(from) + PAWN_PUSH_DIRS[color])
-	// 	if b.Squares[to].IsEmpty() {
-	// 		if to.IsPawnPromoting(color) {
-	// 			// If one type of promotion is legal, all are.
-	// 			legal = b.tryPawnMoveLegality(from, to, to, EMPTY, color)
-	// 			if legal {
-	// 				for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
-	// 					move = NewBitMove(from, to, prom)
-	// 					mlist.Put(move)
-	// 				}
-	// 			}
-	//
-	// 		} else {
-	// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_NONE)
-	// 			if legal {
-	// 				mlist.Put(move)
-	// 			}
-	// 		}
-	//
-	// 		// c. Double push by advancing one more time, if the pawn was at base rank.
-	// 		if from.IsPawnBaseRank(color) {
-	// 			to = Square(int8(to) + PAWN_PUSH_DIRS[color])
-	// 			if b.Squares[to].IsEmpty() {
-	// 				move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_CREATE)
-	// 				if legal {
-	// 					mlist.Put(move)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
-
-
-// void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
-	// NOTE: Pawn moves can be very complicated and have strange effects on the board (en passent, promotion..).
-	// Because of this all pawn moves are tested for legality by 'fake-play'. This could be optimized by testing the 'easy' ones differently ( TODO:).
-	// Square      from   = OTB;
-	// Square      to     = OTB;
-	// Piece       tpiece = EMPTY;
-	// BitMove     move;
-	// const Color opp_color = flip_color(color);
-	// bool        legal     = false;
-
-	// Possible en passent captures are detected backwards so we do not need
-	// to add another conditional to the capture loop below.
-	// if(board->ep_square != OTB) {
-	// 	to = board->ep_square;
-	// 	// We use the 'wrong' color to find e.p. captures by searching in the opposite direction.
-	// 	for(size_t d = 0; d < PAWN_CAPTURE_DIRS_LEN; d++) {
-	// 		Direction dir = PAWN_CAPTURE_DIRS[opp_color][d];
-	// 		from   = (Direction)to + dir;
-	// 		tpiece = board->squares[from];
-	// 		if(on_board(from) && tpiece == (PAWN | color)) {
-	// 			// TODO: pseudomove
-	// 			// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, PAWN|oppColor, EMPTY, EP_TYPE_CAPTURE)
-	// 			// 			if legal {
-	// 			// 				mlist.Put(move)
-	// 			// 			}
-	// 		}
-	//
-	// 	}
-	// }
-
-	// ------->
-
-	// for i := uint8(0); i < b.Pawns[color].Size; i++ {
-	// 	// 0. Retrieve 'from' square from piece list.
-	// 	from = b.Pawns[color].Pieces[i]
-	//
-	// 	// a. Captures
-	// 	//		for _, capdir := range PAWN_CAPTURE_DIRS[color] {
-	// 	for d := 0; d < 2; d++ {
-	// 		capdir := PAWN_CAPTURE_DIRS[color][d]
-	// 		to = Square(int8(from) + capdir)
-	// 		// If the target square is on board and has the opponent's color
-	// 		// the capture is possible.
-	// 		if to.OnBoard() {
-	// 			tpiece = b.Squares[to]
-	// 			if tpiece.HasColor(oppColor) {
-	// 				// We also have to check if the capture is also a promotion.
-	// 				if to.IsPawnPromoting(color) {
-	// 					// If one type of promotion is legal, all are.
-	// 					legal = b.tryPawnMoveLegality(from, to, to, tpiece, color)
-	// 					if legal {
-	// 						for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
-	// 							move = NewBitMove(from, to, prom)
-	// 							mlist.Put(move)
-	// 						}
-	// 					}
-	// 				} else {
-	// 					move, legal = b.newPawnMoveIfLegal(color, from, to, piece, tpiece, EMPTY, EP_TYPE_NONE)
-	// 					if legal {
-	// 						mlist.Put(move)
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	//
-	// 	// b. Push by one.
-	// 	// Target square does never need legality check here.
-	// 	to = Square(int8(from) + PAWN_PUSH_DIRS[color])
-	// 	if b.Squares[to].IsEmpty() {
-	// 		if to.IsPawnPromoting(color) {
-	// 			// If one type of promotion is legal, all are.
-	// 			legal = b.tryPawnMoveLegality(from, to, to, EMPTY, color)
-	// 			if legal {
-	// 				for prom := QUEEN; prom >= KNIGHT; prom >>= 1 {
-	// 					move = NewBitMove(from, to, prom)
-	// 					mlist.Put(move)
-	// 				}
-	// 			}
-	//
-	// 		} else {
-	// 			move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_NONE)
-	// 			if legal {
-	// 				mlist.Put(move)
-	// 			}
-	// 		}
-	//
-	// 		// c. Double push by advancing one more time, if the pawn was at base rank.
-	// 		if from.IsPawnBaseRank(color) {
-	// 			to = Square(int8(to) + PAWN_PUSH_DIRS[color])
-	// 			if b.Squares[to].IsEmpty() {
-	// 				move, legal = b.newPawnMoveIfLegal(color, from, to, piece, EMPTY, EMPTY, EP_TYPE_CREATE)
-	// 				if legal {
-	// 					mlist.Put(move)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-// }
 
 // Board__generate_sliding_moves generates all legal sliding moves for the given
 // color and stores them in the given MoveList. This can be diagonal or

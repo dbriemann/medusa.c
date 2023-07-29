@@ -52,6 +52,10 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 MunitResult test_board__generate_knight_moves(const MunitParameter params[], void *data);
 MunitResult test_board__generate_king_moves(const MunitParameter params[], void *data);
 MunitResult test_board__generate_sliding_moves(const MunitParameter params[], void *data);
+MunitResult test_board__generate_sliding_moves_queens(const MunitParameter params[], void *data);
+MunitResult test_board__generate_sliding_moves_rooks(const MunitParameter params[], void *data);
+MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter params[], void *data);
+MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 
