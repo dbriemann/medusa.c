@@ -176,12 +176,12 @@ const static Direction DIFF_DIR_MAP[240] = {
 
 
 // NOLINTNEXTLINE clangd incorrectly warns of unused function.
-static inline bool rank(const Square sq) {
+static inline Square rank(const Square sq) {
 	return sq >> 4;
 }
 
 // NOLINTNEXTLINE clangd incorrectly warns of unused function.
-static inline bool file(const Square sq) {
+static inline Square file(const Square sq) {
 	return sq & 7;
 }
 

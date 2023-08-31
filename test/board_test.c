@@ -965,7 +965,7 @@ MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void 
 			.name           = "impossible en passent situation",
 			.fen            = "1nbqkb1r/1pppp1pp/7n/r3PpK1/p2P4/P1N5/1PP2PPP/R1BQ1BNR w k f6 0 10",
 			.expected_moves = {
-				.size  = 11,
+				.size  = 10,
 				.moves = {
 					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 					BitMove__new(WPAWN, 0x11, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
@@ -976,10 +976,33 @@ MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void 
 					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 					BitMove__new(WPAWN, 0x33, 0x43, PROMO_NONE, EMPTY, CASTLE_NONE, false),
-					// TODO: fix next one
 					BitMove__new(WPAWN, 0x44, 0x54, PROMO_NONE, EMPTY, CASTLE_NONE, false),
-					BitMove__new(WPAWN, 0x44, 0x57, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 				},
+			},
+		},
+		{
+			.name           = "simple valid en passent",
+			.fen            = "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3",
+			.expected_moves = {
+				.size  = 16,
+				.moves = {
+					BitMove__new(WPAWN, 0x44, 0x55, PROMO_NONE, BPAWN, CASTLE_NONE, true),
+					BitMove__new(WPAWN, 0x10, 0x20, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x10, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x44, 0x54, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				}
 			},
 		},
 	};

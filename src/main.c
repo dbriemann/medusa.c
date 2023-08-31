@@ -12,7 +12,7 @@ int main(void) {
 	Board    board;
 	MoveList moves;
 
-	const char *fen = "6k1/5ppp/4p3/8/8/8/NP6/QK6 w - - 0 1";
+	const char *fen = "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3";
 
 	Error error = Board__set_fen(&board, fen);
 	if (error != OK) {
@@ -23,17 +23,7 @@ int main(void) {
 	MoveList__clear(&moves);
 
 	Board__detect_checks_and_pins(&board, board.player);
-	Board__generate_sliding_moves(&board, &moves, board.player, QUEEN,
-								  ALL_DIRS, ALL_DIRS_LEN, board.queens[board.player],
-								  board.queens_size[board.player]);
-
-	// for(size_t i = 0; i < 64; i++) {
-	// 	const Square sq = LOOKUP_0x88[i];
-	// 	bool attack_check = Board__is_sq_attacked(&board, sq, OTB, BLACK);
-	// 	if(attacked_by[i] != attack_check) {
-	// 		printf("Wrong result for i: %zu\n", i);
-	// 	}
-	// }
+	Board__generate_pawn_moves(&board, &moves, board.player);
 
 	return EXIT_SUCCESS;
 }
