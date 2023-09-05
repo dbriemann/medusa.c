@@ -837,6 +837,28 @@ void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 	}
 }
 
+void  Board__generate_all_legal_moves(Board *board, MoveList *mlist, Color color) {
+	// Detect checks and pins.
+	Board__detect_checks_and_pins(board, color);
+
+	// Always generate king moves.
+	Board__generate_king_moves(board, mlist, color);
+
+	// If there is a double check skip generating other moves.
+	if (board->check_info == CHECK_DOUBLE_CHECK) {
+		return;
+	}
+
+	// Generate the rest of the legal moves.
+	Board__generate_knight_moves(board, mlist, color);
+	Board__generate_pawn_moves(board, mlist, color);
+	// TODO: is it faster to generate all queen moves/dirs at once? ALL_DIRS
+	Board__generate_sliding_moves(board, mlist, board->player, QUEEN, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN, board->queens[board->player], board->queens_size[board->player]);
+	Board__generate_sliding_moves(board, mlist, board->player, ROOK, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN, board->rooks[board->player], board->rooks_size[board->player]);
+	Board__generate_sliding_moves(board, mlist, board->player, QUEEN, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN, board->queens[board->player], board->queens_size[board->player]);
+	Board__generate_sliding_moves(board, mlist, board->player, BISHOP, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN, board->bishops[board->player], board->bishops_size[board->player]);
+}
+
 Error Board__to_string(Board *b, char *str) {
 	if (b == NULL || str == NULL) {
 		return ERR_NULL_PTR;

@@ -1037,6 +1037,143 @@ MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void 
 	return MUNIT_OK;
 }
 
+MunitResult test_board__generate_all_legal_moves(const MunitParameter params[], void *data) {
+	GenerateMovesTestCase testcases[] = {
+		{
+			.name           = "starting position",
+			.fen            = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+			.expected_moves = {
+				.size  = 20,
+				.moves = {
+					// KNIGHT moves.
+					BitMove__new(WKNIGHT, 0x01, 0x20, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x01, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x06, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKNIGHT, 0x06, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+
+					// PAWN moves.
+					BitMove__new(WPAWN, 0x10, 0x20, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x10, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x31, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x22, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x12, 0x32, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x23, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x13, 0x33, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x14, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x14, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+		{
+			.name           = "double check, only king moves",
+			.fen            = "1k6/4R3/8/4n3/8/1r3K1P/QB6/8 w - - 0 1",
+			.expected_moves = {
+				.size  = 5,
+				.moves = {
+					BitMove__new(WKING, 0x25, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x25, 0x15, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x25, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x25, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x25, 0x16, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+		{
+			.name           = "scotch opening position",
+			.fen            = "r1bq1rk1/p1pp1ppp/1np5/4P3/1bP5/2NB4/PP3PPP/R1BQK2R w KQ - 5 10",
+			.expected_moves = {
+				.size  = 39,
+				.moves = {
+					// KING
+					BitMove__new(WKING, 0x04, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x04, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x04, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WKING, 0x04, CASTLING_PATH_SHORT[WHITE][1], PROMO_NONE, EMPTY, CASTLE_OO, false),
+
+					// No KNIGHT moves (knight is pinned)
+					// PAWNS
+					BitMove__new(WPAWN, 0x10, 0x20, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x10, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x11, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x15, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x26, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x16, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x27, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x17, 0x37, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x32, 0x42, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WPAWN, 0x44, 0x54, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// QUEEN orthogonal
+					BitMove__new(WQUEEN, 0x03, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// ROOK
+					BitMove__new(WROOK, 0x00, 0x01, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WROOK, 0x07, 0x06, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WROOK, 0x07, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// QUEEN diagonal
+					BitMove__new(WQUEEN, 0x03, 0x12, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x30, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x25, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x36, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WQUEEN, 0x03, 0x47, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// BISHOP dark
+					BitMove__new(WBISHOP, 0x02, 0x13, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x02, 0x24, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x02, 0x35, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x02, 0x46, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x02, 0x57, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					// BISHOP light
+					BitMove__new(WBISHOP, 0x23, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x45, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x56, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x67, PROMO_NONE, BPAWN, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x12, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x01, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x14, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+					BitMove__new(WBISHOP, 0x23, 0x05, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+				},
+			},
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(GenerateMovesTestCase);
+
+	Board    board;
+	MoveList moves;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		MoveList__clear(&moves);
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		Board__detect_checks_and_pins(&board, board.player);
+		Board__generate_all_legal_moves(&board, &moves, board.player);
+
+		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
+
+		for(size_t i = 0; i < moves.size; i++) {
+			char *expected_move = BitMove__to_notation(testcases[tc].expected_moves.moves[i]);
+			char *actual_move   = BitMove__to_notation(moves.moves[i]);
+			munit_assert_string_equal(expected_move, actual_move);
+			free(expected_move);
+			free(actual_move);
+			munit_assert_uint64(testcases[tc].expected_moves.moves[i], ==, moves.moves[i]);
+		}
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{ "board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
@@ -1049,6 +1186,7 @@ MunitTest test_board_suite[] = {
 	{ "Board__generate_sliding_moves_rooks", test_board__generate_sliding_moves_rooks, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_sliding_moves_bishops", test_board__generate_sliding_moves_bishops, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_pawn_moves", test_board__generate_pawn_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__generate_all_legal_moves", test_board__generate_all_legal_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };

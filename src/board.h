@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "base.h"
+#include "bitmove.h"
 #include "errors.h"
 #include "mlist.h"
 
@@ -71,6 +72,7 @@ void Board__generate_king_moves(Board *board, MoveList *mlist, Color color);
 void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color);
 void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
 								   Piece ptype, const Direction *dirs, const size_t dir_len, Square *pieces, size_t pieces_size);
+void  Board__generate_all_legal_moves(Board *board, MoveList *mlist, Color color);
 Error Board__to_string(Board *b, char *str);
 
 #endif

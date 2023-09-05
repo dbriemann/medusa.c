@@ -56,6 +56,7 @@ MunitResult test_board__generate_sliding_moves_queens(const MunitParameter param
 MunitResult test_board__generate_sliding_moves_rooks(const MunitParameter params[], void *data);
 MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter params[], void *data);
 MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void *data);
+MunitResult test_board__generate_all_legal_moves(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 
