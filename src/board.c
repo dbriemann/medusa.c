@@ -424,6 +424,7 @@ EXIT_PAWN_CHECK:
 		b->queens[opp_color], QUEEN);
 	if (check_counter > 1) {
 		// Double check -> exit early.
+		b->check_info = CHECK_DOUBLE_CHECK;
 		return;
 	}
 	// Rooks
@@ -432,6 +433,7 @@ EXIT_PAWN_CHECK:
 		b->rooks[opp_color], ROOK);
 	if (check_counter > 1) {
 		// Double check -> exit early.
+		b->check_info = CHECK_DOUBLE_CHECK;
 		return;
 	}
 	// Bishops
@@ -440,6 +442,7 @@ EXIT_PAWN_CHECK:
 		b->bishops[opp_color], BISHOP);
 	if (check_counter > 1) {
 		// Double check -> exit early.
+		b->check_info = CHECK_DOUBLE_CHECK;
 		return;
 	}
 }
