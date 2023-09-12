@@ -67,6 +67,27 @@ MunitResult test_piecelist__del_index(const MunitParameter params[], void *data)
 	return MUNIT_OK;
 }
 
+MunitResult test_piecelist__move(const MunitParameter params[], void *data) {
+	Piece  pieces[8] = { 0x11, 0x56, 0x22, 0, 0, 0, 0, 0 }; // b2, g6, c3, ..
+	size_t len       = 3;
+	// Move pieces:
+	// from b2 to b4,
+	// from c3 to h3,
+	// from g1 f1 to g2 (does not exist -> no change).
+	Piece want_pieces1[8] = { 0x31, 0x56, 0x27, 0, 0, 0, 0, 0 };
+
+	PieceList__move(pieces, len, 0x11, 0x31);
+	PieceList__move(pieces, len, 0x22, 0x27);
+	PieceList__move(pieces, len, 0x05, 0x16);
+
+	for(size_t i = 0; i < 8; i++) {
+		// We check all elements in test, not only up to len.
+		munit_assert_int(want_pieces1[i], ==, pieces[i]);
+	}
+
+	return MUNIT_OK;
+}
+
 MunitResult test_bitmove_all(const MunitParameter params[], void *data) {
 	// We don't care about the underlying representation in the test,
 	// just that what is put into a BitMove also comes back out of it
@@ -259,6 +280,7 @@ MunitTest test_diverse_suite[] = {
 	{ "piecelist__add", test_piecelist__add, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "piecelist__del", test_piecelist__del, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "piecelist__del_index", test_piecelist__del_index, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "piecelist__move", test_piecelist__move, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "bitmove__all", test_bitmove_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "utility_functions", test_utility_functions, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "movelist_all", test_movelist_all, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
