@@ -389,6 +389,7 @@ MunitResult test_board__is_sq_attacked(const MunitParameter params[], void *data
 }
 
 MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], void *data) {
+	// TODO: test double check.
 	const DetectChecksAndPinsTestCase
 		testcases[] =
 	{

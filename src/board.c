@@ -862,6 +862,93 @@ void  Board__generate_all_legal_moves(Board *board, MoveList *mlist, Color color
 	Board__generate_sliding_moves(board, mlist, board->player, BISHOP, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN, board->bishops[board->player], board->bishops_size[board->player]);
 }
 
+void Board__make_legal_move(Board *board, BitMove move) {
+	const Square from = BitMove__from(move);
+	const Square to = BitMove__to(move);
+	const Piece promo = BitMove__promoted_piece(move);
+	const Piece tpiece = BitMove__captured_piece(move);
+	const Piece ptype = board->squares[from] & PIECE_MASK;
+	const Color opp_color = flip_color(board->player);
+	const bool is_ep = BitMove__en_passent(move);
+
+	if (tpiece != EMPTY) {
+		// The move is a capture.
+		// tpiece should never be a king :)
+		
+		// Remove captured piece from the board.
+		Board__del_piece(board, to); // TODO: use tpiece instead of to?
+		
+		// If a rook is captured, castling rights have to be removed.
+		if (to == CASTLING_ROOK_SHORT[board->player]) {
+			board->castle_short[opp_color] = false;
+		} else if(to == CASTLING_ROOK_LONG[board->player]) {
+			board->castle_long[opp_color] = false;
+		}
+	} else if (is_ep) {
+		// Handle en passent capture here.
+		const Square capSq = (Direction)to + PAWN_PUSH_DIRS[opp_color];
+		Board__del_piece(board, capSq);
+	}
+
+	// Now move the actual piece on the board.
+	board->squares[to] = board->squares[from];
+	board->squares[from] = EMPTY;
+
+	// Make move in piece list and do special move things.
+	if (ptype == PAWN) {
+		if (creates_en_passent(from, to)) {
+			board->ep_square = (Direction)from + PAWN_PUSH_DIRS[board->player];
+		} else if (promo != PROMO_NONE) {
+			PieceList__del(board->pawns[board->player], &(board->pawns_size[board->player]), from);
+			Board__add_piece(board, to, promo);
+		} else {
+			PieceList__move(board->pawns[board->player], board->pawns_size[board->player], from, to);
+		}
+	} else if (ptype == KNIGHT) {
+		PieceList__move(board->knights[board->player], board->knights_size[board->player], from, to);
+	} else if (ptype == BISHOP) {
+		PieceList__move(board->bishops[board->player], board->bishops_size[board->player], from, to);
+		PieceList__move(board->sliders[board->player], board->sliders_size[board->player], from, to);
+	} else if (ptype == ROOK) {
+		if (from == CASTLING_ROOK_SHORT[board->player]) {
+			board->castle_short[board->player] = false;
+		} else if (from == CASTLING_ROOK_LONG[board->player]) {
+			board->castle_long[board->player] = false;
+		}
+		PieceList__move(board->rooks[board->player], board->rooks_size[board->player], from, to);
+		PieceList__move(board->sliders[board->player], board->sliders_size[board->player], from, to);
+	} else if (ptype == QUEEN) {
+		PieceList__move(board->queens[board->player], board->queens_size[board->player], from, to);
+		PieceList__move(board->sliders[board->player], board->sliders_size[board->player], from, to);
+	} else if (ptype == KING) {
+		const CastleType castle_type = BitMove__castle_type(move);
+
+		board->kings[board->player] = to;
+		board->castle_short[board->player] = false;
+		board->castle_long[board->player] = false;
+
+		if (castle_type == CASTLE_OO) {
+			Square rook_from = CASTLING_ROOK_SHORT[board->player];
+			Square rook_to = CASTLING_PATH_SHORT[board->player][0];
+			board->squares[rook_to] = ROOK | board->player;
+			PieceList__move(board->rooks[board->player], board->rooks_size[board->player], rook_from, rook_to);
+			PieceList__move(board->sliders[board->player], board->sliders_size[board->player], rook_from, rook_to);
+		} else if (castle_type == CASTLE_OOO) {
+			Square rook_from = CASTLING_ROOK_LONG[board->player];
+			Square rook_to = CASTLING_PATH_LONG[board->player][0];
+			board->squares[rook_to] = ROOK | board->player;
+			PieceList__move(board->rooks[board->player], board->rooks_size[board->player], rook_from, rook_to);
+			PieceList__move(board->sliders[board->player], board->sliders_size[board->player], rook_from, rook_to);
+		} 
+	} else {
+		// SHOULD NEVER HAPPEN
+	}
+
+	board->player = flip_color(board->player);
+	board->move_number++;
+	// TODO: half-move draw counter
+}
+
 Error Board__to_string(Board *b, char *str) {
 	if (b == NULL || str == NULL) {
 		return ERR_NULL_PTR;

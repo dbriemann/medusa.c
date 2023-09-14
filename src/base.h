@@ -191,6 +191,22 @@ static inline bool is_pawn_promoting(const Color c, const Square sq) {
 }
 
 // NOLINTNEXTLINE clangd incorrectly warns of unused function.
+static inline bool creates_en_passent(const Square from, const Square to) {
+	// TODO: make this function simpler/faster?
+	Square from_rank = rank(from);
+	Square to_rank   = rank(to);
+
+	Square diff = 0;
+	if (to_rank > from_rank) {
+		diff = to_rank - from_rank;
+	} else {
+		diff = from_rank - to_rank;
+	}
+
+	return diff == 2;
+}
+
+// NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline bool has_color(const Piece p, const Color c) {
 	return (COLOR_TEST_MASK & p) == c;
 }
