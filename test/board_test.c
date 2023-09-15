@@ -2,6 +2,7 @@
 #include "../src/base.h"
 #include "../src/mlist.h"
 #include "../src/board.h"
+#include <asm-generic/errno.h>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -1175,6 +1176,165 @@ MunitResult test_board__generate_all_legal_moves(const MunitParameter params[], 
 	return MUNIT_OK;
 }
 
+MunitResult test_board__make_legal_move(const MunitParameter params[], void *data) {
+	MakeLegalMoveTestCase testcases[] = {
+		{
+			.name           = "starting position: move e2-e4",
+			.fen            = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+			.move           = BitMove__new(WPAWN, 0x14, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = OTB,
+				.ep_square   = 0x24, // e3
+				.player      = BLACK,
+				.move_number = 2,
+				.pawns       = {
+					{ 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67 },
+					{ 0x10, 0x11, 0x12, 0x13, 0x34, 0x15, 0x16, 0x17 },
+				},
+				.pawns_size = { 8, 8 },
+				.squares    = {
+					WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					WPAWN, WPAWN, WPAWN, WPAWN, EMPTY, WPAWN, WPAWN, WPAWN,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, WPAWN, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+				}
+			}
+		},
+		{
+			.name           = "endgame: promotion",
+			.fen            = "3n4/1KP5/8/8/8/6kp/8/8 w - - 0 64",
+			.move           = BitMove__new(WPAWN, 0x62, 0x73, WQUEEN, BKNIGHT, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = OTB,
+				.ep_square   = OTB,
+				.player      = BLACK,
+				.move_number = 65,
+				.pawns       = {
+					{ 0x27 },
+					{ OTB },
+				},
+				.pawns_size = { 1, 0 },
+				.queens     = {
+					{ OTB },
+					{ 0x73 },
+				},
+				.queens_size = { 0, 1 },
+				.sliders     = {
+					{ OTB },
+					{ 0x73 },
+				},
+				.sliders_size = { 0, 1 },
+				.squares      = {
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BKING, BPAWN,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, WKING, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, WQUEEN, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+				}
+			}
+		},
+		{
+			.name           = "endgame: knight captures pawn with check",
+			.fen            = "8/2P5/4K3/3n4/8/6kp/8/8 b - - 0 48",
+			.move           = BitMove__new(BKNIGHT, 0x43, 0x62, PROMO_NONE, WPAWN, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = 0x62,
+				.ep_square   = OTB,
+				.player      = BLACK,
+				.move_number = 49,
+				.pawns       = {
+					{ 0x27 },
+					{ OTB },
+				},
+				.pawns_size = { 1, 0 },
+				.knights    = {
+					{ OTB },
+					{ 0x73 },
+				},
+				.knights_size = { 1, 0 },
+				.squares      = {
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BKING, BPAWN,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, WKING, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, BKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+				}
+			}
+		},
+	};
+
+	const size_t len = sizeof(testcases) / sizeof(MakeLegalMoveTestCase);
+
+	Board board;
+
+	for(size_t tc = 0; tc < len; tc++) {
+		munit_logf(MUNIT_LOG_INFO, "testcase %zu: %s", tc, testcases[tc].name);
+
+		Error error = Board__set_fen(&board, testcases[tc].fen);
+		munit_assert_int(OK, ==, error);
+
+		const Piece ptype = BitMove__piece(testcases[tc].move) & PIECE_MASK;
+		Board__make_legal_move(&board, testcases[tc].move);
+
+		// Assert board and info board.
+		for(size_t i = 0; i < 2 * 64; i++) {
+			munit_assert_int(testcases[tc].expected_board.squares[i], ==, board.squares[i]);
+		}
+		// Assert other board state that changes with each move.
+		munit_assert_int(testcases[tc].expected_board.check_info, ==, board.check_info);
+		munit_assert_int(testcases[tc].expected_board.ep_square, ==, board.ep_square);
+		munit_assert_int(testcases[tc].expected_board.player, ==, board.player);
+		munit_assert_int(testcases[tc].expected_board.move_number, ==, board.move_number);
+		// Assert piece lists.
+		for (size_t color = BLACK; color <= WHITE; color++) {
+			if (ptype == PAWN) {
+				for (size_t i = 0; i < testcases[tc].expected_board.pawns_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.pawns[color][i], ==, board.pawns[color][i]);
+				}
+			} else if (ptype == KNIGHT) {
+				for (size_t i = 0; i < testcases[tc].expected_board.knights_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.knights[color][i], ==, board.knights[color][i]);
+				}
+			} else if (ptype == BISHOP) {
+				for (size_t i = 0; i < testcases[tc].expected_board.bishops_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.bishops[color][i], ==, board.bishops[color][i]);
+				}
+				for (size_t i = 0; i < testcases[tc].expected_board.sliders_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.sliders[color][i], ==, board.sliders[color][i]);
+				}
+			} else if (ptype == ROOK) {
+				for (size_t i = 0; i < testcases[tc].expected_board.rooks_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.rooks[color][i], ==, board.rooks[color][i]);
+				}
+				for (size_t i = 0; i < testcases[tc].expected_board.sliders_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.sliders[color][i], ==, board.sliders[color][i]);
+				}
+			} else if (ptype == QUEEN) {
+				for (size_t i = 0; i < testcases[tc].expected_board.queens_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.queens[color][i], ==, board.queens[color][i]);
+				}
+				for (size_t i = 0; i < testcases[tc].expected_board.sliders_size[color]; i++) {
+					munit_assert_int(testcases[tc].expected_board.sliders[color][i], ==, board.sliders[color][i]);
+				}
+			} else if (ptype == KING) {
+				munit_assert_int(testcases[tc].expected_board.kings[color], ==, board.kings[color]);
+			}
+		}
+	}
+
+	return MUNIT_OK;
+}
+
 MunitTest test_board_suite[] = {
 	{ "board__set_fen", test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "board__add_del_piece", test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
@@ -1188,6 +1348,7 @@ MunitTest test_board_suite[] = {
 	{ "Board__generate_sliding_moves_bishops", test_board__generate_sliding_moves_bishops, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_pawn_moves", test_board__generate_pawn_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 	{ "Board__generate_all_legal_moves", test_board__generate_all_legal_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
+	{ "Board__make_legal_move", test_board__make_legal_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 
 	{ 0, 0, 0, 0, MUNIT_TEST_OPTION_NONE, 0 },
 };

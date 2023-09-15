@@ -44,6 +44,14 @@ struct GenerateMovesTestCase {
 	MoveList expected_moves;
 };
 
+typedef struct MakeLegalMoveTestCase MakeLegalMoveTestCase;
+struct MakeLegalMoveTestCase {
+	const BitMove move;
+	const char *name;
+	const char *fen;
+	const Board expected_board;
+};
+
 MunitResult test_board__set_fen(const MunitParameter params[], void *data);
 MunitResult test_board__add_del_piece(const MunitParameter params[], void *data);
 MunitResult test_board__clear_funcs(const MunitParameter params[], void *data);
@@ -57,7 +65,7 @@ MunitResult test_board__generate_sliding_moves_rooks(const MunitParameter params
 MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter params[], void *data);
 MunitResult test_board__generate_pawn_moves(const MunitParameter params[], void *data);
 MunitResult test_board__generate_all_legal_moves(const MunitParameter params[], void *data);
-// TODO: make legal move test func
+MunitResult test_board__make_legal_move(const MunitParameter params[], void *data);
 
 extern MunitTest test_board_suite[];
 

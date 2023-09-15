@@ -898,7 +898,8 @@ void Board__make_legal_move(Board *board, BitMove move) {
 	if (ptype == PAWN) {
 		if (creates_en_passent(from, to)) {
 			board->ep_square = (Direction)from + PAWN_PUSH_DIRS[board->player];
-		} else if (promo != PROMO_NONE) {
+		} 
+		if (promo != PROMO_NONE) {
 			PieceList__del(board->pawns[board->player], &(board->pawns_size[board->player]), from);
 			Board__add_piece(board, to, promo);
 		} else {

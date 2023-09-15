@@ -9,10 +9,9 @@
 #include "mlist.h"
 
 int main(void) {
-	Board    board;
-	MoveList moves;
+	Board board;
 
-	const char *fen = "1k6/4R3/8/4n3/8/1r3K1P/QB6/8 w - - 0 1";
+	const char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
 	if (error != OK) {
@@ -20,10 +19,8 @@ int main(void) {
 		return 1;
 	}
 
-	MoveList__clear(&moves);
+	Board__make_legal_move(&board, BitMove__new(WPAWN, 0x14, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false));
 
-	Board__detect_checks_and_pins(&board, board.player);
-	Board__generate_all_legal_moves(&board, &moves, board.player);
 
 	return EXIT_SUCCESS;
 }
