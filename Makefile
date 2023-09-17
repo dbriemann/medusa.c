@@ -5,7 +5,8 @@ SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))
 TEST_SOURCES=$(wildcard test/*.c)
 
-DEBUG_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -g -O0
+#-Wpadded 
+DEBUG_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -g -O0 
 DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_EXE=$(DEBUG_DIR)/medusa

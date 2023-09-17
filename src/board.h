@@ -30,28 +30,29 @@
 // move generation.
 typedef struct Board Board;
 struct Board {
-	Piece squares[64 * 2];
-	bool castle_short[2];
-	bool castle_long[2];
-	uint16_t move_number;
-	uint16_t draw_counter;
-	Square check_info;
-	Square ep_square;
-	Color player;
+	Piece squares[64 * 2];  // 128 bytes
+	bool castle_short[2];   // 2 bytes
+	bool castle_long[2];    // 2 bytes
+	uint16_t move_number;   // 2 bytes
+	uint16_t draw_counter;  // 2 bytes
+	Square check_info;      // 1 byte
+	Square ep_square;       // 1 byte
+	Color player;           // 1 byte
 	// Piece lists.
-	Square kings[2];
-	Square sliders[2][13];
-	size_t sliders_size[2];
-	Square queens[2][9];
-	size_t queens_size[2];
-	Square rooks[2][10];
-	size_t rooks_size[2];
-	Square bishops[2][10];
-	size_t bishops_size[2];
-	Square knights[2][10];
-	size_t knights_size[2];
-	Square pawns[2][8];
-	size_t pawns_size[2];
+	Square sliders[2][13];  // 26 bytes
+	Square rooks[2][10];    // 20 bytes
+	Square bishops[2][10];  // 20 bytes
+	Square knights[2][10];  // 20 bytes
+	Square queens[2][9];    // 18 bytes
+	Square pawns[2][8];     // 16 bytes
+	Square kings[2];        // 2 bytes
+	// padding: 3 bytes
+	size_t sliders_size[2]; // 16 bytes
+	size_t queens_size[2];  // 16 bytes
+	size_t rooks_size[2];   // 16 bytes
+	size_t bishops_size[2]; // 16 bytes
+	size_t knights_size[2]; // 16 bytes
+	size_t pawns_size[2];   // 16 bytes
 };
 
 // TODO convert all Board * to Board * const ?

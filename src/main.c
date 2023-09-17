@@ -11,6 +11,8 @@
 int main(void) {
 	Board board;
 
+	printf("board size including padding/packing: %lu\n", sizeof(Board));
+
 	const char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
