@@ -30,6 +30,7 @@
 // move generation.
 typedef struct Board Board;
 struct Board {
+	// NOTE: do not add pointer members here. This struct is copied by assignment.
 	Piece squares[64 * 2];  // 128 bytes
 	bool castle_short[2];   // 2 bytes
 	bool castle_long[2];    // 2 bytes
