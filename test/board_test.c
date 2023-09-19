@@ -1192,6 +1192,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 					{ 0x10, 0x11, 0x12, 0x13, 0x34, 0x15, 0x16, 0x17 },
 				},
 				.pawns_size = { 8, 8 },
+				.kings      = { 0x74, 0x04 },
 				.squares    = {
 					WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,  INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					WPAWN, WPAWN, WPAWN, WPAWN, EMPTY, WPAWN, WPAWN, WPAWN,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -1228,6 +1229,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 					{ 0x73 },
 				},
 				.sliders_size = { 0, 1 },
+				.kings        = { 0x26, 0x61 },
 				.squares      = {
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -1259,6 +1261,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 					{ OTB },
 				},
 				.knights_size = { 1, 0 },
+				.kings        = { 0x26, 0x54 },
 				.squares      = {
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
@@ -1268,7 +1271,92 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 					EMPTY, EMPTY, EMPTY, EMPTY, WKING, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, BKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_MASK_CHECK, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
 					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,           INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
-					// TODO: debug why square 127 is bullshit
+				}
+			}
+		},
+		{
+			.name           = "endgame: bishop pins knight",
+			.fen            = "6k1/8/8/3n4/8/8/2BK4/8 w - - 0 54",
+			.move           = BitMove__new(WBISHOP, 0x12, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = OTB,
+				.ep_square   = OTB,
+				.player      = BLACK,
+				.move_number = 55,
+				.knights     = {
+					{ 0x43 },
+					{ OTB },
+				},
+				.knights_size = { 1, 0 },
+				.bishops      = {
+					{ OTB },
+					{ 0x21 },
+				},
+				.bishops_size = { 0, 1 },
+				.kings        = { 0x76, 0x13 },
+				.squares      = {
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, WKING, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, WBISHOP, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,       INFO_NONE,         1, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE,         1, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, BKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY,       INFO_NONE, INFO_NONE, INFO_NONE,         1, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,         1, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,         1, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BKING, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+				}
+			}
+		},
+		{
+			.name           = "nonsense rooks position: cancel short castling",
+			.fen            = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 100",
+			.move           = BitMove__new(WROOK, 0x07, 0x77, PROMO_NONE, BROOK, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = 0x77,
+				.ep_square   = OTB,
+				.player      = BLACK,
+				.move_number = 101,
+				.rooks       = {
+					{ 0x70 },
+					{ 0x00, 0x77 },
+				},
+				.rooks_size = { 1, 2 },
+				.kings      = { 0x74, 0x04 },
+				.squares    = {
+					WROOK, EMPTY, EMPTY, EMPTY, WKING, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					BROOK, EMPTY, EMPTY, EMPTY, BKING, EMPTY, EMPTY, WROOK,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_MASK_FORBIDDEN_ESCAPE, INFO_NONE, INFO_MASK_CHECK, INFO_MASK_CHECK, INFO_MASK_CHECK,
+				}
+			}
+		},
+		{
+			.name           = "nonsense rooks position: cancel long castling",
+			.fen            = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 100",
+			.move           = BitMove__new(WROOK, 0x00, 0x70, PROMO_NONE, BROOK, CASTLE_NONE, false),
+			.expected_board = {
+				.check_info  = 0x70,
+				.ep_square   = OTB,
+				.player      = BLACK,
+				.move_number = 101,
+				.rooks       = {
+					{ 0x77 },
+					{ 0x70, 0x07 },
+				},
+				.rooks_size = { 1, 2 },
+				.kings      = { 0x74, 0x04 },
+				.squares    = {
+					EMPTY, EMPTY, EMPTY, EMPTY, WKING, EMPTY, EMPTY, WROOK,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE, INFO_NONE,
+					WROOK, EMPTY, EMPTY, EMPTY, BKING, EMPTY, EMPTY, BROOK,         INFO_MASK_CHECK, INFO_MASK_CHECK, INFO_MASK_CHECK, INFO_MASK_CHECK, INFO_NONE, INFO_MASK_FORBIDDEN_ESCAPE, INFO_NONE, INFO_NONE,
 				}
 			}
 		},
@@ -1306,7 +1394,6 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 				}
 			} else if (ptype == KNIGHT) {
 				for (size_t i = 0; i < testcases[tc].expected_board.knights_size[color]; i++) {
-					munit_logf(MUNIT_LOG_INFO, "knight, color = %lu, i = %lu", color, i);
 					munit_assert_int(testcases[tc].expected_board.knights[color][i], ==, board.knights[color][i]);
 				}
 			} else if (ptype == BISHOP) {

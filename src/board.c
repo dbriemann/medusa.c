@@ -879,9 +879,9 @@ void Board__make_legal_move(Board *board, BitMove move) {
 		Board__del_piece(board, to); // TODO: use tpiece instead of to?
 		
 		// If a rook is captured, castling rights have to be removed.
-		if (to == CASTLING_ROOK_SHORT[board->player]) {
+		if (to == CASTLING_ROOK_SHORT[opp_color]) {
 			board->castle_short[opp_color] = false;
-		} else if(to == CASTLING_ROOK_LONG[board->player]) {
+		} else if(to == CASTLING_ROOK_LONG[opp_color]) {
 			board->castle_long[opp_color] = false;
 		}
 	} else if (is_ep) {
