@@ -377,6 +377,8 @@ bool Board__is_sq_attacked_by_slider(Board *b, const Square sq,
 }
 
 void Board__detect_checks_and_pins(Board *b, Color color) {
+	// TODO: can we also store attacked squares in the meta board?
+
 	Board__clear_meta(b);
 	const Color opp_color = flip_color(color);
 
@@ -932,12 +934,14 @@ void Board__make_legal_move(Board *board, BitMove move) {
 			Square rook_from = CASTLING_ROOK_SHORT[board->player];
 			Square rook_to = CASTLING_PATH_SHORT[board->player][0];
 			board->squares[rook_to] = ROOK | board->player;
+			board->squares[rook_from] = EMPTY;
 			PieceList__move(board->rooks[board->player], board->rooks_size[board->player], rook_from, rook_to);
 			PieceList__move(board->sliders[board->player], board->sliders_size[board->player], rook_from, rook_to);
 		} else if (castle_type == CASTLE_OOO) {
 			Square rook_from = CASTLING_ROOK_LONG[board->player];
 			Square rook_to = CASTLING_PATH_LONG[board->player][0];
 			board->squares[rook_to] = ROOK | board->player;
+			board->squares[rook_from] = EMPTY;
 			PieceList__move(board->rooks[board->player], board->rooks_size[board->player], rook_from, rook_to);
 			PieceList__move(board->sliders[board->player], board->sliders_size[board->player], rook_from, rook_to);
 		} 
