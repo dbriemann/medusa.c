@@ -66,6 +66,8 @@ $(RELEASE_DIR):
 	@mkdir -p $(RELEASE_DIR)
 $(GENERATOR_DIR): 
 	@mkdir -p $(GENERATOR_DIR)
+$(PERFT_DIR): 
+	@mkdir -p $(PERFT_DIR)
 
 clean:
 	rm -rf ./bin/
@@ -74,6 +76,8 @@ clean:
 generator: $(GENERATOR_DIR) $(GENERATOR_EXE)
 
 debug: $(DEBUG_DIR) $(DEBUG_EXE)
+
+perft: $(PERFT_DIR) $(PERFT_EXE)
 
 .PHONY: test
 test: $(TEST_DIR) $(TEST_EXE)

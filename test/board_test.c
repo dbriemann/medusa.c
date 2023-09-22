@@ -2,7 +2,6 @@
 #include "../src/base.h"
 #include "../src/mlist.h"
 #include "../src/board.h"
-#include <asm-generic/errno.h>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
