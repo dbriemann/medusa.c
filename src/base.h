@@ -19,98 +19,98 @@ typedef uint8_t Info;
 typedef int8_t Direction;
 typedef uint8_t CastleType;
 
-const static CastleType CASTLE_NONE = 0x0;
-const static CastleType CASTLE_OO   = 0x1;
-const static CastleType CASTLE_OOO  = 0x2;
+static const CastleType CASTLE_NONE = 0x0;
+static const CastleType CASTLE_OO   = 0x1;
+static const CastleType CASTLE_OOO  = 0x2;
 
-const static Square OTB = 0x7F;
+static const Square OTB = 0x7F;
 
 // All special check values are off-board.
-const static Square CHECK_NONE         = OTB;
-const static Square CHECK_DOUBLE_CHECK = 0x0F;
-const static Square CHECK_CHECKMATE    = 0x1F;
+static const Square CHECK_NONE         = OTB;
+static const Square CHECK_DOUBLE_CHECK = 0x0F;
+static const Square CHECK_CHECKMATE    = 0x1F;
 
 // Other special constants.
-const static Piece PROMO_NONE = 0;
+static const Piece PROMO_NONE = 0;
 
-const static Info INFO_NONE              = 0x0;
-const static Info INFO_PIN_COUNTER_START = 1;
-const static Info INFO_MASK_PINNED       = 0x0F; // Bits 1-4 == space for possible pinner enumeration.
-// const static Info INFO_MASK_ATTACKED		 = 16;	 // Bit 5 == attacked?
-const static Info INFO_MASK_FORBIDDEN_ESCAPE = 32;  // Bit 6 == forbidden square for king (line of check).
-const static Info INFO_MASK_MAYBE_PINNED     = 64;  // Bit 7 == mark for pinning.
-const static Info INFO_MASK_CHECK            = 128; // Bit 8 == check.
+static const Info INFO_NONE              = 0x0;
+static const Info INFO_PIN_COUNTER_START = 1;
+static const Info INFO_MASK_PINNED       = 0x0F; // Bits 1-4 == space for possible pinner enumeration.
+// static const Info INFO_MASK_ATTACKED		 = 16;	 // Bit 5 == attacked?
+static const Info INFO_MASK_FORBIDDEN_ESCAPE = 32;  // Bit 6 == forbidden square for king (line of check).
+static const Info INFO_MASK_MAYBE_PINNED     = 64;  // Bit 7 == mark for pinning.
+static const Info INFO_MASK_CHECK            = 128; // Bit 8 == check.
 
 // Colors
-const static Color BLACK           = 0;
-const static Color WHITE           = 1;
-const static Color COLOR_ONLY_MASK = 1;
-const static Color COLOR_TEST_MASK = 129;
+static const Color BLACK           = 0;
+static const Color WHITE           = 1;
+static const Color COLOR_ONLY_MASK = 1;
+static const Color COLOR_TEST_MASK = 129;
 
 // Pieces:
-const static Piece EMPTY        = 128; // 10000000
-const static Piece PAWN         = 2;   // 00000010
-const static Piece KNIGHT       = 4;   // 00000100
-const static Piece BISHOP       = 8;   // 00001000
-const static Piece ROOK         = 16;  // 00010000
-const static Piece QUEEN        = 32;  // 00100000
-const static Piece KING         = 64;  // 01000000
-const static Piece PIECE_MASK   = 126; // 01111110
-const static Piece PINNERS_MASK = 56;  // 00111000
+static const Piece EMPTY        = 128; // 10000000
+static const Piece PAWN         = 2;   // 00000010
+static const Piece KNIGHT       = 4;   // 00000100
+static const Piece BISHOP       = 8;   // 00001000
+static const Piece ROOK         = 16;  // 00010000
+static const Piece QUEEN        = 32;  // 00100000
+static const Piece KING         = 64;  // 01000000
+static const Piece PIECE_MASK   = 126; // 01111110
+static const Piece PINNERS_MASK = 56;  // 00111000
 
 // Colored pieces:
-const static Piece BPAWN   = PAWN | BLACK;
-const static Piece BKNIGHT = KNIGHT | BLACK;
-const static Piece BBISHOP = BISHOP | BLACK;
-const static Piece BROOK   = ROOK | BLACK;
-const static Piece BQUEEN  = QUEEN | BLACK;
-const static Piece BKING   = KING | BLACK;
-const static Piece WPAWN   = PAWN | WHITE;
-const static Piece WKNIGHT = KNIGHT | WHITE;
-const static Piece WBISHOP = BISHOP | WHITE;
-const static Piece WROOK   = ROOK | WHITE;
-const static Piece WQUEEN  = QUEEN | WHITE;
-const static Piece WKING   = KING | WHITE;
+static const Piece BPAWN   = PAWN | BLACK;
+static const Piece BKNIGHT = KNIGHT | BLACK;
+static const Piece BBISHOP = BISHOP | BLACK;
+static const Piece BROOK   = ROOK | BLACK;
+static const Piece BQUEEN  = QUEEN | BLACK;
+static const Piece BKING   = KING | BLACK;
+static const Piece WPAWN   = PAWN | WHITE;
+static const Piece WKNIGHT = KNIGHT | WHITE;
+static const Piece WBISHOP = BISHOP | WHITE;
+static const Piece WROOK   = ROOK | WHITE;
+static const Piece WQUEEN  = QUEEN | WHITE;
+static const Piece WKING   = KING | WHITE;
 
 // Directions:
-const static Direction UP         = 16;
-const static Direction DOWN       = -16;
-const static Direction LEFT       = -1;
-const static Direction RIGHT      = 1;
-const static Direction UP_LEFT    = UP + LEFT;
-const static Direction UP_RIGHT   = UP + RIGHT;
-const static Direction DOWN_LEFT  = DOWN + LEFT;
-const static Direction DOWN_RIGHT = DOWN + RIGHT;
+static const Direction UP         = 16;
+static const Direction DOWN       = -16;
+static const Direction LEFT       = -1;
+static const Direction RIGHT      = 1;
+static const Direction UP_LEFT    = UP + LEFT;
+static const Direction UP_RIGHT   = UP + RIGHT;
+static const Direction DOWN_LEFT  = DOWN + LEFT;
+static const Direction DOWN_RIGHT = DOWN + RIGHT;
 
-const static Direction PAWN_PUSH_DIRS[2]       = { DOWN, UP };
-const static size_t    PAWN_PUSH_DIRS_LEN      = 2;
-const static Direction PAWN_CAPTURE_DIRS[2][2] = { { DOWN_LEFT, DOWN_RIGHT }, { UP_LEFT, UP_RIGHT } };
-const static size_t    PAWN_CAPTURE_DIRS_LEN   = 2;
-const static Square    PAWN_BASE_RANK[2]       = { 6, 1 };
-const static size_t    PAWN_BASE_RANK_LEN      = 2;
-const static Square    PAWN_PROMOTE_RANK[2]    = { 0, 7 };
-const static size_t    PAWN_PROMOTE_RANK_LEN   = 2;
+static const Direction PAWN_PUSH_DIRS[2]       = { DOWN, UP };
+static const size_t    PAWN_PUSH_DIRS_LEN      = 2;
+static const Direction PAWN_CAPTURE_DIRS[2][2] = { { DOWN_LEFT, DOWN_RIGHT }, { UP_LEFT, UP_RIGHT } };
+static const size_t    PAWN_CAPTURE_DIRS_LEN   = 2;
+static const Square    PAWN_BASE_RANK[2]       = { 6, 1 };
+static const size_t    PAWN_BASE_RANK_LEN      = 2;
+static const Square    PAWN_PROMOTE_RANK[2]    = { 0, 7 };
+static const size_t    PAWN_PROMOTE_RANK_LEN   = 2;
 
-const static Direction KNIGHT_DIRS[8] = {
+static const Direction KNIGHT_DIRS[8] = {
 	UP + UP_LEFT, UP + UP_RIGHT, DOWN + DOWN_LEFT, DOWN + DOWN_RIGHT,
 	LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT
 };
-const static size_t    KNIGHT_DIRS_LEN             = 8;
-const static Direction DIAGONAL_DIRS[4]            = { UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
-const static size_t    DIAGONAL_DIRS_LEN           = 4;
-const static Direction ORTHOGONAL_DIRS[4]          = { RIGHT, LEFT, UP, DOWN };
-const static size_t    ORTHOGONAL_DIRS_LEN         = 4;
-const static Direction ALL_DIRS[8]                 = { RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
-const static size_t    ALL_DIRS_LEN                = 8;
-const static Square    CASTLING_PATH_SHORT[2][2]   = { { 0x75, 0x76 }, { 0x5, 0x6 } };
-const static Square    CASTLING_PATH_LONG[2][3]    = { { 0x73, 0x72, 0x71 }, { 0x3, 0x2, 0x1 } };
-const static Square    CASTLING_ROOK_SHORT[2]      = { 0x77, 0x07 };
-const static Square    CASTLING_ROOK_LONG[2]       = { 0x70, 0x00 };
-const static Square    CASTLING_DETECT_SHORT[2][2] = { { 0x74, 0x76 }, { 0x04, 0x06 } }; // FROM->TO squares
-const static Square    CASTLING_DETECT_LONG[2][2]  = { { 0x74, 0x72 }, { 0x04, 0x02 } };// FROM->TO squares
-const static size_t    CASTLING_LEN                = 2;
+static const size_t    KNIGHT_DIRS_LEN             = 8;
+static const Direction DIAGONAL_DIRS[4]            = { UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
+static const size_t    DIAGONAL_DIRS_LEN           = 4;
+static const Direction ORTHOGONAL_DIRS[4]          = { RIGHT, LEFT, UP, DOWN };
+static const size_t    ORTHOGONAL_DIRS_LEN         = 4;
+static const Direction ALL_DIRS[8]                 = { RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
+static const size_t    ALL_DIRS_LEN                = 8;
+static const Square    CASTLING_PATH_SHORT[2][2]   = { { 0x75, 0x76 }, { 0x5, 0x6 } };
+static const Square    CASTLING_PATH_LONG[2][3]    = { { 0x73, 0x72, 0x71 }, { 0x3, 0x2, 0x1 } };
+static const Square    CASTLING_ROOK_SHORT[2]      = { 0x77, 0x07 };
+static const Square    CASTLING_ROOK_LONG[2]       = { 0x70, 0x00 };
+static const Square    CASTLING_DETECT_SHORT[2][2] = { { 0x74, 0x76 }, { 0x04, 0x06 } }; // FROM->TO squares
+static const Square    CASTLING_DETECT_LONG[2][2]  = { { 0x74, 0x72 }, { 0x04, 0x02 } };// FROM->TO squares
+static const size_t    CASTLING_LEN                = 2;
 
-// const static Square META_BOARD_INDEXES[64] = {
+// static const Square META_BOARD_INDEXES[64] = {
 // 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 // 	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 // 	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -121,7 +121,7 @@ const static size_t    CASTLING_LEN                = 2;
 // 	0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
 // };
 
-const static char LOOKUP_SQUARE_NAMES[128][2] = {
+static const char LOOKUP_SQUARE_NAMES[128][2] = {
 	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", "l1", "m1", "n1", "o1", "p1",
 	"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", "l2", "m2", "n2", "o2", "p2",
 	"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3", "i3", "j3", "k3", "l3", "m3", "n3", "o3", "p3",
@@ -133,7 +133,7 @@ const static char LOOKUP_SQUARE_NAMES[128][2] = {
 };
 
 // 0x88 board:
-const static Square LOOKUP_0x88[64] = {
+static const Square LOOKUP_0x88[64] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
 	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
@@ -144,7 +144,7 @@ const static Square LOOKUP_0x88[64] = {
 	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77
 };
 
-const static Square DIFF_ATTACK_MAP[240] = {
+static const Square DIFF_ATTACK_MAP[240] = {
 	40, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 40, 0, 0, 40, 0, 0,
 	0, 0, 0, 48, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 48,
 	0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 48, 0, 0, 0, 40,
@@ -159,7 +159,7 @@ const static Square DIFF_ATTACK_MAP[240] = {
 	0, 40, 0, 0, 40, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 40, 0,
 };
 
-const static Direction DIFF_DIR_MAP[240] = {
+static const Direction DIFF_DIR_MAP[240] = {
 	-17, 0, 0, 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, -15, 0, 0, -17, 0, 0,
 	0, 0, 0, -16, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, -17, 0, 0, 0, 0, -16,
 	0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, -17, 0, 0, 0, -16, 0, 0, 0, -15,
