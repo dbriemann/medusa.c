@@ -955,29 +955,60 @@ void Board__make_legal_move(Board *board, BitMove move) {
 	// TODO: half-move draw counter
 }
 
-Error Board__to_string(Board *b, char *str) {
-	if (b == NULL || str == NULL) {
+Error Board__to_string(Board *b, char **str) {
+	if (b == NULL) {
 		return ERR_NULL_PTR;
 	}
 
-	// str := "  +-----------------+\n"
-	// for r := 7; r >= 0; r-- {
-	// 	str += strconv.Itoa(r+1) + " | "
-	// 	for f := 0; f < 8; f++ {
-	// 		idx := 16*r + f
-	// 		if Piece(idx) == b.EpSquare {
-	// 			str += ", "
-	// 		} else {
-	// 			str += PrintMap[b.Squares[idx]] + " "
-	// 		}
-	//
-	// 		if f == 7 {
-	// 			str += "|\n"
-	// 		}
-	// 	}
-	// }
-	// str += "  +-----------------+\n"
-	// str += "    a b c d e f g h\n"
+	char *out = calloc(72+1, sizeof(char));
+	size_t ri = 0;
+
+	for (int r = 7; r >= 0; r--) {
+		for (size_t f = 0; f < 8; f++) {
+			Square idx = 16*r + f;
+			Piece p = b->squares[idx];
+
+			if (p == WPAWN) {
+				out[ri] = 'P';
+			} else if (p == BPAWN) {
+				out[ri] = 'p';			
+			} else if (p == WKNIGHT) {
+				out[ri] = 'N';			
+			} else if (p == BKNIGHT) {
+				out[ri] = 'n';			
+			} else if (p == WBISHOP) {
+				out[ri] = 'B';			
+			} else if (p == BBISHOP) {
+				out[ri] = 'b';			
+			} else if (p == WROOK) {
+				out[ri] = 'R';			
+			} else if (p == BROOK) {
+				out[ri] = 'r';			
+			} else if (p == WQUEEN) {
+				out[ri] = 'Q';			
+			} else if (p == BQUEEN) {
+				out[ri] = 'q';			
+			} else if (p == WKING) {
+				out[ri] = 'K';			
+			} else if (p == BKING) {
+				out[ri] = 'k';			
+			} else if (p == EMPTY){
+				out[ri] = '.';
+			} else {
+				// Should not exist.
+				out[ri] = '?';
+			}
+			ri++;
+			if (f == 7) {
+				out[ri] = '\n';
+				ri++;
+			}
+		}
+	}
+
+	out[ri] = 0;
+
+	*str = out;
 
 	return OK;
 }
