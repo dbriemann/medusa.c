@@ -1,11 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "board.h"
+#include "errors.h"
 #include "perft.h"
 #include "base.h"
 #include "bitmove.h"
-#include <stdio.h>
 
-void perft__validate(Board b, unsigned int depth, PerftData *pdata) {
+void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool verbose) {
+	if (verbose) {
+		printf("----------------------------------\n");
+		char *print_board = NULL;
+		Board__to_string(&b, &print_board);
+		printf("board:\n%s\n", print_board);
+		free(print_board);
+	}
+
 	if (depth == 0) {
+		if (verbose) {
+			printf("----------------------------------\n");
+			printf("----------------------------------\n");
+		}
 		return;
 	}
 
@@ -18,6 +33,12 @@ void perft__validate(Board b, unsigned int depth, PerftData *pdata) {
 	Board depth_board = b;
 
 	for (uint64_t i = 0; i < mlist.size; i++) {
+		if (verbose) {
+			char *notation = BitMove__to_notation(mlist.moves[i]);
+			printf("move: %s\n\n", notation);
+			free(notation);
+		}
+
 		Board__make_legal_move(&b, mlist.moves[i]);
 
 		if (depth == 1) {
@@ -32,9 +53,9 @@ void perft__validate(Board b, unsigned int depth, PerftData *pdata) {
 			} else if (b.check_info != CHECK_NONE) {
 				pdata->checks++;
 			}
-		} else {
-			perft__validate(b, depth - 1, pdata);
 		}
+		perft__validate(b, depth - 1, pdata, verbose);
+
 		b = depth_board;
 	}
 }

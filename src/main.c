@@ -9,7 +9,7 @@
 int main(void) {
 	Board board;
 
-	const char *fen = "rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+	const char *fen = "4k3/ppppppp1/7p/8/7P/8/PPPPPPP1/4K3 w - - 0 1";
 
 	Error error = Board__set_fen(&board, fen);
 	if (error != OK) {
@@ -33,6 +33,11 @@ int main(void) {
 	printf("eps: %lu\n", pdata.eps);
 	printf("castles: %lu\n", pdata.castles);
 	printf("checks: %lu\n", pdata.checks);
+
+	// char *str = NULL;
+	// Board__to_string(&board, &str);
+	// printf("BOARD:\n%s\n", str);
+	// free(str);
 
 	return EXIT_SUCCESS;
 }

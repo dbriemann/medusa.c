@@ -1210,7 +1210,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.move           = BitMove__new(WPAWN, 0x44, 0x53, PROMO_NONE, EMPTY, CASTLE_NONE, true),
 			.expected_board = {
 				.check_info  = OTB,
-				.ep_square   = 0x53, // this should be gone after new moves are generated
+				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 4,
 				.pawns       = {
