@@ -897,6 +897,7 @@ void Board__make_legal_move(Board *board, BitMove move) {
 	board->squares[from] = EMPTY;
 
 	// Make move in piece list and do special move things.
+	board->ep_square = OTB; // Reset for every move.
 	if (ptype == PAWN) {
 		if (creates_en_passent(from, to)) {
 			board->ep_square = (Direction)from + PAWN_PUSH_DIRS[board->player];
