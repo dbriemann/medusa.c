@@ -8,6 +8,20 @@
 #include "bitmove.h"
 
 void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool verbose) {
+	MoveList mlist;
+	MoveList__clear(&mlist);
+
+	Board__detect_checks_and_pins(&b, b.player);
+	Board__generate_all_legal_moves(&b, &mlist, b.player);
+
+	if (mlist.size == 0) {
+		if (b.check_info != CHECK_NONE) {
+			pdata->mates++;
+		} else {
+			// TODO: STALEMATE
+		}
+	}
+
 	if (verbose) {
 		printf("----------------------------------\n");
 		char *print_board = NULL;
@@ -23,12 +37,6 @@ void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool verbose
 		}
 		return;
 	}
-
-	MoveList mlist;
-	MoveList__clear(&mlist);
-
-	Board__detect_checks_and_pins(&b, b.player);
-	Board__generate_all_legal_moves(&b, &mlist, b.player);
 
 	Board depth_board = b;
 

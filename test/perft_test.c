@@ -79,6 +79,9 @@ MunitResult test_perft_validate(const MunitParameter params[], void *data) {
 		if (testcases[tc].target_pdata.eps >= 0) {
 			munit_assert_uint64(testcases[tc].target_pdata.eps, ==, pdata.eps);
 		}
+		if (testcases[tc].target_pdata.mates >= 0) {
+			munit_assert_uint64(testcases[tc].target_pdata.mates, ==, pdata.mates);
+		}
 	}
 
 	return MUNIT_OK;
