@@ -16,7 +16,7 @@ MunitResult test_board__set_fen(const MunitParameter params[], void *data) {
 				.castle_long  = { false, true },
 				.move_number  = 5,
 				.draw_counter = 0,
-				.check_info   = OTB,
+				.check_info   = CHECK_NONE,
 				.ep_square    = 0x56, // g6
 				.player       = WHITE,
 				.squares      = {
@@ -492,7 +492,7 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.name           = "black pins multiple pieces to the white king",
 			.fen            = "b3r1k1/5pp1/p6p/3RB3/P3KN1q/8/6PP/8 w - - 0 1",
 			.expected_board = {
-				.check_info = OTB,
+				.check_info = CHECK_NONE,
 				.ep_square  = OTB,
 				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
@@ -511,7 +511,7 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.name           = "white pins eight pieces to the black king",
 			.fen            = "1B1R1Q2/ppqnr2p/Q1bkr2Q/2ppp3/1Q6/P7/1P1R3B/K7 b - - 0 1",
 			.expected_board = {
-				.check_info = OTB,
+				.check_info = CHECK_NONE,
 				.ep_square  = OTB,
 				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
@@ -530,7 +530,7 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			.name           = "white pins nothing",
 			.fen            = "6R1/6N1/Q3nnk1/5rb1/4r1b1/8/PP6/KB4R1 b - - 0 1",
 			.expected_board = {
-				.check_info = OTB,
+				.check_info = CHECK_NONE,
 				.ep_square  = OTB,
 				.squares    = {
 					// We only care for the info board .. thus the regular squares are just set to EMPTY.
@@ -1182,7 +1182,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 			.move           = BitMove__new(WPAWN, 0x14, 0x34, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = 0x24, // e3
 				.player      = BLACK,
 				.move_number = 2,
@@ -1209,7 +1209,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "rnbqkbnr/pp2pppp/2p5/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
 			.move           = BitMove__new(WPAWN, 0x44, 0x53, PROMO_NONE, EMPTY, CASTLE_NONE, true),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 4,
@@ -1236,7 +1236,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "3n4/1KP5/8/8/8/6kp/8/8 w - - 0 64",
 			.move           = BitMove__new(WPAWN, 0x62, 0x73, WQUEEN, BKNIGHT, CASTLE_NONE, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 65,
@@ -1305,7 +1305,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "6k1/8/8/3n4/8/8/2BK4/8 w - - 0 54",
 			.move           = BitMove__new(WBISHOP, 0x12, 0x21, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 55,
@@ -1391,7 +1391,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "8/5k2/8/8/8/8/8/K6Q w - - 0 100",
 			.move           = BitMove__new(WQUEEN, 0x07, 0x77, PROMO_NONE, EMPTY, CASTLE_NONE, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 101,
@@ -1418,7 +1418,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 100",
 			.move           = BitMove__new(WKING, 0x04, 0x06, PROMO_NONE, EMPTY, CASTLE_OO, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 101,
@@ -1445,7 +1445,7 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void *dat
 			.fen            = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 100",
 			.move           = BitMove__new(WKING, 0x04, 0x02, PROMO_NONE, EMPTY, CASTLE_OOO, false),
 			.expected_board = {
-				.check_info  = OTB,
+				.check_info  = CHECK_NONE,
 				.ep_square   = OTB,
 				.player      = BLACK,
 				.move_number = 101,

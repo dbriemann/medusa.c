@@ -58,7 +58,7 @@ void Board__clear(Board *b) {
 void Board__clear_meta(Board *b) {
 	// This function is called often and thus the "loop" is manually unrolled.
 	// It is a lot faster than any looping construct.
-	b->check_info = OTB;
+	b->check_info = CHECK_NONE;
 
 	b->squares[0x8]  = INFO_NONE;
 	b->squares[0x9]  = INFO_NONE;
@@ -449,6 +449,8 @@ EXIT_PAWN_CHECK:
 	}
 }
 
+// TODO: too many checks
+
 int Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker,
 										 const int ccount, size_t plist_len,
 										 Square const *const plist,
@@ -746,14 +748,13 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 		if (is_pinned && board->squares[to_info_index(to)] != board->squares[to_info_index((from))]) {
 			// Pawn is pinned but target is not on the pin path -> next direction.
 			continue;
-		}else if (is_check && !to_sq_prevents_check) {
-			// If there is a check but the move's target does not prevent it => impossible move => skip.
-			continue;
 		} else if (tpiece != EMPTY) {
 			// Cannot push forward.
 			continue;
+		} else if (is_check && !to_sq_prevents_check) {
+			// If there is a check but the move's target does not prevent it => impossible move => skip.
+			goto DOUBLE_STEP;
 		}
-
 		if(is_pawn_promoting(color, to)) {
 			// For promotions we have to create a move for all possible pieces.
 			for(Piece prom = QUEEN; prom >= KNIGHT; prom >>= 1) {
@@ -764,10 +765,16 @@ void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color) {
 			// Normal move by one.
 			move = BitMove__new(PAWN | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
 			MoveList__put(mlist, move);
+		}
 
-			// d. Double square push.
-			if(rank(from) == PAWN_BASE_RANK[color]) {
-				to = (Direction)to + PAWN_PUSH_DIRS[color];
+DOUBLE_STEP:
+		// d. Double square push.
+		if(rank(from) == PAWN_BASE_RANK[color]) {
+			to = (Direction)to + PAWN_PUSH_DIRS[color];
+			bool to_sq_prevents_check = is_mask_set(board->squares[to_info_index(to)], INFO_MASK_CHECK);
+			if (is_check && !to_sq_prevents_check) {
+				// If there is a check but the move's target does not prevent it => impossible move => skip.
+			} else {
 				tpiece = board->squares[to];
 				if(tpiece == EMPTY) {
 					move = BitMove__new(PAWN | color, from, to, PROMO_NONE, tpiece, CASTLE_NONE, false);
@@ -896,8 +903,10 @@ void Board__make_legal_move(Board *board, BitMove move) {
 	board->squares[to] = board->squares[from];
 	board->squares[from] = EMPTY;
 
+	// Resets
+	board->check_info = CHECK_NONE;
+	board->ep_square = OTB;
 	// Make move in piece list and do special move things.
-	board->ep_square = OTB; // Reset for every move.
 	if (ptype == PAWN) {
 		if (creates_en_passent(from, to)) {
 			board->ep_square = (Direction)from + PAWN_PUSH_DIRS[board->player];

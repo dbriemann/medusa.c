@@ -44,6 +44,18 @@ MunitResult test_perft_validate(const MunitParameter params[], void *data) {
 				.mates    = 8,
 			},
 		},
+		{
+			.name         = "starting position: depth 5",
+			.fen          = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+			.depth        = 5,
+			.target_pdata = {
+				.nodes    = 4865609,
+				.checks   = 27351,
+				.captures = 82719,
+				.mates    = 347,
+				.eps      = 258,
+			},
+		},
 	};
 
 	const size_t len = sizeof(testcases) / sizeof(PerftTestCase);
