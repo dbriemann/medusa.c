@@ -1,18 +1,65 @@
+#include <bits/stdint-uintn.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "base.h"
+#include "bitmove.h"
 #include "board.h"
 #include "errors.h"
 #include "perft.h"
-#include "base.h"
-#include "bitmove.h"
 
-void perft_new(Board b, unsigned int depth, PerftData *pdata, bool debug) {
+void perft_analyze(Board b, unsigned int max_depth, PerftData *pdata) {
+	if (max_depth == 0) {
+		return;
+	}
 
+	if (max_depth == 1) {
+		perft_validate(b, max_depth, pdata, false);
+		return;
+	}
+
+	MoveList mlist;
+	MoveList__clear(&mlist);
+
+	Board__detect_checks_and_pins(&b, b.player);
+	Board__generate_all_legal_moves(&b, &mlist, b.player);
+
+	Board root_board = b;
+
+	for (uint64_t i = 0; i < mlist.size; i++) {
+		PerftData root_data = {
+			.nodes = 0,
+			.captures = 0,
+			.eps = 0,
+			.promos = 0,
+			.checks = 0,
+			.double_checks = 0,
+			.mates = 0,
+			.castles = 0,
+		};
+
+		Board__make_legal_move(&b, mlist.moves[i]);
+
+		perft_validate(b, max_depth - 1, &root_data, false);
+
+		b = root_board;
+
+		char *move = BitMove__to_notation(mlist.moves[i]);
+		printf("%s: nodes=%lu, checks=%lu\n", move, root_data.nodes, root_data.checks);
+		free(move);
+
+		pdata->nodes += root_data.nodes;
+		pdata->captures += root_data.captures;
+		pdata->eps += root_data.eps;
+		pdata->promos += root_data.promos;
+		pdata->checks += root_data.checks;
+		pdata->double_checks += root_data.double_checks;
+		pdata->mates += root_data.mates;
+		pdata->castles += root_data.castles;
+	}
 }
 
-void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool debug) {
-	// TODO: collect perft data for all first moves.
+void perft_validate(Board b, unsigned int depth, PerftData *pdata, bool debug) {
 	MoveList mlist;
 	MoveList__clear(&mlist);
 
@@ -27,12 +74,12 @@ void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool debug) 
 			// if (b.squares[0x37] != BQUEEN
 			// 	&& b.squares[0x40] != BQUEEN
 			// 	&& b.squares[0x31] != BBISHOP) {
-			printf("----------------------------------\n");
-			char *print_board = NULL;
-			Board__to_string(&b, &print_board);
-			printf("board:\n%s\n", print_board);
-			free(print_board);
-			printf("----------------------------------\n");
+			// printf("----------------------------------\n");
+			// char *print_board = NULL;
+			// Board__to_string(&b, &print_board);
+			// printf("board:\n%s\n", print_board);
+			// free(print_board);
+			// printf("----------------------------------\n");
 			// }
 		}
 	} else {
@@ -77,7 +124,7 @@ void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool debug) 
 				pdata->captures++;
 			}
 		}
-		perft__validate(b, depth - 1, pdata, debug);
+		perft_validate(b, depth - 1, pdata, debug);
 
 		b = depth_board;
 	}

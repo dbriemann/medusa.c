@@ -17,6 +17,7 @@ struct PerftData {
 	int64_t castles;
 };
 
-void perft__validate(Board b, unsigned int depth, PerftData *pdata, bool debug);
+void perft_analyze(Board b, unsigned int max_depth, PerftData *pdata);
+void perft_validate(Board b, unsigned int depth, PerftData *pdata, bool debug);
 
 #endif
