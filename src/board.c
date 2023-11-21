@@ -391,7 +391,7 @@ void Board__detect_checks_and_pins(Board *b, Color color) {
 			b->check_info = knight_sq;
 			check_counter++;
 			b->squares[to_info_index(knight_sq)] = INFO_MASK_CHECK;
-			break; // TODO: we could skip the pawn section here ?!
+			goto AFTER_PAWN_CHECK; // If a knight checks, there cannot be a double check with a pawn.
 		}
 	}
 
@@ -407,12 +407,12 @@ void Board__detect_checks_and_pins(Board *b, Color color) {
 				b->check_info = pawn_sq;
 				check_counter++;
 				b->squares[to_info_index(pawn_sq)] = INFO_MASK_CHECK;
-				goto EXIT_PAWN_CHECK; // double break -> exit pawn loops
+				goto AFTER_PAWN_CHECK; // double break -> exit pawn loops
 			}
 		}
 	}
 
-EXIT_PAWN_CHECK:
+AFTER_PAWN_CHECK:
 
 	// Detect checks and pins by sliders.
 	// Queens

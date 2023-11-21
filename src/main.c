@@ -11,18 +11,6 @@ int main(void) {
 
 	const char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-	// const char *fen = "rnbqkbnr/pppppppp/8/8/5P2/8/PPPPP1PP/RNBQKBNR b KQkq - 0 1";
-	// const char *fen = "rnbqkbnr/pppp1ppp/4p3/8/5P2/8/PPPPP1PP/RNBQKBNR w KQkq - 0 2";
-	// const char *fen = "rnbqkbnr/pppppppp/8/8/8/7N/PPPPPPPP/RNBQKB1R b KQkq - 1 1";
-	// const char *fen = "rnbqkbnr/pppp1ppp/8/4p3/8/7N/PPPPPPPP/RNBQKB1R w KQkq - 0 2";
-	// const char *fen = "rnbqkbnr/pppp1ppp/8/4p3/8/5P1N/PPPPP1PP/RNBQKB1R b KQkq - 0 2";
-	// const char *fen = "rnb1kbnr/pppp1ppp/8/4p3/7q/5P1N/PPPPP1PP/RNBQKB1R w KQkq - 1 3";
-
-	// const char *fen = "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 0 1";
-	// const char *fen = "rnbqkbnr/pp1ppppp/2p5/8/1P6/8/P1PPPPPP/RNBQKBNR w KQkq - 0 2";
-	// const char *fen = "rnbqkbnr/pp1ppppp/2p5/8/1P6/3P4/P1P1PPPP/RNBQKBNR b KQkq - 0 2";
-	// const char *fen = "rnb1kbnr/pp1ppppp/2p5/q7/1P6/3P4/P1P1PPPP/RNBQKBNR w KQkq - 1 3";
-
 	Error error = Board__set_fen(&board, fen);
 	if (error != OK) {
 		printf("OUCH: %d\n", error);
@@ -39,7 +27,7 @@ int main(void) {
 		.double_checks = 0,
 		.captures = 0,
 	};
-	perft_analyze(board, 4, &pdata);
+	perft_analyze(board, 6, &pdata);
 	printf("nodes: %lu\n", pdata.nodes);
 	printf("captures: %lu\n", pdata.captures);
 	printf("eps: %lu\n", pdata.eps);
