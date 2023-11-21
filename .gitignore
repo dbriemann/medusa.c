@@ -5,3 +5,5 @@ cov/
 medusa.profraw
 medusa.profdata
 *.report
+gmon.out
+callgrind.out.*
