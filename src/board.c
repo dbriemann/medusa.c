@@ -867,7 +867,11 @@ void Board__make_legal_move(Board *board, BitMove move) {
 	const Color opp_color = flip_color(board->player);
 	const bool is_ep = BitMove__en_passent(move);
 
-	if (tpiece != EMPTY) {
+	if (is_ep) {
+		// Handle en passent capture here.
+		const Square capSq = (Direction)to + PAWN_PUSH_DIRS[opp_color];
+		Board__del_piece(board, capSq);
+	} else if (tpiece != EMPTY) {
 		// The move is a capture.
 		// tpiece should never be a king :)
 
@@ -880,10 +884,6 @@ void Board__make_legal_move(Board *board, BitMove move) {
 		} else if (to == CASTLING_ROOK_LONG[opp_color]) {
 			board->castle_long[opp_color] = false;
 		}
-	} else if (is_ep) {
-		// Handle en passent capture here.
-		const Square capSq = (Direction)to + PAWN_PUSH_DIRS[opp_color];
-		Board__del_piece(board, capSq);
 	}
 
 	// Now move the actual piece on the board.
