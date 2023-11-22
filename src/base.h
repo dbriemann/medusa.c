@@ -1,9 +1,9 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 /**
  * Piece, Color, Square and Info are all just uint8_t and are often
@@ -16,7 +16,7 @@ typedef uint8_t Piece;
 typedef uint8_t Color;
 typedef uint8_t Square;
 typedef uint8_t Info;
-typedef int8_t Direction;
+typedef int8_t  Direction;
 typedef uint8_t CastleType;
 
 static const CastleType CASTLE_NONE = 0x0;
@@ -82,33 +82,41 @@ static const Direction UP_RIGHT   = UP + RIGHT;
 static const Direction DOWN_LEFT  = DOWN + LEFT;
 static const Direction DOWN_RIGHT = DOWN + RIGHT;
 
-static const Direction PAWN_PUSH_DIRS[2]       = { DOWN, UP };
+static const Direction PAWN_PUSH_DIRS[2]       = {DOWN, UP};
 static const size_t    PAWN_PUSH_DIRS_LEN      = 2;
-static const Direction PAWN_CAPTURE_DIRS[2][2] = { { DOWN_LEFT, DOWN_RIGHT }, { UP_LEFT, UP_RIGHT } };
-static const size_t    PAWN_CAPTURE_DIRS_LEN   = 2;
-static const Square    PAWN_BASE_RANK[2]       = { 6, 1 };
-static const size_t    PAWN_BASE_RANK_LEN      = 2;
-static const Square    PAWN_PROMOTE_RANK[2]    = { 0, 7 };
-static const size_t    PAWN_PROMOTE_RANK_LEN   = 2;
-
-static const Direction KNIGHT_DIRS[8] = {
-	UP + UP_LEFT, UP + UP_RIGHT, DOWN + DOWN_LEFT, DOWN + DOWN_RIGHT,
-	LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT
+static const Direction PAWN_CAPTURE_DIRS[2][2] = {
+	{DOWN_LEFT, DOWN_RIGHT},
+    {  UP_LEFT,   UP_RIGHT}
 };
-static const size_t    KNIGHT_DIRS_LEN             = 8;
-static const Direction DIAGONAL_DIRS[4]            = { UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
-static const size_t    DIAGONAL_DIRS_LEN           = 4;
-static const Direction ORTHOGONAL_DIRS[4]          = { RIGHT, LEFT, UP, DOWN };
-static const size_t    ORTHOGONAL_DIRS_LEN         = 4;
-static const Direction ALL_DIRS[8]                 = { RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
-static const size_t    ALL_DIRS_LEN                = 8;
-static const Square    CASTLING_PATH_SHORT[2][2]   = { { 0x75, 0x76 }, { 0x5, 0x6 } };
-static const Square    CASTLING_PATH_LONG[2][3]    = { { 0x73, 0x72, 0x71 }, { 0x3, 0x2, 0x1 } };
-static const Square    CASTLING_ROOK_SHORT[2]      = { 0x77, 0x07 };
-static const Square    CASTLING_ROOK_LONG[2]       = { 0x70, 0x00 };
-static const Square    CASTLING_DETECT_SHORT[2][2] = { { 0x74, 0x76 }, { 0x04, 0x06 } }; // FROM->TO squares
-static const Square    CASTLING_DETECT_LONG[2][2]  = { { 0x74, 0x72 }, { 0x04, 0x02 } };// FROM->TO squares
-static const size_t    CASTLING_LEN                = 2;
+static const size_t PAWN_CAPTURE_DIRS_LEN = 2;
+static const Square PAWN_BASE_RANK[2]     = {6, 1};
+static const size_t PAWN_BASE_RANK_LEN    = 2;
+static const Square PAWN_PROMOTE_RANK[2]  = {0, 7};
+static const size_t PAWN_PROMOTE_RANK_LEN = 2;
+
+static const Direction KNIGHT_DIRS[8]      = {UP + UP_LEFT,   UP + UP_RIGHT,    DOWN + DOWN_LEFT, DOWN + DOWN_RIGHT,
+                                              LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT};
+static const size_t    KNIGHT_DIRS_LEN     = 8;
+static const Direction DIAGONAL_DIRS[4]    = {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
+static const size_t    DIAGONAL_DIRS_LEN   = 4;
+static const Direction ORTHOGONAL_DIRS[4]  = {RIGHT, LEFT, UP, DOWN};
+static const size_t    ORTHOGONAL_DIRS_LEN = 4;
+static const Direction ALL_DIRS[8]         = {RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
+static const size_t    ALL_DIRS_LEN        = 8;
+static const Square    CASTLING_PATH_SHORT[2][2] = {
+    {0x75, 0x76},
+    { 0x5,  0x6}
+};
+static const Square CASTLING_PATH_LONG[2][3] = {
+	{0x73, 0x72, 0x71},
+    { 0x3,  0x2,  0x1}
+};
+static const Square CASTLING_ROOK_SHORT[2] = {0x77, 0x07};
+static const Square CASTLING_ROOK_LONG[2]  = {0x70, 0x00};
+static const Square CASTLING_FROM[2]       = {0x74, 0x04};
+static const Square CASTLING_OO_TO[2]      = {0x76, 0x06};
+static const Square CASTLING_OOO_TO[2]     = {0x72, 0x02};
+static const size_t CASTLING_LEN           = 2;
 
 // static const Square META_BOARD_INDEXES[64] = {
 // 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -122,58 +130,46 @@ static const size_t    CASTLING_LEN                = 2;
 // };
 
 static const char LOOKUP_SQUARE_NAMES[128][2] = {
-	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", "l1", "m1", "n1", "o1", "p1",
-	"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", "l2", "m2", "n2", "o2", "p2",
-	"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3", "i3", "j3", "k3", "l3", "m3", "n3", "o3", "p3",
-	"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "i4", "j4", "k4", "l4", "m4", "n4", "o4", "p4",
-	"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "i5", "j5", "k5", "l5", "m5", "n5", "o5", "p5",
-	"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "i6", "j6", "k6", "l6", "m6", "n6", "o6", "p6",
-	"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "i7", "j7", "k7", "l7", "m7", "n7", "o7", "p7",
-	"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "i8", "j8", "k8", "l8", "m8", "n8", "o8", "p8",
+	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", "l1", "m1", "n1", "o1", "p1", "a2", "b2", "c2",
+	"d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", "l2", "m2", "n2", "o2", "p2", "a3", "b3", "c3", "d3", "e3", "f3",
+	"g3", "h3", "i3", "j3", "k3", "l3", "m3", "n3", "o3", "p3", "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "i4",
+	"j4", "k4", "l4", "m4", "n4", "o4", "p4", "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "i5", "j5", "k5", "l5",
+	"m5", "n5", "o5", "p5", "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "i6", "j6", "k6", "l6", "m6", "n6", "o6",
+	"p6", "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "i7", "j7", "k7", "l7", "m7", "n7", "o7", "p7", "a8", "b8",
+	"c8", "d8", "e8", "f8", "g8", "h8", "i8", "j8", "k8", "l8", "m8", "n8", "o8", "p8",
 };
 
 // 0x88 board:
-static const Square LOOKUP_0x88[64] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-	0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
-	0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
-	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77
-};
+static const Square LOOKUP_0x88[64] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12, 0x13, 0x14,
+                                       0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x30, 0x31,
+                                       0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
+                                       0x47, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x60, 0x61, 0x62, 0x63,
+                                       0x64, 0x65, 0x66, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77};
 
 static const Square DIFF_ATTACK_MAP[240] = {
-	40, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 40, 0, 0, 40, 0, 0,
-	0, 0, 0, 48, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 48,
-	0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 48, 0, 0, 0, 40,
-	0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 48, 0, 0, 40, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 40, 4, 48, 4, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 4, 104, 112, 104, 4, 0, 0, 0, 0, 0, 0, 48, 48, 48, 48, 48, 48, 112, 0,
-	112, 48, 48, 48, 48, 48, 48, 0, 0, 0, 0, 0, 0, 4, 104, 112, 104, 4, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 4, 48, 4, 40, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 40, 0, 0, 48, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 40,
-	0, 0, 0, 48, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 48,
-	0, 0, 0, 0, 40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0,
-	0, 40, 0, 0, 40, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 40, 0,
+	40,  0,   0,  0, 0,  0,  0,  48, 0,  0,  0,   0, 0,   0,  40, 0,  0,  40, 0,  0, 0,  0,   0,   48,  0,  0,  0,
+	0,   0,   40, 0, 0,  0,  0,  40, 0,  0,  0,   0, 48,  0,  0,  0,  0,  40, 0,  0, 0,  0,   0,   0,   40, 0,  0,
+	0,   48,  0,  0, 0,  40, 0,  0,  0,  0,  0,   0, 0,   0,  40, 0,  0,  48, 0,  0, 40, 0,   0,   0,   0,  0,  0,
+	0,   0,   0,  0, 40, 4,  48, 4,  40, 0,  0,   0, 0,   0,  0,  0,  0,  0,  0,  0, 4,  104, 112, 104, 4,  0,  0,
+	0,   0,   0,  0, 48, 48, 48, 48, 48, 48, 112, 0, 112, 48, 48, 48, 48, 48, 48, 0, 0,  0,   0,   0,   0,  4,  104,
+	112, 104, 4,  0, 0,  0,  0,  0,  0,  0,  0,   0, 0,   0,  40, 4,  48, 4,  40, 0, 0,  0,   0,   0,   0,  0,  0,
+	0,   0,   40, 0, 0,  48, 0,  0,  40, 0,  0,   0, 0,   0,  0,  0,  0,  40, 0,  0, 0,  48,  0,   0,   0,  40, 0,
+	0,   0,   0,  0, 0,  40, 0,  0,  0,  0,  48,  0, 0,   0,  0,  40, 0,  0,  0,  0, 40, 0,   0,   0,   0,  0,  48,
+	0,   0,   0,  0, 0,  40, 0,  0,  40, 0,  0,   0, 0,   0,  0,  48, 0,  0,  0,  0, 0,  0,   40,  0,
 };
 
 static const Direction DIFF_DIR_MAP[240] = {
-	-17, 0, 0, 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, -15, 0, 0, -17, 0, 0,
-	0, 0, 0, -16, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, -17, 0, 0, 0, 0, -16,
-	0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, -17, 0, 0, 0, -16, 0, 0, 0, -15,
-	0, 0, 0, 0, 0, 0, 0, 0, -17, 0, 0, -16, 0, 0, -15, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, -17, -33, -16, -31, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, -18, -17, -16, -15, -14, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, 0,
-	1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 14, 15, 16, 17, 18, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 31, 16, 33, 17, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 15, 0, 0, 16, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 15,
-	0, 0, 0, 16, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 16,
-	0, 0, 0, 0, 17, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0,
-	0, 17, 0, 0, 15, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 17, 0,
+	-17, 0, 0,   0,   0, 0,   0,   -16, 0,   0,   0,   0,   0,  0,   -15, 0,   0,   -17, 0,  0,  0,   0,  0,  -16,
+	0,   0, 0,   0,   0, -15, 0,   0,   0,   0,   -17, 0,   0,  0,   0,   -16, 0,   0,   0,  0,  -15, 0,  0,  0,
+	0,   0, 0,   -17, 0, 0,   0,   -16, 0,   0,   0,   -15, 0,  0,   0,   0,   0,   0,   0,  0,  -17, 0,  0,  -16,
+	0,   0, -15, 0,   0, 0,   0,   0,   0,   0,   0,   0,   0,  -17, -33, -16, -31, -15, 0,  0,  0,   0,  0,  0,
+	0,   0, 0,   0,   0, -18, -17, -16, -15, -14, 0,   0,   0,  0,   0,   0,   -1,  -1,  -1, -1, -1,  -1, -1, 0,
+	1,   1, 1,   1,   1, 1,   1,   0,   0,   0,   0,   0,   0,  14,  15,  16,  17,  18,  0,  0,  0,   0,  0,  0,
+	0,   0, 0,   0,   0, 15,  31,  16,  33,  17,  0,   0,   0,  0,   0,   0,   0,   0,   0,  0,  15,  0,  0,  16,
+	0,   0, 17,  0,   0, 0,   0,   0,   0,   0,   0,   15,  0,  0,   0,   16,  0,   0,   0,  17, 0,   0,  0,  0,
+	0,   0, 15,  0,   0, 0,   0,   16,  0,   0,   0,   0,   17, 0,   0,   0,   0,   15,  0,  0,  0,   0,  0,  16,
+	0,   0, 0,   0,   0, 17,  0,   0,   15,  0,   0,   0,   0,  0,   0,   16,  0,   0,   0,  0,  0,   0,  17, 0,
 };
-
 
 // NOLINTNEXTLINE clangd incorrectly warns of unused function.
 static inline Square rank(const Square sq) {

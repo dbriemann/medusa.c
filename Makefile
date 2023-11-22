@@ -1,5 +1,5 @@
 # TODO compiler..
-CC?=clang
+CC=clang
 
 SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))

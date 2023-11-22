@@ -31,22 +31,22 @@
 typedef struct Board Board;
 struct Board {
 	// NOTE: do not add pointer members here. This struct is copied by assignment.
-	Piece squares[64 * 2];  // 128 bytes
-	bool castle_short[2];   // 2 bytes
-	bool castle_long[2];    // 2 bytes
-	uint16_t move_number;   // 2 bytes
-	uint16_t draw_counter;  // 2 bytes
-	Square check_info;      // 1 byte
-	Square ep_square;       // 1 byte
-	Color player;           // 1 byte
+	Piece    squares[64 * 2]; // 128 bytes
+	bool     castle_short[2]; // 2 bytes
+	bool     castle_long[2];  // 2 bytes
+	uint16_t move_number;     // 2 bytes
+	uint16_t draw_counter;    // 2 bytes
+	Square   check_info;      // 1 byte
+	Square   ep_square;       // 1 byte
+	Color    player;          // 1 byte
 	// Piece lists.
-	Square sliders[2][13];  // 26 bytes
-	Square rooks[2][10];    // 20 bytes
-	Square bishops[2][10];  // 20 bytes
-	Square knights[2][10];  // 20 bytes
-	Square queens[2][9];    // 18 bytes
-	Square pawns[2][8];     // 16 bytes
-	Square kings[2];        // 2 bytes
+	Square sliders[2][13]; // 26 bytes
+	Square rooks[2][10];   // 20 bytes
+	Square bishops[2][10]; // 20 bytes
+	Square knights[2][10]; // 20 bytes
+	Square queens[2][9];   // 18 bytes
+	Square pawns[2][8];    // 16 bytes
+	Square kings[2];       // 2 bytes
 	// padding: 3 bytes
 	size_t sliders_size[2]; // 16 bytes
 	size_t queens_size[2];  // 16 bytes
@@ -57,25 +57,24 @@ struct Board {
 };
 
 // TODO convert all Board * to Board * const ?
-void  Board__set_starting_position(Board *b);
-Error Board__set_fen(Board *b, const char *fen);
-void  Board__add_piece(Board *b, Square sq, Piece p);
-void  Board__del_piece(Board *b, Square sq);
-void  Board__clear(Board *b);
-void  Board__clear_meta(Board *b);
-bool  Board__is_sq_attacked(Board *b, const Square sq, const Square ignore_sq, Color color);
-bool  Board__is_sq_attacked_by_slider(Board *b, const Square sq, const Square ignore_sq, Color color);
-void  Board__detect_checks_and_pins(Board *b, Color color);
-int   Board__detect_slider_checks_and_pins(Board *b, Color color, Info *pmarker,
-										   const int ccount, size_t plist_len,
-										   Square const *const plist, Piece ptype);
-void Board__generate_knight_moves(Board *board, MoveList *mlist, Color color);
-void Board__generate_king_moves(Board *board, MoveList *mlist, Color color);
-void Board__generate_pawn_moves(Board *board, MoveList *mlist, Color color);
-void Board__generate_sliding_moves(Board *board, MoveList *mlist, Color color,
-								   Piece ptype, const Direction *dirs, const size_t dir_len, Square *pieces, size_t pieces_size);
-void  Board__generate_all_legal_moves(Board *board, MoveList *mlist, Color color);
-void  Board__make_legal_move(Board *board, BitMove move);
-Error Board__to_string(Board *b, char **str);
+void  Board__set_starting_position(Board * b);
+Error Board__set_fen(Board * b, const char * fen);
+void  Board__add_piece(Board * b, Square sq, Piece p);
+void  Board__del_piece(Board * b, Square sq);
+void  Board__clear(Board * b);
+void  Board__clear_meta(Board * b);
+bool  Board__is_sq_attacked(Board * b, const Square sq, const Square ignore_sq, Color color);
+bool  Board__is_sq_attacked_by_slider(Board * b, const Square sq, const Square ignore_sq, Color color);
+void  Board__detect_checks_and_pins(Board * b, Color color);
+int   Board__detect_slider_checks_and_pins(Board * b, Color color, Info * pmarker, const int ccount, size_t plist_len,
+                                           Square const * const plist, Piece ptype);
+void  Board__generate_knight_moves(Board * board, MoveList * mlist, Color color);
+void  Board__generate_king_moves(Board * board, MoveList * mlist, Color color);
+void  Board__generate_pawn_moves(Board * board, MoveList * mlist, Color color);
+void  Board__generate_sliding_moves(Board * board, MoveList * mlist, Color color, const Direction * dirs,
+                                    const size_t dir_len, Square * pieces, size_t pieces_size);
+void  Board__generate_all_legal_moves(Board * board, MoveList * mlist, Color color);
+void  Board__make_legal_move(Board * board, BitMove move);
+Error Board__to_string(Board * b, char ** str);
 
 #endif
