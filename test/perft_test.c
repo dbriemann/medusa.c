@@ -1,10 +1,11 @@
-#include "perft_test.h"
+#include <stdint.h>
+
 #include "../src/base.h"
 #include "../src/board.h"
 #include "../src/mlist.h"
-#include <bits/stdint-uintn.h>
+#include "perft_test.h"
 
-#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 MunitResult test_perft_validate(const MunitParameter params[], void * data) {
 	const PerftTestCase testcases[] = {
@@ -38,6 +39,7 @@ MunitResult test_perft_validate(const MunitParameter params[], void * data) {
          .depth = 5,
          .nodes = 4865609,
 		 },
+ // TODO: add more perfts
 	};
 
 	const size_t len = sizeof(testcases) / sizeof(PerftTestCase);

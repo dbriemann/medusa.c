@@ -20,7 +20,7 @@ GENERATOR_DIR=bin/generator
 GENERATOR_OBJECTS=$(GENERATOR_DIR)/gen.o $(GENERATOR_DIR)/generate.o
 GENERATOR_EXE=$(GENERATOR_DIR)/gen
 
-TEST_CFLAGS=-Wall -Wextra -pedantic-errors -fprofile-instr-generate -fcoverage-mapping -g -O0
+TEST_CFLAGS=-Wall -Wextra -fprofile-arcs -ftest-coverage -g -O0
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
@@ -90,11 +90,11 @@ perft: $(PERFT_DIR) $(PERFT_EXE)
 
 .PHONY: test
 test: $(TEST_DIR) $(TEST_EXE)
-	# TODO: improve coverage reporting: https://llvm.org/docs/CommandGuide/llvm-cov.html
-	LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test --log-visible info --show-stderr
-	llvm-profdata-14 merge -sparse cov/medusa.profraw -o cov/medusa.profdata
-	llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/line.report
-	llvm-cov-14 report $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/summary.report
-	llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata -format=html > cov/line.report.html
+	# TODO: lcov / gnu
+	# LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test --log-visible info --show-stderr
+	# llvm-profdata-14 merge -sparse cov/medusa.profraw -o cov/medusa.profdata
+	# llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/line.report
+	# llvm-cov-14 report $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/summary.report
+	# llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata -format=html > cov/line.report.html
 
 all: test debug

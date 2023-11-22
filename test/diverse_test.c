@@ -4,7 +4,7 @@
 #include "../src/mlist.h"
 #include "../src/plist.h"
 
-#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 MunitResult test_piecelist__add(const MunitParameter params[], void * data) {
 	Square sq         = 0x34; // e4

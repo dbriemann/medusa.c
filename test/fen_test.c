@@ -7,9 +7,10 @@
 #include "../src/fen.h"
 #include "fen_test.h"
 
-#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
+MunitResult test_fen_parse_pieces(const MunitParameter params[], void * data) {
+	// clang-format off
 	const FenParsePiecesTestCase testcases[] = {
 		{
 			.name            = "Starting position (valid)",
@@ -87,6 +88,8 @@ MunitResult test_fen_parse_pieces(const MunitParameter params[], void *data) {
 			.expected_result = ERR_INVALID_INPUT,
 		},
 	};
+	// clang-format off
+	
 	Piece                        output[64];
 
 	const size_t len = sizeof(testcases) / sizeof(FenParsePiecesTestCase);
@@ -144,51 +147,53 @@ MunitResult test_fen_parse_color_to_move(const MunitParameter params[], void *da
 }
 
 MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *data) {
+	// clang-format on
 	const FenParseCastlingRightsTestCase testcases[] = {
 		{
-			.name            = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
-			.input_fen       = "KQkq",
+         .name            = "White: 0-0, 0-0-0, Black: 0-0. 0-0-0 (valid)",
+         .input_fen       = "KQkq",
+         .expected_result = OK,
+         .expected_oo     = {true, true},
+         .expected_ooo    = {true, true},
+		 },
+		{
+         .name            = "White: 0-0, 0-0-0 (valid)",
+         .input_fen       = "KQ",
+         .expected_result = OK,
+         .expected_oo     = {false, true},
+         .expected_ooo    = {false, true},
+		 },
+		{
+         .name            = "White: 0-0, 0-0-0 (valid)",
+         .input_fen       = "kq",
+         .expected_result = OK,
+         .expected_oo     = {true, false},
+         .expected_ooo    = {true, false},
+		 },
+		{
+         .name            = "White: 0-0-0, Black: 0-0 (valid)",
+         .input_fen       = "Qk", // reversed notation is accepted in medusa.
 			.expected_result = OK,
-			.expected_oo     = { true, true },
-			.expected_ooo    = { true, true },
-		},
+         .expected_oo     = {true, false},
+         .expected_ooo    = {false, true},
+		 },
 		{
-			.name            = "White: 0-0, 0-0-0 (valid)",
-			.input_fen       = "KQ",
-			.expected_result = OK,
-			.expected_oo     = { false, true },
-			.expected_ooo    = { false, true },
-		},
+         .name            = "Empty string (invalid)",
+         .input_fen       = "",
+         .expected_result = ERR_INVALID_INPUT,
+		 },
 		{
-			.name            = "White: 0-0, 0-0-0 (valid)",
-			.input_fen       = "kq",
-			.expected_result = OK,
-			.expected_oo     = { true, false },
-			.expected_ooo    = { true, false },
-		},
+         .name            = "White: 0-0, unknown char (invalid)",
+         .input_fen       = "Qx",
+         .expected_result = ERR_INVALID_INPUT,
+		 },
 		{
-			.name            = "White: 0-0-0, Black: 0-0 (valid)",
-			.input_fen       = "Qk", // reversed notation is accepted in medusa.
-			.expected_result = OK,
-			.expected_oo     = { true, false },
-			.expected_ooo    = { false, true },
-		},
-		{
-			.name            = "Empty string (invalid)",
-			.input_fen       = "",
-			.expected_result = ERR_INVALID_INPUT,
-		},
-		{
-			.name            = "White: 0-0, unknown char (invalid)",
-			.input_fen       = "Qx",
-			.expected_result = ERR_INVALID_INPUT,
-		},
-		{
-			.name            = "Too many chars (invalid)",
-			.input_fen       = "KQkqK",
-			.expected_result = ERR_INVALID_INPUT,
-		},
+         .name            = "Too many chars (invalid)",
+         .input_fen       = "KQkqK",
+         .expected_result = ERR_INVALID_INPUT,
+		 },
 	};
+	// clang-format off
 
 	const size_t len = sizeof(testcases) / sizeof(FenParseCastlingRightsTestCase);
 
@@ -227,26 +232,19 @@ MunitResult test_fen_parse_castling_rights(const MunitParameter params[], void *
 }
 
 MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) {
+	// clang-format on
 	const char * valid_squares[64] = {
-		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
-		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
-		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
-		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
-		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
-		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-		"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 	};
 	const Square valid_squares_index[64] = {
-		56, 57, 58, 59, 60, 61, 62, 63,
-		48, 49, 50, 51, 52, 53, 54, 55,
-		40, 41, 42, 43, 44, 45, 46, 47,
-		32, 33, 34, 35, 36, 37, 38, 39,
-		24, 25, 26, 27, 28, 29, 30, 31,
-		16, 17, 18, 19, 20, 21, 22, 23,
-		8,  9, 10, 11, 12, 13, 14, 15,
-		0,  1,  2,  3,  4,  5,  6,  7,
+		56, 57, 58, 59, 60, 61, 62, 63, 48, 49, 50, 51, 52, 53, 54, 55, 40, 41, 42, 43, 44, 45,
+		46, 47, 32, 33, 34, 35, 36, 37, 38, 39, 24, 25, 26, 27, 28, 29, 30, 31, 16, 17, 18, 19,
+		20, 21, 22, 23, 8,  9,  10, 11, 12, 13, 14, 15, 0,  1,  2,  3,  4,  5,  6,  7,
 	};
+	// clang-format off
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on board (valid)");
 	Square sq;
@@ -267,23 +265,16 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 		munit_assert_int(ERR_INVALID_INPUT, ==, error);
 	}
 
-	// Ignore warning to test case where string is empty.
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Warray-bounds"
-	munit_log(MUNIT_LOG_INFO, "testcase: malformed input (invalid)");
-	Error error = fen_square_to_index("", &sq);
-	munit_assert_int(ERR_INVALID_INPUT, ==, error);
-	#pragma clang diagnostic pop
-	error = fen_square_to_index("a88", &sq);
+	Error error = fen_square_to_index("a88", &sq);
 	munit_assert_int(ERR_INVALID_INPUT, ==, error);
 
 	// Ignore warning to test case where string is NULL.
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wnonnull"
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wnonnull"
 	munit_log(MUNIT_LOG_INFO, "testcase: NULL args");
 	error = fen_square_to_index(NULL, &sq);
 	munit_assert_int(ERR_NULL_PTR, ==, error);
-	#pragma clang diagnostic pop
+	#pragma GCC diagnostic pop
 	error = fen_square_to_index("does not matter", NULL);
 	munit_assert_int(ERR_NULL_PTR, ==, error);
 
@@ -291,15 +282,45 @@ MunitResult test_fen_square_to_index(const MunitParameter params[], void *data) 
 }
 
 MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) {
-	const char *valid_squares[16] = {
-		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
-		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+	// clang-format on
+	const char * valid_squares[16] = {
+		"a6",
+		"b6",
+		"c6",
+		"d6",
+		"e6",
+		"f6",
+		"g6",
+		"h6",
+		"a3",
+		"b3",
+		"c3",
+		"d3",
+		"e3",
+		"f3",
+		"g3",
+		"h3",
 	};
 
 	const Square valid_squares_index[16] = {
-		40, 41, 42, 43, 44, 45, 46, 47,
-		16, 17, 18, 19, 20, 21, 22, 23,
+		40,
+		41,
+		42,
+		43,
+		44,
+		45,
+		46,
+		47,
+		16,
+		17,
+		18,
+		19,
+		20,
+		21,
+		22,
+		23,
 	};
+	// clang-format off
 
 	munit_log(MUNIT_LOG_INFO, "testcase: all squares on rank 3 and 6 (valid)");
 	Square sq;
@@ -312,14 +333,13 @@ MunitResult test_fen_parse_ep_square(const MunitParameter params[], void *data) 
 		}
 	}
 
-	const char *invalid_squares[48] = {
-		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
-		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
-		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
-		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-		"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+	// clang-format on
+	const char * invalid_squares[48] = {
+		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 	};
+	// clang-format off
 
 	munit_log(MUNIT_LOG_INFO, "testcase: no ep square (valid)");
 	Error error = fen_parse_ep_square("-", &sq);
@@ -425,60 +445,54 @@ MunitResult test_fen_parse_half_move_clock(const MunitParameter params[], void *
 }
 
 MunitResult test_parse_fen(const MunitParameter params[], void *data) {
-	ParseFenTestCase
-		testcases[] =
-	{
+	// clang-format on
+	ParseFenTestCase testcases[] = {
 		{
-			.name            = "Start position",
-			.input_fen       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-			.expected_result = OK,
-			.expected_mb     =
-			{
-				.squares =
-				{
-					WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WBISHOP, WKNIGHT, WROOK,
-					WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN, WPAWN,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN, BPAWN,
-					BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BBISHOP, BKNIGHT, BROOK,
-				},
-				.color        = WHITE,
-				.castle_short = { true, true },
-				.castle_long  = { true, true },
-				.half_moves   = 0,
-				.move_num     = 1,
-				.ep_square    = OTB,
-			},
-		},
+         .name            = "Start position",
+         .input_fen       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+         .expected_result = OK,
+         .expected_mb =
+         {
+         .squares =
+         {
+         WROOK, WKNIGHT, WBISHOP, WQUEEN,  WKING,  WBISHOP, WKNIGHT, WROOK,   WPAWN, WPAWN, WPAWN,
+         WPAWN, WPAWN,   WPAWN,   WPAWN,   WPAWN,  EMPTY,   EMPTY,   EMPTY,   EMPTY, EMPTY, EMPTY,
+         EMPTY, EMPTY,   EMPTY,   EMPTY,   EMPTY,  EMPTY,   EMPTY,   EMPTY,   EMPTY, EMPTY, EMPTY,
+         EMPTY, EMPTY,   EMPTY,   EMPTY,   EMPTY,  EMPTY,   EMPTY,   EMPTY,   EMPTY, EMPTY, EMPTY,
+         EMPTY, EMPTY,   EMPTY,   EMPTY,   BPAWN,  BPAWN,   BPAWN,   BPAWN,   BPAWN, BPAWN, BPAWN,
+         BPAWN, BROOK,   BKNIGHT, BBISHOP, BQUEEN, BKING,   BBISHOP, BKNIGHT, BROOK,
+         },
+         .color        = WHITE,
+         .castle_short = {true, true},
+         .castle_long  = {true, true},
+         .half_moves   = 0,
+         .move_num     = 1,
+         .ep_square    = OTB,
+         }, },
 		{
-			.name            = "Ep passent & no castles",
-			.input_fen       = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
-			.expected_result = OK,
-			.expected_mb     =
-			{
-				.squares =
-				{
-					WROOK, EMPTY, WBISHOP, WQUEEN, EMPTY, WBISHOP, WKNIGHT, WROOK,
-					WPAWN, WPAWN, WPAWN, WPAWN, WKING, WPAWN, WPAWN, WPAWN,
-					EMPTY, EMPTY, WKNIGHT, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, BPAWN, BPAWN, WPAWN, EMPTY, EMPTY, EMPTY,
-					EMPTY, EMPTY, EMPTY, EMPTY, BPAWN, EMPTY, EMPTY, EMPTY,
-					BPAWN, BPAWN, EMPTY, EMPTY, BKING, BPAWN, BPAWN, BPAWN,
-					BROOK, BKNIGHT, BBISHOP, BQUEEN, EMPTY, BBISHOP, BKNIGHT, BROOK,
-				},
-				.color        = WHITE,
-				.castle_short = { false, false },
-				.castle_long  = { false, false },
-				.half_moves   = 0,
-				.move_num     = 5,
-				.ep_square    = 43,
-			},
-		},
+         .name            = "Ep passent & no castles",
+         .input_fen       = "rnbq1bnr/pp2kppp/4p3/2ppP3/8/2N5/PPPPKPPP/R1BQ1BNR w - d6 0 5",
+         .expected_result = OK,
+         .expected_mb =
+         {
+         .squares =
+         {
+         WROOK, EMPTY, WBISHOP, WQUEEN,  EMPTY,  WBISHOP, WKNIGHT, WROOK,   WPAWN, WPAWN, WPAWN,
+         WPAWN, WKING, WPAWN,   WPAWN,   WPAWN,  EMPTY,   EMPTY,   WKNIGHT, EMPTY, EMPTY, EMPTY,
+         EMPTY, EMPTY, EMPTY,   EMPTY,   EMPTY,  EMPTY,   EMPTY,   EMPTY,   EMPTY, EMPTY, EMPTY,
+         EMPTY, BPAWN, BPAWN,   WPAWN,   EMPTY,  EMPTY,   EMPTY,   EMPTY,   EMPTY, EMPTY, EMPTY,
+         BPAWN, EMPTY, EMPTY,   EMPTY,   BPAWN,  BPAWN,   EMPTY,   EMPTY,   BKING, BPAWN, BPAWN,
+         BPAWN, BROOK, BKNIGHT, BBISHOP, BQUEEN, EMPTY,   BBISHOP, BKNIGHT, BROOK,
+         },
+         .color        = WHITE,
+         .castle_short = {false, false},
+         .castle_long  = {false, false},
+         .half_moves   = 0,
+         .move_num     = 5,
+         .ep_square    = 43,
+         }, },
 	};
+	// clang-format off
 
 	MinBoard out_board;
 

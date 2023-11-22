@@ -3,7 +3,7 @@
 #include "../src/board.h"
 #include "../src/mlist.h"
 
-#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 MunitResult test_board__set_fen(const MunitParameter params[], void * data) {
 	// clang-format off
@@ -840,7 +840,12 @@ MunitResult test_board__generate_sliding_moves_queens(const MunitParameter param
 		munit_assert_int(OK, ==, error);
 
 		Board__detect_checks_and_pins(&board, board.player);
-		Board__generate_sliding_moves(&board, &moves, board.player, ALL_DIRS, ALL_DIRS_LEN, board.queens[board.player],
+		Board__generate_sliding_moves(&board,
+		                              &moves,
+		                              board.player,
+		                              ALL_DIRS,
+		                              ALL_DIRS_LEN,
+		                              board.queens[board.player],
 		                              board.queens_size[board.player]);
 
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
@@ -897,8 +902,13 @@ MunitResult test_board__generate_sliding_moves_rooks(const MunitParameter params
 		munit_assert_int(OK, ==, error);
 
 		Board__detect_checks_and_pins(&board, board.player);
-		Board__generate_sliding_moves(&board, &moves, board.player, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN,
-		                              board.rooks[board.player], board.rooks_size[board.player]);
+		Board__generate_sliding_moves(&board,
+		                              &moves,
+		                              board.player,
+		                              ORTHOGONAL_DIRS,
+		                              ORTHOGONAL_DIRS_LEN,
+		                              board.rooks[board.player],
+		                              board.rooks_size[board.player]);
 
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
@@ -957,8 +967,13 @@ MunitResult test_board__generate_sliding_moves_bishops(const MunitParameter para
 		munit_assert_int(OK, ==, error);
 
 		Board__detect_checks_and_pins(&board, board.player);
-		Board__generate_sliding_moves(&board, &moves, board.player, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN,
-		                              board.bishops[board.player], board.bishops_size[board.player]);
+		Board__generate_sliding_moves(&board,
+		                              &moves,
+		                              board.player,
+		                              DIAGONAL_DIRS,
+		                              DIAGONAL_DIRS_LEN,
+		                              board.bishops[board.player],
+		                              board.bishops_size[board.player]);
 
 		munit_assert_size(testcases[tc].expected_moves.size, ==, moves.size);
 
@@ -1590,21 +1605,25 @@ MunitResult test_board__make_legal_move(const MunitParameter params[], void * da
 }
 
 MunitTest test_board_suite[] = {
-	{					   "board__set_fen",						test_board__set_fen, 0, 0, MUNIT_TEST_OPTION_NONE,0																													   },
-	{				 "board__add_del_piece",                  test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{				   "board__clear_funcs",                    test_board__clear_funcs, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{				"board__is_sq_attacked",                 test_board__is_sq_attacked, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{		"board__detect_checks_and_pins",         test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{		 "Board__generate_knight_moves",          test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{		   "Board__generate_king_moves",            test_board__generate_king_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{ "Board__generate_sliding_moves_queens",  test_board__generate_sliding_moves_queens, 0, 0, MUNIT_TEST_OPTION_NONE,
-     0																												   },
-	{  "Board__generate_sliding_moves_rooks",   test_board__generate_sliding_moves_rooks, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{"Board__generate_sliding_moves_bishops", test_board__generate_sliding_moves_bishops, 0, 0, MUNIT_TEST_OPTION_NONE,
-     0																												   },
-	{		   "Board__generate_pawn_moves",            test_board__generate_pawn_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{	  "Board__generate_all_legal_moves",       test_board__generate_all_legal_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
-	{			   "Board__make_legal_move",                test_board__make_legal_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{					   "board__set_fen",test_board__set_fen, 0,0, MUNIT_TEST_OPTION_NONE,0																													 },
+	{				 "board__add_del_piece",                test_board__add_del_piece, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{				   "board__clear_funcs",                  test_board__clear_funcs, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{				"board__is_sq_attacked",               test_board__is_sq_attacked, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{		"board__detect_checks_and_pins",       test_board__detect_checks_and_pins, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{		 "Board__generate_knight_moves",        test_board__generate_knight_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{		   "Board__generate_king_moves",          test_board__generate_king_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{ "Board__generate_sliding_moves_queens",
+     test_board__generate_sliding_moves_queens, 0,
+     0, MUNIT_TEST_OPTION_NONE,
+     0																												 },
+	{  "Board__generate_sliding_moves_rooks", test_board__generate_sliding_moves_rooks, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{"Board__generate_sliding_moves_bishops",
+     test_board__generate_sliding_moves_bishops, 0,
+     0, MUNIT_TEST_OPTION_NONE,
+     0																												 },
+	{		   "Board__generate_pawn_moves",          test_board__generate_pawn_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{	  "Board__generate_all_legal_moves",     test_board__generate_all_legal_moves, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{			   "Board__make_legal_move",              test_board__make_legal_move, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 
-	{									  0,										  0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
+	{									  0,										0, 0, 0, MUNIT_TEST_OPTION_NONE, 0},
 };

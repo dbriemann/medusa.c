@@ -1,8 +1,9 @@
 #ifndef PERFT_TEST_H
 #define PERFT_TEST_H
 
+#include <stdint.h>
+
 #include "../src/perft.h"
-#include <bits/stdint-uintn.h>
 
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "../munit/munit.h"
