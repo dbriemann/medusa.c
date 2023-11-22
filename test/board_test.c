@@ -591,7 +591,6 @@ MunitResult test_board__detect_checks_and_pins(const MunitParameter params[], vo
 			// Only check info board squares.. this test does not care about the pieces.
 			if (!on_board(i)) {
 				// munit_logf(MUNIT_LOG_INFO, "i: %zu, piece: %d\n", i, board.squares[i]);
-				munit_logf(MUNIT_LOG_INFO, "sq %zu", i);
 				munit_assert_int(testcases[tc].expected_board.squares[i], ==, board.squares[i]);
 			}
 		}

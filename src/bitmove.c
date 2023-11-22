@@ -5,9 +5,8 @@
 #include "base.h"
 #include "bitmove.h"
 
-BitMove BitMove__new(const Piece piece, const Square from, const Square to, const Piece promo, Piece cap_piece,
-                     CastleType castle_type, bool ep) {
-	// TODO: this is too slow.
+BitMove BitMove__new(const Piece piece, const Square from, const Square to, const Piece promo, const Piece cap_piece,
+                     const CastleType castle_type, const bool ep) {
 	BitMove move = 0;
 	move |= (BitMove)ep << MOVE_EP_SHIFT;
 	move |= (BitMove)castle_type << MOVE_CASTLE_TYPE_SHIFT;
@@ -20,21 +19,39 @@ BitMove BitMove__new(const Piece piece, const Square from, const Square to, cons
 	return move;
 }
 
-Square BitMove__from(const BitMove bm) { return (Square)(bm & MOVE_FROM_MASK); }
+// BitMove BitMove__new_fast(const Square from, const Square to, const Piece promo) {
+// 	BitMove move = (BitMove)from | (BitMove)to << MOVE_TO_SHIFT | (BitMove)promo << MOVE_PROMOTION_SHIFT;
 
-Square BitMove__to(const BitMove bm) { return (Square)((bm & MOVE_TO_MASK) >> MOVE_TO_SHIFT); }
+// 	return move;
+// }
 
-Piece BitMove__promoted_piece(const BitMove bm) { return (Square)((bm & MOVE_PROMOTION_MASK) >> MOVE_PROMOTION_SHIFT); }
+Square BitMove__from(const BitMove bm) {
+	return (Square)(bm & MOVE_FROM_MASK);
+}
 
-Piece BitMove__piece(const BitMove bm) { return (Square)((bm & MOVE_PIECE_MASK) >> MOVE_PIECE_SHIFT); }
+Square BitMove__to(const BitMove bm) {
+	return (Square)((bm & MOVE_TO_MASK) >> MOVE_TO_SHIFT);
+}
 
-Piece BitMove__captured_piece(const BitMove bm) { return (Piece)((bm & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_SHIFT); }
+Piece BitMove__promoted_piece(const BitMove bm) {
+	return (Square)((bm & MOVE_PROMOTION_MASK) >> MOVE_PROMOTION_SHIFT);
+}
+
+Piece BitMove__piece(const BitMove bm) {
+	return (Square)((bm & MOVE_PIECE_MASK) >> MOVE_PIECE_SHIFT);
+}
+
+Piece BitMove__captured_piece(const BitMove bm) {
+	return (Piece)((bm & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_SHIFT);
+}
 
 CastleType BitMove__castle_type(const BitMove bm) {
 	return (CastleType)((bm & MOVE_CASTLE_TYPE_MASK) >> MOVE_CASTLE_TYPE_SHIFT);
 }
 
-bool BitMove__en_passent(const BitMove bm) { return (CastleType)((bm & MOVE_EP_MASK) >> MOVE_EP_SHIFT); }
+bool BitMove__en_passent(const BitMove bm) {
+	return (CastleType)((bm & MOVE_EP_MASK) >> MOVE_EP_SHIFT);
+}
 
 BitMove BitMove__add_feature(BitMove move, BitMove mask, BitMove shift, Square bits) {
 	move &= ~mask;                  // Erase existing bits in the mask's region.
