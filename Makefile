@@ -1,5 +1,5 @@
 # TODO compiler..
-CC=clang
+CC=gcc
 
 SOURCES=$(wildcard src/*.c)
 SOURCES_NO_MAIN=$(filter-out src/main.c, $(SOURCES))
@@ -11,6 +11,11 @@ DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_EXE=$(DEBUG_DIR)/medusa
 
+RELEASE_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -O2 -g
+RELEASE_DIR=bin/release
+RELEASE_OBJECTS=$(patsubst src/%.c, $(RELEASE_DIR)/%.o, $(SOURCES))
+RELEASE_EXE=$(RELEASE_DIR)/medusa
+
 GENERATOR_DIR=bin/generator
 GENERATOR_OBJECTS=$(GENERATOR_DIR)/gen.o $(GENERATOR_DIR)/generate.o
 GENERATOR_EXE=$(GENERATOR_DIR)/gen
@@ -21,17 +26,19 @@ TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES_NO_MAIN))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
 TEST_EXE=$(TEST_DIR)/test
 
-# TODO: for release only compile sources that are needed (no generators etc)
-RELEASE_CFLAGS=-Wall -Wextra -pedantic-errors -Werror # TODO
-RELEASE_DIR=bin/release
-RELEASE_EXE=$(RELEASE_DIR)/medusa # TODO
-
 # Debug build
 $(DEBUG_OBJECTS): $(DEBUG_DIR)/%.o : src/%.c
 	$(CC) $(DEBUG_CFLAGS) -c $< -o $@
 
 $(DEBUG_EXE): $(DEBUG_OBJECTS)
 	$(CC) $(DEBUG_CFLAGS) -o $(DEBUG_EXE) $(DEBUG_OBJECTS)
+
+# Debug build
+$(RELEASE_OBJECTS): $(RELEASE_DIR)/%.o : src/%.c
+	$(CC) $(RELEASE_CFLAGS) -c $< -o $@
+
+$(RELEASE_EXE): $(RELEASE_OBJECTS)
+	$(CC) $(RELEASE_CFLAGS) -o $(RELEASE_EXE) $(RELEASE_OBJECTS)
 
 # Generator build
 $(GENERATOR_DIR)/gen.o : generators/gen.c 
@@ -76,6 +83,8 @@ clean:
 generator: $(GENERATOR_DIR) $(GENERATOR_EXE)
 
 debug: $(DEBUG_DIR) $(DEBUG_EXE)
+
+release: $(RELEASE_DIR) $(RELEASE_EXE)
 
 perft: $(PERFT_DIR) $(PERFT_EXE)
 
