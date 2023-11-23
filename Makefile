@@ -130,6 +130,7 @@ cov-browse:
 .PHONY: bench
 bench: perft
 	# TODO perf stat ..?
+	@echo "## $(shell git tag --points-at HEAD)"
 	./bin/perft/perft 7 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 	
 
