@@ -79,6 +79,7 @@ $(PERFT_DIR):
 clean:
 	rm -rf ./bin/
 	rm -rf ./cov/
+	rm report.info
 
 generator: $(GENERATOR_DIR) $(GENERATOR_EXE)
 
@@ -90,11 +91,15 @@ perft: $(PERFT_DIR) $(PERFT_EXE)
 
 .PHONY: test
 test: $(TEST_DIR) $(TEST_EXE)
-	# TODO: lcov / gnu
-	# LLVM_PROFILE_FILE="cov/medusa.profraw" ./bin/test/test --log-visible info --show-stderr
-	# llvm-profdata-14 merge -sparse cov/medusa.profraw -o cov/medusa.profdata
-	# llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/line.report
-	# llvm-cov-14 report $(TEST_DIR)/test -instr-profile=cov/medusa.profdata > cov/summary.report
-	# llvm-cov-14 show $(TEST_DIR)/test -instr-profile=cov/medusa.profdata -format=html > cov/line.report.html
+	# run tests
+	./bin/test/test --log-visible info --show-stderr
+	# generate coverage report
+	lcov --capture --directory bin/test --output-file report.info
+	# generate html report, open with: make cov-browse
+	genhtml report.info --output-directory cov
+
+.PHONY: cov-browse
+cov-browse:
+	xdg-open cov/index.html
 
 all: test debug

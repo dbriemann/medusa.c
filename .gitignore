@@ -7,3 +7,4 @@ medusa.profdata
 *.report
 gmon.out
 callgrind.out.*
+report.info
