@@ -10,6 +10,7 @@
 int main(int argc, char * argv[]) {
 	if (argc < 3) {
 		printf("usage: perft depth \"fen\"\n");
+		return EXIT_FAILURE;
 	}
 
 	// arg 1 must be uint
@@ -44,7 +45,11 @@ int main(int argc, char * argv[]) {
 		double used_cycles = (double)(end_time - start_time);
 		double used_time   = (double)(used_cycles) / CLOCKS_PER_SEC;
 
-		printf("depth %lu => nodes: %lu, time: %f sec, n/sec: %f\n", d, nodes, used_time, (double)nodes / used_time);
+		printf("depth %lu => nodes: %lu, time: %f sec, kNodes/sec: %f\n",
+		       d,
+		       nodes,
+		       used_time,
+		       (double)nodes * 0.001 / used_time);
 	}
 
 	return EXIT_SUCCESS;

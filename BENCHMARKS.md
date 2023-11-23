@@ -1,6 +1,6 @@
 # perft
 
-## movegen-v0.0.1
+## 20231123.movegen-v1
 
 ```
 ./bin/perft/perft 7 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

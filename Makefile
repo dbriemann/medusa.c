@@ -7,13 +7,13 @@ TEST_SOURCES=$(wildcard test/*.c)
 PERFT_SOURCE=perft/main.c
 
 #-Wpadded 
-DEBUG_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -g -O0 
+DEBUG_CFLAGS=-std=gnu99 -Wall -Wextra -pedantic-errors -Werror -g -O0 
 DEBUG_DIR=bin/debug
 DEBUG_OBJECTS=$(patsubst src/%.c, $(DEBUG_DIR)/%.o, $(SOURCES))
 DEBUG_MAIN_OBJECT=$(DEBUG_DIR)/main.o
 DEBUG_EXE=$(DEBUG_DIR)/medusa
 
-RELEASE_CFLAGS=-Wall -Wextra -pedantic-errors -Werror -O2 -g
+RELEASE_CFLAGS=std=gnu99 -Wall -Wextra -pedantic-errors -Werror -O2 -g
 RELEASE_DIR=bin/release
 RELEASE_OBJECTS=$(patsubst src/%.c, $(RELEASE_DIR)/%.o, $(SOURCES))
 RELEASE_MAIN_OBJECT=$(RELEASE_DIR)/main.o
@@ -27,7 +27,7 @@ GENERATOR_DIR=bin/generator
 GENERATOR_OBJECTS=$(GENERATOR_DIR)/gen.o $(GENERATOR_DIR)/generate.o
 GENERATOR_EXE=$(GENERATOR_DIR)/gen
 
-TEST_CFLAGS=-Wall -Wextra -fprofile-arcs -ftest-coverage -g -O0
+TEST_CFLAGS=-std=gnu99 -Wall -Wextra -fprofile-arcs -ftest-coverage -g -O0
 TEST_DIR=bin/test
 TEST_OBJECTS=$(patsubst src/%.c, $(TEST_DIR)/%.o, $(SOURCES))
 TEST_SRC_OBJECTS=$(patsubst test/%.c, $(TEST_DIR)/%.o, $(TEST_SOURCES))
