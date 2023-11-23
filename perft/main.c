@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../src/board.h"
 #include "../src/errors.h"
@@ -25,6 +26,8 @@ int main(int argc, char * argv[]) {
 	// arg 2 must be valid FEN.
 	char * fen = argv[2];
 
+	printf("perft(\"%s\")\n", fen);
+
 	Board board;
 
 	Error error = Board__set_fen(&board, fen);
@@ -33,8 +36,16 @@ int main(int argc, char * argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	uint64_t nodes = perft(board, depth);
-	printf("nodes: %lu\n", nodes);
+	for (size_t d = 1; d <= (size_t)depth; d++) {
+		clock_t  start_time = clock();
+		uint64_t nodes      = perft(board, d);
+		clock_t  end_time   = clock();
+
+		double used_cycles = (double)(end_time - start_time);
+		double used_time   = (double)(used_cycles) / CLOCKS_PER_SEC;
+
+		printf("depth %lu => nodes: %lu, time: %f sec, n/sec: %f\n", d, nodes, used_time, (double)nodes / used_time);
+	}
 
 	return EXIT_SUCCESS;
 }

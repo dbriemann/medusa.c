@@ -19,14 +19,14 @@ uint64_t perft(Board b, unsigned int depth) {
 		return mlist.size;
 	}
 
-	Board depth_board = b;
+	Board work_board = b;
 
 	uint64_t nodes = 0;
 
 	for (uint64_t i = 0; i < mlist.size; i++) {
-		Board__make_legal_move(&b, mlist.moves[i]);
-		nodes += perft(b, depth - 1);
-		b = depth_board;
+		Board__make_legal_move(&work_board, mlist.moves[i]);
+		nodes += perft(work_board, depth - 1);
+		work_board = b;
 	}
 
 	return nodes;

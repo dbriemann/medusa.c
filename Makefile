@@ -127,4 +127,10 @@ test: $(TEST_DIR) $(TEST_EXE)
 cov-browse:
 	xdg-open cov/index.html
 
+.PHONY: bench
+bench: perft
+	# TODO perf stat ..?
+	./bin/perft/perft 7 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+	
+
 all: test debug
