@@ -3,16 +3,19 @@
 #include <stdlib.h>
 
 #include "../src/board.h"
+#include "../src/engine.h"
 #include "../src/errors.h"
-#include "../src/iocontroller.h"
 #include "../src/perft.h"
 
 int main(void) {
-	IOController controller = {
-		.protocol = IDLE,
+	Engine engine = {
+		.io_controller =
+			{
+							.protocol = IDLE,
+							},
 	};
 
-	IOController__loop(&controller);
+	Engine__io_loop(&engine);
 
 	return EXIT_SUCCESS;
 }

@@ -1,8 +1,10 @@
-#ifndef IOCONTROLLER_H
-#define IOCONTROLLER_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "board.h"
 
 enum IOProtocol {
 	IDLE,
@@ -17,7 +19,13 @@ struct IOController {
 	char *     command;
 };
 
-void IOController__loop(IOController * controller);
-void IOController__process_uci_commands(IOController * controller);
+typedef struct Engine Engine;
+struct Engine {
+	Board        board;
+	IOController io_controller;
+};
+
+void Engine__io_loop(Engine * engine);
+void Engine__process_uci_commands(Engine * engine);
 
 #endif
