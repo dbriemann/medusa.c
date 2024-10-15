@@ -1,4 +1,6 @@
-# Medusa (0x88 chess engine)
+# Medusa
+
+A chess engine based on 0x88 boards.
 
 ## TODOs
 
