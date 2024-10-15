@@ -113,7 +113,7 @@ MunitResult test_bitmove_all(const MunitParameter params[], void * data) {
 		munit_assert_int(WQUEEN, ==, BitMove__promoted_piece(g7g8Q));
 		munit_log(MUNIT_LOG_INFO, BitMove__to_notation(g7g8Q));
 		char * g7g8Qstr = BitMove__to_notation(g7g8Q);
-		munit_assert_string_equal("g7g8Q", g7g8Qstr);
+		munit_assert_string_equal("g7g8q", g7g8Qstr);
 		free(g7g8Qstr);
 	}
 

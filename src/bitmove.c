@@ -23,18 +23,18 @@ Piece BitMove__promoted_piece(const BitMove bm) {
 	return (Square)((bm & MOVE_PROMOTION_MASK) >> MOVE_PROMOTION_SHIFT);
 }
 
-char *BitMove__to_notation(const BitMove move) {
-	Square from = BitMove__from(move);
-	Square to = BitMove__to(move);
-	Piece promo = BitMove__promoted_piece(move);
+char * BitMove__to_notation(const BitMove move) {
+	Square from  = BitMove__from(move);
+	Square to    = BitMove__to(move);
+	Piece  promo = BitMove__promoted_piece(move);
 
-	char *notation = calloc(4 + 1, sizeof(char));
+	char * notation = calloc(4 + 1, sizeof(char));
 	if (!notation) {
 		return NULL;
 	}
 
-	const char *from_s = LOOKUP_SQUARE_NAMES[from];
-	const char *to_s = LOOKUP_SQUARE_NAMES[to];
+	const char * from_s = LOOKUP_SQUARE_NAMES[from];
+	const char * to_s   = LOOKUP_SQUARE_NAMES[to];
 
 	notation[0] = from_s[0];
 	notation[1] = from_s[1];
@@ -43,11 +43,11 @@ char *BitMove__to_notation(const BitMove move) {
 	notation[4] = '\0';
 
 	if (promo) {
-		char *extend = realloc(notation, 5 + 1);
+		char * extend = realloc(notation, 5 + 1);
 		if (!extend) {
 			return NULL;
 		}
-		notation = extend;
+		notation    = extend;
 		notation[4] = Piece_to_notation(promo);
 		notation[5] = '\0';
 	}
@@ -133,9 +133,9 @@ char *BitMove__to_notation(const BitMove move) {
 // }
 
 char Piece_to_notation(const Piece piece) {
-	Color c = piece & COLOR_ONLY_MASK;
-	Piece p = piece & PIECE_MASK;
-	char ps = ' ';
+	// Color c  = piece & COLOR_ONLY_MASK;
+	Piece p  = piece & PIECE_MASK;
+	char  ps = ' ';
 
 	if (p & KNIGHT) {
 		ps = 'n';
@@ -149,9 +149,9 @@ char Piece_to_notation(const Piece piece) {
 		ps = 'k';
 	}
 
-	if (c == WHITE) {
-		ps = toupper(ps);
-	}
+	// if (c == WHITE) {
+	// 	ps = toupper(ps);
+	// }
 
 	return ps;
 }

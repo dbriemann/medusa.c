@@ -56,6 +56,7 @@ void Engine__process_uci_commands(Engine * engine) {
 		LOG(DEBUG, "no command in uci handler", controller->debug);
 		return;
 	} else if (!strcmp("debug", controller->command)) {
+		// debug [ on | off ]
 		char * token = strtok(NULL, spaces_delims);
 		if (token == NULL) {
 			LOG(DEBUG, "no token for debug command", controller->debug);
@@ -69,24 +70,60 @@ void Engine__process_uci_commands(Engine * engine) {
 		}
 		return;
 	} else if (!strcmp("isready", controller->command)) {
+		// isready
 		// TODO: wait for sync with engine before reply.
+		Board__set_starting_position(&(engine->board));
 		printf("readyok\n");
 		return;
 	} else if (!strcmp("position", controller->command)) {
+		// position [fen <fenstring> | startpos ]  moves <move1> .... <movei>
 		char * token = strtok(NULL, spaces_delims);
 		if (token == NULL) {
 			LOG(DEBUG, "no token for position command", controller->debug);
-		} else if (!strcmp("startpos", token)) {
-			Board__set_starting_position(&(engine->board));
-		} else if (!strcmp("fen", token)) {
-			token     = strtok(NULL, newline_delim);
-			Error err = Board__set_fen(&(engine->board), token);
-			if (err != OK) {
-				LOG(ERROR, "FEN code invalid", controller->debug);
+		} else {
+			size_t len        = strlen(token) + 1;
+			char * subcommand = calloc(len, sizeof(char));
+			if (!subcommand) {
+				LOG(ERROR, "out of memory, cannot allocate", controller->debug);
+				return;
 			}
-		} else if (!strcmp("moves", token)) {
-			// TODO:
+			memcpy(subcommand, token, len);
+
+			if (!strcmp("startpos", subcommand)) {
+				Board__set_starting_position(&(engine->board));
+				token = strtok(NULL, newline_delim);
+			} else if (!strcmp("fen", subcommand)) {
+				token = strtok(NULL, newline_delim);
+				// TODO: currently extra string after FEN is ignored.
+				// It would be cleaner to cut this off and only pass the FEN to the set_fen function.
+				Error err = Board__set_fen(&(engine->board), token);
+				if (err != OK) {
+					LOG(ERROR, "FEN code invalid", controller->debug);
+				}
+			}
+
+			free(subcommand);
 		}
+
+		// Test if there are moves after the subcommand.
+		printf("TOKEN: %s\n", token);
+		// char * moves = NULL;
+		// if (!strcmp("moves", token)) {
+		// 	moves = strtok(NULL, newline_delim);
+		// }
+		// if (!moves) {
+		// 	moves = strstr(token, "moves");
+		// 	if (moves) {
+		// 		moves += 5; // skip after keyword.
+		// 	}
+		// }
+		// if (moves) {
+		// 	moves = strtok(moves, spaces_delims);
+		// 	while (moves) {
+		// 		printf("move: %s\n", moves);
+		// 		moves = strtok(NULL, spaces_delims);
+		// 	}
+		// }
 
 		return;
 	}
