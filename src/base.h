@@ -9,8 +9,7 @@
  * Piece, Color, Square and Info are all just uint8_t and are often
  * arithmetically mixed. However they all exist to make the code more readable.
  */
-// TODO: find out if narrow integer types make sense because of arithmetic
-// promotion.
+// TODO: find out if narrow integer types make sense because of arithmetic promotion.
 // https://wiki.sei.cmu.edu/confluence/display/c/INT02-C.+Understand+integer+conversion+rules
 typedef uint8_t Piece;
 typedef uint8_t Color;
@@ -94,15 +93,21 @@ static const size_t PAWN_BASE_RANK_LEN    = 2;
 static const Square PAWN_PROMOTE_RANK[2]  = {0, 7};
 static const size_t PAWN_PROMOTE_RANK_LEN = 2;
 
-static const Direction KNIGHT_DIRS[8]      = {UP + UP_LEFT,   UP + UP_RIGHT,    DOWN + DOWN_LEFT, DOWN + DOWN_RIGHT,
-                                              LEFT + UP_LEFT, LEFT + DOWN_LEFT, RIGHT + UP_RIGHT, RIGHT + DOWN_RIGHT};
-static const size_t    KNIGHT_DIRS_LEN     = 8;
-static const Direction DIAGONAL_DIRS[4]    = {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
-static const size_t    DIAGONAL_DIRS_LEN   = 4;
-static const Direction ORTHOGONAL_DIRS[4]  = {RIGHT, LEFT, UP, DOWN};
-static const size_t    ORTHOGONAL_DIRS_LEN = 4;
-static const Direction ALL_DIRS[8]         = {RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
-static const size_t    ALL_DIRS_LEN        = 8;
+static const Direction KNIGHT_DIRS[8]            = {UP + UP_LEFT,
+                                                    UP + UP_RIGHT,
+                                                    DOWN + DOWN_LEFT,
+                                                    DOWN + DOWN_RIGHT,
+                                                    LEFT + UP_LEFT,
+                                                    LEFT + DOWN_LEFT,
+                                                    RIGHT + UP_RIGHT,
+                                                    RIGHT + DOWN_RIGHT};
+static const size_t    KNIGHT_DIRS_LEN           = 8;
+static const Direction DIAGONAL_DIRS[4]          = {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
+static const size_t    DIAGONAL_DIRS_LEN         = 4;
+static const Direction ORTHOGONAL_DIRS[4]        = {RIGHT, LEFT, UP, DOWN};
+static const size_t    ORTHOGONAL_DIRS_LEN       = 4;
+static const Direction ALL_DIRS[8]               = {RIGHT, LEFT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
+static const size_t    ALL_DIRS_LEN              = 8;
 static const Square    CASTLING_PATH_SHORT[2][2] = {
     {0x75, 0x76},
     { 0x5,  0x6}
