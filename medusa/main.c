@@ -9,10 +9,7 @@
 
 int main(void) {
 	Engine engine = {
-		.io_controller =
-			{
-							.protocol = IDLE,
-							},
+		.io_controller = {.protocol = IDLE},
 	};
 
 	Engine__io_loop(&engine);
