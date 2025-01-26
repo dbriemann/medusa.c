@@ -417,24 +417,24 @@ AFTER_PAWN_CHECK:
 
 	// Detect checks and pins by sliders.
 	// Queens
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter,
-	                                                      b->queens_size[opp_color], b->queens[opp_color], QUEEN);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->queens_size[opp_color], b->queens[opp_color], QUEEN);
 	if (check_counter > 1) {
 		// Double check -> exit early.
 		b->check_info = CHECK_DOUBLE_CHECK;
 		return;
 	}
 	// Rooks
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter,
-	                                                      b->rooks_size[opp_color], b->rooks[opp_color], ROOK);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->rooks_size[opp_color], b->rooks[opp_color], ROOK);
 	if (check_counter > 1) {
 		// Double check -> exit early.
 		b->check_info = CHECK_DOUBLE_CHECK;
 		return;
 	}
 	// Bishops
-	check_counter += Board__detect_slider_checks_and_pins(b, color, &pin_marker, check_counter,
-	                                                      b->bishops_size[opp_color], b->bishops[opp_color], BISHOP);
+	check_counter += Board__detect_slider_checks_and_pins(
+		b, color, &pin_marker, check_counter, b->bishops_size[opp_color], b->bishops[opp_color], BISHOP);
 	if (check_counter > 1) {
 		// Double check -> exit early.
 		b->check_info = CHECK_DOUBLE_CHECK;
@@ -643,7 +643,7 @@ void Board__generate_knight_moves(Board * board, MoveList * mlist, Color color) 
 					move = BitMove__new(from, to, PROMO_NONE);
 					MoveList__put(mlist, move);
 				} // Else the square is occupied by a piece of the same color.
-			}     // Else target is off the board.
+			} // Else target is off the board.
 		}
 	}
 }
@@ -848,14 +848,34 @@ void Board__generate_all_legal_moves(Board * board, MoveList * mlist, Color colo
 	Board__generate_knight_moves(board, mlist, color);
 	Board__generate_pawn_moves(board, mlist, color);
 	// TODO: is it faster to generate all queen moves/dirs at once? ALL_DIRS
-	Board__generate_sliding_moves(board, mlist, board->player, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN,
-	                              board->queens[board->player], board->queens_size[board->player]);
-	Board__generate_sliding_moves(board, mlist, board->player, ORTHOGONAL_DIRS, ORTHOGONAL_DIRS_LEN,
-	                              board->rooks[board->player], board->rooks_size[board->player]);
-	Board__generate_sliding_moves(board, mlist, board->player, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN,
-	                              board->queens[board->player], board->queens_size[board->player]);
-	Board__generate_sliding_moves(board, mlist, board->player, DIAGONAL_DIRS, DIAGONAL_DIRS_LEN,
-	                              board->bishops[board->player], board->bishops_size[board->player]);
+	Board__generate_sliding_moves(board,
+	                              mlist,
+	                              board->player,
+	                              ORTHOGONAL_DIRS,
+	                              ORTHOGONAL_DIRS_LEN,
+	                              board->queens[board->player],
+	                              board->queens_size[board->player]);
+	Board__generate_sliding_moves(board,
+	                              mlist,
+	                              board->player,
+	                              ORTHOGONAL_DIRS,
+	                              ORTHOGONAL_DIRS_LEN,
+	                              board->rooks[board->player],
+	                              board->rooks_size[board->player]);
+	Board__generate_sliding_moves(board,
+	                              mlist,
+	                              board->player,
+	                              DIAGONAL_DIRS,
+	                              DIAGONAL_DIRS_LEN,
+	                              board->queens[board->player],
+	                              board->queens_size[board->player]);
+	Board__generate_sliding_moves(board,
+	                              mlist,
+	                              board->player,
+	                              DIAGONAL_DIRS,
+	                              DIAGONAL_DIRS_LEN,
+	                              board->bishops[board->player],
+	                              board->bishops_size[board->player]);
 }
 
 void Board__make_legal_move(Board * board, BitMove move) {
